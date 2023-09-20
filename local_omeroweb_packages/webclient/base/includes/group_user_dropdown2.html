@@ -92,17 +92,20 @@
 	    <!-- Group / User drop-down -->
         
         <div id="groupsUsersButton" title="Switch Group/User">
-            <img 
-            {% if active_group.getDetails.getPermissions.isGroupWrite %} src="{% static 'webclient/image/group_green16.png' %}"
-            {% else %}
-                {% if active_group.getDetails.getPermissions.isGroupAnnotate %} src="{% static "webclient/image/group_orange16.png" %}"
+            <div class="group-select-text">Group Select </div>
+            <div class="group-image">
+                <img 
+                {% if active_group.getDetails.getPermissions.isGroupWrite %} src="{% static 'webclient/image/group_green16.png' %}"
                 {% else %}
-                    {% if active_group.details.permissions.isGroupRead %} src="{% static "webclient/image/group_red16.png" %}"
+                    {% if active_group.getDetails.getPermissions.isGroupAnnotate %} src="{% static "webclient/image/group_orange16.png" %}"
                     {% else %}
-                        src="{% static "webclient/image/personal16.png" %}"
+                        {% if active_group.details.permissions.isGroupRead %} src="{% static "webclient/image/group_red16.png" %}"
+                        {% else %}
+                            src="{% static "webclient/image/personal16.png" %}"
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            {% endif %} />
+                {% endif %} />
+            </div>
             <span>{{ active_group.name }}</span><span>{{ active_user.getFullName }}</span>
         </div>
 
