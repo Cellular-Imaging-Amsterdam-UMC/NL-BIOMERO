@@ -1,0 +1,515 @@
+/* Copyright (C) 2018 University of Dundee & Open Microscopy Environment.
+ All rights reserved.
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http:www.gnu.org/licenses/>.
+*/
+
+body {
+  margin: 0;
+}
+
+ul {
+  list-style: none;
+}
+
+/* the reactroot */
+.columnContainer {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.paradeCentrePanel {
+  flex-grow: 1;
+  position: relative;
+}
+
+.leftPanel, .rightPanel {
+  flex: 0 0 350px;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.leftPanel {
+  border-right: solid #ddd 1px;
+}
+
+.rightPanel {
+  border-left: solid #ddd 1px;
+}
+
+
+.parade_icon_layout {
+	background: url(../images/icon_layout.png) no-repeat scroll center center transparent;
+}
+
+.parade_table_layout {
+	background: url(../images/table_layout.png) no-repeat scroll center center transparent;
+}
+
+/* Top-level React element */
+.reactContainer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.parade_layout_container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.filterContainer {
+  background: rgb(239, 241, 244);
+  border-bottom: 1px solid hsl(210, 32%, 87%);
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.parade_filter {
+  margin: 5px;
+  clear: both;
+}
+
+.filterContainer input, .filterContainer select {
+  margin-left: 5px;
+}
+
+.filterContainer input[type='range'] {
+  position: relative;
+  top: 6px;
+}
+
+.plateGrid, .centrePanel {
+  flex: 1;
+  width: 100%;
+  overflow: auto;
+}
+
+.plateGrid table {
+    background: #fff none repeat scroll 0 0;
+    width: 0;
+    table-layout: auto;
+}
+
+.plateGrid table th {
+    vertical-align: middle;
+}
+
+.plateGrid table td {
+    padding: 1px;
+    border: 1px solid #ccc;
+    position: relative;
+}
+
+.plateGrid table td.placeholder {
+    vertical-align: top;
+}
+
+.plateGrid table td.ui-selecting {
+    border: 1px dashed #555;
+    padding: 1px;
+    background-color: #87ABD2;
+}
+
+.plateGrid table td.ui-selected {
+    border: 1px dashed #555;
+    padding: 1px;
+    background-color: #87ABD2;
+}
+
+/** Plate Well, when showing heatmap **/
+.heatmap img {
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0;
+}
+.heatmap img:hover {
+  opacity: 1;
+}
+
+.heatmapLutKey {
+  float: left;
+  margin-left: 10px;
+}
+.heatmapLutKey span {
+  float: left;
+    padding: 3px;
+    font-size: 12px;
+}
+.heatmapLutKey>div {
+    height: 14px;
+    margin: 2px;
+    float: left;
+}
+.heatmapLutKey>div>div {
+  float:left;
+  width: 1px;
+  height: 100%;
+  margin: 0;
+  border-width: 0;
+}
+
+input[type=range].parade {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 3.3px 0;
+}
+input[type=range].parade:focus {
+  outline: none;
+}
+input[type=range].parade::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0), 0px 0px 1px rgba(13, 13, 13, 0);
+  background: rgba(238, 238, 238, 0.82);
+  border-radius: 1.3px;
+  border: 0.2px solid #aaaaaa;
+}
+input[type=range].parade::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 0px solid #aaaaaa;
+  height: 15px;
+  width: 15px;
+  border-radius: 3px;
+  background: #727c86;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -3.5px;
+}
+input[type=range].parade:focus::-webkit-slider-runnable-track {
+  background: rgba(238, 238, 238, 0.82);
+}
+input[type=range].parade::-moz-range-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0), 0px 0px 1px rgba(13, 13, 13, 0);
+  background: rgba(238, 238, 238, 0.82);
+  border-radius: 1.3px;
+  border: 0.2px solid #aaaaaa;
+}
+input[type=range].parade::-moz-range-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 0px solid #aaaaaa;
+  height: 15px;
+  width: 15px;
+  border-radius: 3px;
+  background: #727c86;
+  cursor: pointer;
+}
+input[type=range].parade::-ms-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range].parade::-ms-fill-lower {
+  background: rgba(225, 225, 225, 0.82);
+  border: 0.2px solid #aaaaaa;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0), 0px 0px 1px rgba(13, 13, 13, 0);
+}
+input[type=range].parade::-ms-fill-upper {
+  background: rgba(238, 238, 238, 0.82);
+  border: 0.2px solid #aaaaaa;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0), 0px 0px 1px rgba(13, 13, 13, 0);
+}
+input[type=range].parade::-ms-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 0px solid #aaaaaa;
+  height: 15px;
+  width: 15px;
+  border-radius: 3px;
+  background: #727c86;
+  cursor: pointer;
+  height: 8.4px;
+}
+input[type=range].parade:focus::-ms-fill-lower {
+  background: rgba(238, 238, 238, 0.82);
+}
+input[type=range].parade:focus::-ms-fill-upper {
+  background: rgba(238, 238, 238, 0.82);
+}
+
+.parade_centrePanel {
+  flex-grow: 1;
+  overflow: auto;
+  margin: 10px;
+}
+
+.parade_centrePanel .datasetThumb {
+  background-color: hsl(0,0%,95%);
+  margin: 5px;
+  padding: 5px;
+  background-color: #F2F2F2;
+  border: 1px solid white;
+  border-radius: 2px 2px 2px 2px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  float: left;
+}
+
+#omero_parade img.waiting {
+  background:url(../../webgateway/img/spinner.gif);
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+}
+
+.layoutControls {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+}
+
+.layoutControls>label {
+  line-height: 24px;
+  padding: 8px;
+}
+
+.layoutControls>div {
+  float: right;
+  border: 1px solid #ccc;
+  background-color: transparent;
+  border-radius: 4px;
+  padding: 0px;
+}
+
+.layoutControls button {
+  width: 25px;
+  height: 20px;
+  border: 0px;
+  border-right: 1px solid #ccc;
+}
+
+.layoutControls .checked {
+  background-color: #ccc;
+}
+
+.layoutControls button:focus {
+  outline: none;
+}
+
+.layoutControls button:first-child {
+  border-bottom-left-radius: 4px;
+  border-top-left-radius: 4px;
+}
+
+.layoutControls button:last-child {
+  border-bottom-right-radius: 4px;
+  border-top-right-radius: 4px;
+  border-right-width: 0;
+}
+
+.tableLayoutButton {
+  background: url("../images/table_layout.png") no-repeat scroll center center transparent;
+}
+.iconLayoutButton {
+  background: url("../images/icon_layout.png") no-repeat scroll center center transparent;
+}
+.plotLayoutButton {
+  background: url("../images/plot_layout.png") no-repeat scroll center center transparent;
+}
+
+.parade_dataTable {
+  width: 100%;
+}
+
+.parade_centrePanel th {
+  border-top: solid #ddd 1px;
+  border-bottom: solid #ddd 1px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #999;
+}
+
+.parade_centrePanel td {
+  text-align: center;
+  font-size: 110%;
+  padding: 3px;
+  vertical-align: middle;
+}
+
+.layoutHeader {
+  padding: 5px;
+  background: rgb(239, 241, 244);
+  border-bottom: 1px solid hsl(210,10%,70%);
+}
+
+.thumbnail_plot {
+  margin: 25px 75px;
+  margin-bottom: 0px;
+  padding: 10px;
+  height: 450px;
+  box-sizing: border-box;
+  border: solid black 1px;
+  position: relative;
+  min-width: 650px;
+}
+
+.thumbnail_plot_canvas {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.thumbnail_plot img {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  margin: -10px;
+}
+
+.parade_layout_container img {
+  box-sizing: border-box;
+}
+
+.parade_centrePanel img.ui-selected {
+  border: solid #87ABD2 3px;
+}
+
+.parade_centrePanel .thumbnail_plot_canvas .data-point {
+  position: absolute;
+  height: 10px;
+  width: 10px;
+  background-color: #1f4579;
+  border-radius: 50%;
+}
+
+.parade_centrePanel .thumbnail_plot_canvas .ui-selected {
+  background-color: #33aba1;
+}
+
+.parade_centrePanel tr.ui-selected {
+  background-color: #33aba1;
+}
+
+.parade_centrePanel .plot-x-ticks {
+  z-index: -1;
+  height: 40px;
+  margin-left: 75px;
+  margin-right: 75px;
+  min-width: 650px;
+}
+
+.parade_centrePanel .plot-x-label {
+  min-width: 850px;
+  z-index: -1;
+  text-align: center;
+}
+
+.parade_centrePanel .plot-y-ticks {
+  z-index: -1;
+  margin-left: 75px;
+  margin-right: 75px;
+  transform: translateY(-509px);
+  min-width: 650px;
+}
+
+.parade_centrePanel .plot-y-label {
+  transform-origin: center;
+  transform: translate(-50%, 0) rotate(-90deg) translate(450px, 15px);
+  text-align: center;
+  width: 450px;
+}
+
+.parade_centrePanel line.plot-x-tick-lines {
+  stroke: black;
+  stroke-width: 1;
+  shape-rendering: crispedges;
+}
+
+.parade_centrePanel line.plot-x-grid-lines {
+  stroke: lightgray;
+  stroke-width: 1;
+  shape-rendering: crispedges;
+  stroke-dasharray: 5,5;
+}
+
+.parade_centrePanel line.plot-y-tick-lines {
+  stroke: black;
+  stroke-width: 1;
+  shape-rendering: crispedges;
+}
+
+.parade_centrePanel line.plot-y-grid-lines {
+  stroke: lightgray;
+  stroke-width: 1;
+  shape-rendering: crispedges;
+  stroke-dasharray: 5,5;
+}
+
+.plateGrid td.ui-selected img {
+  border: solid transparent 3px;
+}
+
+.parade_removeFilter {
+  margin-left: 20px;
+  border-radius: 15px;
+  visibility: hidden;
+}
+
+.parade_filter:hover .parade_removeFilter {
+  visibility: visible;
+}
+
+.parade_openAll {
+  width: 100%;
+  text-align: center;
+}
+
+.parade_openAll h1 {
+  text-align: center;
+}
+
+.parade_filter .sparkline {
+  padding-top: 2px;
+  margin: 8px 5px 0px;
+  font-size: 12px;
+  float: left;
+}
+
+.parade_filter .sparkline .minimum {
+  margin-right: 2px;
+}
+
+.parade_filter .sparkline .maximum {
+  margin-left: 2px;
+}
+
+.parade_filter .sparkline svg {
+  height: 18px;
+  width: 36px;
+}
+
+.parade_filter_controls {
+  float: left;
+}
