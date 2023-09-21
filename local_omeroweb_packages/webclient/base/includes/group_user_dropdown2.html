@@ -63,11 +63,10 @@
                         // NEW: Log a message when a Group list item is double-clicked
                         $("#groupList").on("dblclick", "li a", function(event) {
                             event.preventDefault();
-                            console.log("Group list item double-clicked.");
                             // Get the group id from the clicked element
                             var gid = $(this).attr("data-gid");
                             // Set the user to 'all users'
-                            var url = "{% url 'change_active_group' %}?active_group=" + gid + "&experimenter=-1&url={{ current_url }}";
+                            var url = "{% url 'change_active_group' %}?active_group=" + gid + "&url={% url 'userdata' %}?experimenter=-1";
                             window.location.href = url;
                         });
                     });
