@@ -160,6 +160,7 @@ services:
     volumes: # Added this line for local development
       - ./local_omeroweb_packages:/opt/omero/web/venv3/lib/python3.6/site-packages/omeroweb/webclient/templates/
       - ./local_omeroweb_static:/opt/omero/web/OMERO.web/var/
+      - ./local_omeroweb_config:/opt/omero/web/config/
 
   
 
