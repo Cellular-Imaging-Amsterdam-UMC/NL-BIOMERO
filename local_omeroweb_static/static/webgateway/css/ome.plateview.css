@@ -1,0 +1,159 @@
+/**
+ * weblitz_plateview - style definitions
+ * 
+ * Copyright (c) 2011 Glencoe Software, Inc. All rights reserved.
+ * 
+ * This software is distributed under the terms described by the LICENCE file
+ * you can find at the root of the distribution bundle, which states you are
+ * free to use it only for non commercial purposes.
+ * If the file is missing please request a copy by contacting
+ * jason@glencoesoftware.com.
+ *
+ * Author: Carlos Neves <carlos(at)glencoesoftware.com>
+ */
+
+.weblitz-plateview table {
+  border-spacing: 2px;
+  table-layout: fixed;
+}
+
+.weblitz-plateview .pv-focus {
+  margin: -4px;
+  padding: 1px;
+  border: solid 3px red;
+}
+
+.weblitz-plateview .waiting {
+  background:url(../img/spinner.gif);
+  background-color: #eee;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.5;
+}
+
+.weblitz-plateview .loading {
+  display: none;
+}
+
+.wellSize10 .wellSize {width: 10px;}
+.wellSize11 .wellSize {width: 11px;}
+.wellSize12 .wellSize {width: 12px;}
+.wellSize13 .wellSize {width: 13px;}
+.wellSize14 .wellSize {width: 14px;}
+.wellSize15 .wellSize {width: 15px;}
+.wellSize16 .wellSize {width: 16px;}
+.wellSize17 .wellSize {width: 17px;}
+.wellSize18 .wellSize {width: 18px;}
+.wellSize19 .wellSize {width: 19px;}
+.wellSize20 .wellSize {width: 20px;}
+.wellSize21 .wellSize {width: 21px;}
+.wellSize22 .wellSize {width: 22px;}
+.wellSize23 .wellSize {width: 23px;}
+.wellSize24 .wellSize {width: 24px;}
+.wellSize25 .wellSize {width: 25px;}
+.wellSize26 .wellSize {width: 26px;}
+.wellSize27 .wellSize {width: 27px;}
+.wellSize28 .wellSize {width: 28px;}
+.wellSize29 .wellSize {width: 29px;}
+.wellSize30 .wellSize {width: 30px;}
+.wellSize31 .wellSize {width: 31px;}
+.wellSize32 .wellSize {width: 32px;}
+.wellSize33 .wellSize {width: 33px;}
+.wellSize34 .wellSize {width: 34px;}
+.wellSize35 .wellSize {width: 35px;}
+.wellSize36 .wellSize {width: 36px;}
+.wellSize37 .wellSize {width: 37px;}
+.wellSize38 .wellSize {width: 38px;}
+.wellSize39 .wellSize {width: 39px;}
+.wellSize40 .wellSize {width: 40px;}
+.wellSize41 .wellSize {width: 41px;}
+.wellSize42 .wellSize {width: 42px;}
+.wellSize43 .wellSize {width: 43px;}
+.wellSize44 .wellSize {width: 44px;}
+.wellSize45 .wellSize {width: 45px;}
+.wellSize46 .wellSize {width: 46px;}
+.wellSize47 .wellSize {width: 47px;}
+.wellSize48 .wellSize {width: 48px;}
+.wellSize49 .wellSize {width: 49px;}
+.wellSize50 .wellSize {width: 50px;}
+.wellSize51 .wellSize {width: 51px;}
+.wellSize52 .wellSize {width: 52px;}
+.wellSize53 .wellSize {width: 53px;}
+.wellSize54 .wellSize {width: 54px;}
+.wellSize55 .wellSize {width: 55px;}
+.wellSize56 .wellSize {width: 56px;}
+.wellSize57 .wellSize {width: 57px;}
+.wellSize58 .wellSize {width: 58px;}
+.wellSize59 .wellSize {width: 59px;}
+.wellSize60 .wellSize {width: 60px;}
+.wellSize61 .wellSize {width: 61px;}
+.wellSize62 .wellSize {width: 62px;}
+.wellSize63 .wellSize {width: 63px;}
+.wellSize64 .wellSize {width: 64px;}
+.wellSize65 .wellSize {width: 65px;}
+.wellSize66 .wellSize {width: 66px;}
+.wellSize67 .wellSize {width: 67px;}
+.wellSize68 .wellSize {width: 68px;}
+.wellSize69 .wellSize {width: 69px;}
+.wellSize70 .wellSize {width: 70px;}
+.wellSize71 .wellSize {width: 71px;}
+.wellSize72 .wellSize {width: 72px;}
+.wellSize73 .wellSize {width: 73px;}
+.wellSize74 .wellSize {width: 74px;}
+.wellSize75 .wellSize {width: 75px;}
+.wellSize76 .wellSize {width: 76px;}
+.wellSize77 .wellSize {width: 77px;}
+.wellSize78 .wellSize {width: 78px;}
+.wellSize79 .wellSize {width: 79px;}
+.wellSize80 .wellSize {width: 80px;}
+.wellSize81 .wellSize {width: 81px;}
+.wellSize82 .wellSize {width: 82px;}
+.wellSize83 .wellSize {width: 83px;}
+.wellSize84 .wellSize {width: 84px;}
+.wellSize85 .wellSize {width: 85px;}
+.wellSize86 .wellSize {width: 86px;}
+.wellSize87 .wellSize {width: 87px;}
+.wellSize88 .wellSize {width: 88px;}
+.wellSize89 .wellSize {width: 89px;}
+.wellSize90 .wellSize {width: 90px;}
+.wellSize91 .wellSize {width: 91px;}
+.wellSize92 .wellSize {width: 92px;}
+.wellSize93 .wellSize {width: 93px;}
+.wellSize94 .wellSize {width: 94px;}
+.wellSize95 .wellSize {width: 95px;}
+.wellSize96 .wellSize {width: 96px;}
+.wellSize97 .wellSize {width: 97px;}
+.wellSize98 .wellSize {width: 98px;}
+.wellSize99 .wellSize {width: 99px;}
+.wellSize100 .wellSize {width: 100px;}
+.wellSize101 .wellSize {width: 101px;}
+.wellSize102 .wellSize {width: 102px;}
+.wellSize103 .wellSize {width: 103px;}
+.wellSize104 .wellSize {width: 104px;}
+.wellSize105 .wellSize {width: 105px;}
+.wellSize106 .wellSize {width: 106px;}
+.wellSize107 .wellSize {width: 107px;}
+.wellSize108 .wellSize {width: 108px;}
+.wellSize109 .wellSize {width: 109px;}
+.wellSize110 .wellSize {width: 110px;}
+.wellSize111 .wellSize {width: 111px;}
+.wellSize112 .wellSize {width: 112px;}
+.wellSize113 .wellSize {width: 113px;}
+.wellSize114 .wellSize {width: 114px;}
+.wellSize115 .wellSize {width: 115px;}
+.wellSize116 .wellSize {width: 116px;}
+.wellSize117 .wellSize {width: 117px;}
+.wellSize118 .wellSize {width: 118px;}
+.wellSize119 .wellSize {width: 119px;}
+.wellSize120 .wellSize {width: 120px;}
+.wellSize121 .wellSize {width: 121px;}
+.wellSize122 .wellSize {width: 122px;}
+.wellSize123 .wellSize {width: 123px;}
+.wellSize124 .wellSize {width: 124px;}
+.wellSize125 .wellSize {width: 125px;}
+.wellSize126 .wellSize {width: 126px;}
+.wellSize127 .wellSize {width: 127px;}
+.wellSize128 .wellSize {width: 128px;}
+.wellSize129 .wellSize {width: 129px;}
+.wellSize130 .wellSize {width: 130px;}
+

@@ -1,0 +1,11 @@
+{
+"TOTAL_MEMORY": 1572864000,
+"dataUrl": "FPBioimage.data.unityweb",
+"asmCodeUrl": "FPBioimage.asm.code.unityweb",
+"asmMemoryUrl": "FPBioimage.asm.memory.unityweb",
+"asmFrameworkUrl": "FPBioimage.asm.framework.unityweb",
+"backgroundColor": "#141414",
+"progressLogoUrl": "./logo.png",
+"progressEmptyUrl": "./empty.png",
+"progressFullUrl": "./full.png"
+}
