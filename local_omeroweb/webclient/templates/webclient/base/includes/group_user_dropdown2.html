@@ -59,6 +59,16 @@
                             $("#groupMembers-" + gid).show();
                             return false;
                         });
+
+                        // NEW: Log a message when a Group list item is double-clicked
+                        $("#groupList").on("dblclick", "li a", function(event) {
+                            event.preventDefault();
+                            // Get the group id from the clicked element
+                            var gid = $(this).attr("data-gid");
+                            // Set the user to 'all users'
+                            var url = "{% url 'change_active_group' %}?active_group=" + gid + "&url={% url 'userdata' %}?experimenter=-1";
+                            window.location.href = url;
+                        });
                     });
                 }
             }
@@ -81,17 +91,20 @@
 	    <!-- Group / User drop-down -->
         
         <div id="groupsUsersButton" title="Switch Group/User">
-            <img 
-            {% if active_group.getDetails.getPermissions.isGroupWrite %} src="{% static 'webclient/image/group_green16.png' %}"
-            {% else %}
-                {% if active_group.getDetails.getPermissions.isGroupAnnotate %} src="{% static "webclient/image/group_orange16.png" %}"
+            <div class="group-select-text">Group Select </div>
+            <div class="group-image">
+                <img 
+                {% if active_group.getDetails.getPermissions.isGroupWrite %} src="{% static 'webclient/image/group_green16.png' %}"
                 {% else %}
-                    {% if active_group.details.permissions.isGroupRead %} src="{% static "webclient/image/group_red16.png" %}"
+                    {% if active_group.getDetails.getPermissions.isGroupAnnotate %} src="{% static "webclient/image/group_orange16.png" %}"
                     {% else %}
-                        src="{% static "webclient/image/personal16.png" %}"
+                        {% if active_group.details.permissions.isGroupRead %} src="{% static "webclient/image/group_red16.png" %}"
+                        {% else %}
+                            src="{% static "webclient/image/personal16.png" %}"
+                        {% endif %}
                     {% endif %}
-                {% endif %}
-            {% endif %} />
+                {% endif %} />
+            </div>
             <span>{{ active_group.name }}</span><span>{{ active_user.getFullName }}</span>
         </div>
 

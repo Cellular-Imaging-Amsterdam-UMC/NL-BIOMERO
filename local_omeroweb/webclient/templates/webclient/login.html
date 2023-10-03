@@ -69,6 +69,8 @@
 {% block head %}
     {{ block.super }}
 	
+    {% include "webgateway/base/includes/shortcut_icon.html" %}
+	
 	<script type="text/javascript" charset="utf-8">
 			$(function(){ $("label").inFieldLabels(); });
 		</script>
@@ -79,17 +81,14 @@
 
 <div style="margin: auto">
 
-<div style="margin: 5% auto 0; height: 100px"></div>
+<div style="margin: 15% auto 0; height: 350px"></div>
 <div class="login-logos">
     <div class="custom_logo">
-        {% if LOGIN_LOGO %}
-            <img src="{{ LOGIN_LOGO }}" />
-        {% else %}
-            <img src="{% static "webclient/image/custom_login_logo.png" %}" />
-        {% endif %}
+        <img src="{% static "webclient/image/Amsterdam-UMC.png" %}" style="max-width: 600px; height: auto;" />
     </div>
     <img src="{% static "webclient/image/logo_login_web.png" %}" />
 </div>
+
 
 <div id="login">
     {% block login %}
@@ -98,21 +97,8 @@
 				<span class="error">{% trans "Error:" %} {{ error | urlize }}</span>
 			{% endif %}
 			
-			<div id="choose_server">
-					
-					{% comment %}
-					{% trans form.server.label_tag %}
-					{% endcomment %}
-					
-			  		{{ form.server }}
-			   
-			   <!-- Form Error -->
-				{% if form.server.errors %}
-	                 {% for error in form.server.errors %}
-	                     <span class="form_error">{{ error|escape }}</span>
-	                 {% endfor %}
-				{% endif %}
-		   </div>
+            <!--NEW: removed server option-->
+			<input type="hidden" name="{{ form.server.name }}" value="1" />
 
 			<div>
 				{% trans form.username.label_tag %}

@@ -227,12 +227,14 @@
 
 	    
 		#groupsUsersButton {
+            display: inline-flex;
+            flex-direction: row; 
+            align-items: center;
 			overflow:hidden;
 			padding:.3em 1.8em .3em .7em;
 			-webkit-border-radius:5px; /* Saf3+, Chrome */
 			-moz-border-radius:5px; /* FF1+ */
 			border-radius:5px; /* Opera 10.5, IE 9 */ 
-			display: inline-block;
 			font-family:"Helvetica Neue", Helvetica, Arial, sans-serif;
 			font-weight:500;
 			color:white;
@@ -245,13 +247,10 @@
 		
 			#groupsUsersButton img {
 				margin-right:6px;
-				float:left;
 			}
 	
 			#groupsUsersButton span {
-				display:inline-block;
 				font-size:1.15em;
-				overflow:hidden;
 				line-height:1.6em;
 				padding-right:8px;
 				color:white;
@@ -263,7 +262,19 @@
 				font-weight:700;
 				font-family: 'HelveticaNeue', Helvetica, Arial, sans-serif;
 			}
-			
+
+			/* New styles */
+            .group-select-text {
+                font-size: 1.15em;
+                line-height: 1.6em;
+                color: white;
+                font-weight: 900;
+                padding-right: 8px;
+            }
+
+            .group-image img {
+                margin-right: 6px;
+            }
 
 	
 	

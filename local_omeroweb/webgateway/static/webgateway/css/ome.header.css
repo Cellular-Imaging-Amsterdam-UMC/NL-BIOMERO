@@ -218,14 +218,33 @@
 			background: url(../img/icon_figure_scripts.png) center center no-repeat;
 		}
 
-		#scriptButton{
-			background: url(../img/icon_script.png) center center no-repeat;
+		/* NEW: Clearer Scripts and Activity button */
+		#scriptButton::before, #launch_activities::before {
+		    content: attr(title);
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    color: hsl(210,20%,90%); /* Lighter color */
+		    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Font family from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    font-weight: 500; /* Font weight from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    text-shadow: 0 1px 0px rgba(0,0,0,.4); /* Text shadow from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    font-size: 1.2em; /* Font size from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    padding: 0.5em; /* Add padding */
+		    height: calc(100% - 1em); /* Adjust for padding */
 		}
-	
-		#launch_activities{
-			background:url(../img/activity_light_24.png) center center no-repeat;
+
+		#scriptButton:hover::before, #launch_activities:hover::before {
+			color: white; /* Color when hovered */
 		}
 		
+		#scriptButton::before{
+		    content: "</ Scripts >";
+		}
+		
+		#launch_activities::before{
+		    content: "Activities Log";
+		}
+		/* NEW: Ends */
 		#script_notifications li:first-child {
 			 -webkit-border-top-left-radius:3px; /* Saf3+, Chrome */
 				  -moz-border-radius-topleft:3px; /* FF1+ */
