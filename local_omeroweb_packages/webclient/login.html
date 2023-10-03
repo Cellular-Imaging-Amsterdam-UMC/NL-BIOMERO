@@ -97,21 +97,8 @@
 				<span class="error">{% trans "Error:" %} {{ error | urlize }}</span>
 			{% endif %}
 			
-			<div id="choose_server">
-					
-					{% comment %}
-					{% trans form.server.label_tag %}
-					{% endcomment %}
-					
-			  		{{ form.server }}
-			   
-			   <!-- Form Error -->
-				{% if form.server.errors %}
-	                 {% for error in form.server.errors %}
-	                     <span class="form_error">{{ error|escape }}</span>
-	                 {% endfor %}
-				{% endif %}
-		   </div>
+            <!--NEW: removed server option-->
+			<input type="hidden" name="{{ form.server.name }}" value="1" />
 
 			<div>
 				{% trans form.username.label_tag %}

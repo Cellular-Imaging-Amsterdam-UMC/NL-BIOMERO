@@ -1,0 +1,60 @@
+{% extends "webadmin/base.html" %}
+{% load i18n %}
+
+{% comment %}
+<!--
+  Copyright (C) 2011-2021 University of Dundee & Open Microscopy Environment.
+  All rights reserved.
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Affero General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+{% endcomment %}
+
+{% block title %}{% trans "Change avatar" %}{% endblock %}
+
+{% block center_details %}
+{{ block.super }}
+<div class="one_column_content">
+    <h1>{% trans "Change user photo" %}</h1>
+
+    <div style="width:150px">
+        {% if has_photo %}
+        <img src="{% url 'wamyphoto' %}" style="max-width:200px; max-height:200px"/>
+        {% else %}
+        <p><center><img src="{% url 'wamyphoto' %}" class="imgzoom"/></center>
+        <br/><ul class="errorlist"><li>No avatar set.</li></ul></p>
+        {% endif %}
+    </div>
+
+    <div >
+        <form enctype="multipart/form-data" method="post" action="{% url 'wamanageavatar' "upload" %}"
+            class="standard_form settings_form" style="position:relative;">{% csrf_token %}
+            <p>Upload new picture. Select an image file on your computer (max 200KB):</p>
+            
+            {% for field in form_file %}
+                {% if field.errors %}{{ field.errors }}{% endif %}<br />
+                {{ field }}{{ field.help_text|safe }}
+                <br />
+            {% endfor %}
+            <input type="submit" style="float:none" value="{% trans 'Upload' %}" />
+
+            <a style="position: absolute; right: 20px; bottom: 20px; color: hsl(210,70%,10%)" class="submit_btn" href="{% url 'wamyaccount' %}">
+                <span>Done</span>
+            </a>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}

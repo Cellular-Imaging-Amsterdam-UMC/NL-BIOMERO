@@ -19335,3 +19335,370 @@ django.urls.exceptions.NoReverseMatch: Reverse for 'active_group' not found. 'ac
 2023-09-28 14:54:49,956  INFO [                           omero.gateway] (proc.00067) close():1987 closed connection (uuid=b6edcd39-57ff-4b2d-9186-65ce6b9ee361)
 2023-09-28 14:55:49,935  INFO [                           omero.gateway] (proc.00070) connect():2274 created connection (uuid=b6edcd39-57ff-4b2d-9186-65ce6b9ee361)
 2023-09-28 14:55:49,944  INFO [                           omero.gateway] (proc.00070) close():1987 closed connection (uuid=b6edcd39-57ff-4b2d-9186-65ce6b9ee361)
+2023-10-03 12:45:41,610  INFO [                omeroweb.webclient.views] (proc.00050) <module>():138 INIT '50'
+2023-10-03 12:45:41,623  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:45:41,634  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:45:41,710  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:45:41,881  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:45:53,053  INFO [                omeroweb.webclient.views] (proc.00072) <module>():138 INIT '72'
+2023-10-03 12:45:53,063  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:45:53,072  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:45:53,165  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:45:53,177  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:46:54,105  INFO [                omeroweb.webclient.views] (proc.00066) <module>():138 INIT '66'
+2023-10-03 12:46:54,121  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:46:54,133  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:46:54,273  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:46:54,285  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:47:34,706  INFO [                omeroweb.webclient.views] (proc.00073) <module>():138 INIT '73'
+2023-10-03 12:47:34,718  INFO [                                    root] (proc.00073) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:47:34,727  INFO [                                    root] (proc.00073) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:47:34,815  INFO [                                    root] (proc.00073) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:47:34,825  INFO [                                    root] (proc.00073) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:47:35,776  INFO [                omeroweb.webclient.views] (proc.00069) <module>():138 INIT '69'
+2023-10-03 12:47:35,789  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:47:35,799  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:47:35,905  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:47:35,917  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:47:43,476  INFO [                           omero.gateway] (proc.00066) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:43,633  INFO [                 omero.util.UpgradeCheck] (proc.00066) run():150 no update needed
+2023-10-03 12:47:43,653  INFO [                           omero.gateway] (proc.00066) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:43,843  INFO [                omeroweb.webclient.views] (proc.00068) <module>():138 INIT '68'
+2023-10-03 12:47:43,855  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:47:43,865  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:47:43,957  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:47:43,965  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:47:43,994  INFO [                           omero.gateway] (proc.00068) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,408  INFO [                           omero.gateway] (proc.00068) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,717 WARNI [                 omeroweb.feedback.views] (proc.00068) handler404():233 Not Found: /static/3rdparty/hammer-2.0.8/hammer.min.js.map
+2023-10-03 12:47:44,745 WARNI [                          django.request] (proc.00068) log_response():230 Not Found: /static/3rdparty/hammer-2.0.8/hammer.min.js.map
+2023-10-03 12:47:44,745  INFO [                           omero.gateway] (proc.00066) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,762  INFO [                           omero.gateway] (proc.00073) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,745 WARNI [                          django.request] (proc.00068) log_response():230 HTTP 404 <WSGIRequest: GET '/static/3rdparty/hammer-2.0.8/hammer.min.js.map'>
+2023-10-03 12:47:44,778  INFO [                           omero.gateway] (proc.00066) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,928  INFO [                           omero.gateway] (proc.00069) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,929  INFO [                           omero.gateway] (proc.00073) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:44,944  INFO [                           omero.gateway] (proc.00068) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:45,002  INFO [                           omero.gateway] (proc.00069) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:45,011  INFO [                           omero.gateway] (proc.00068) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:45,070  INFO [                           omero.gateway] (proc.00066) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:45,343  INFO [                           omero.gateway] (proc.00066) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:54,605  INFO [                           omero.gateway] (proc.00072) connect():2274 created connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:47:54,626  INFO [                           omero.gateway] (proc.00072) close():1987 closed connection (uuid=daeee8be-00ec-49dc-b153-154d7e94785e)
+2023-10-03 12:55:49,674  INFO [                omeroweb.webclient.views] (proc.00050) <module>():138 INIT '50'
+2023-10-03 12:55:49,686  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:55:49,695  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:55:49,747  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:55:49,758  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:56:22,057  INFO [                omeroweb.webclient.views] (proc.00069) <module>():138 INIT '69'
+2023-10-03 12:56:22,071  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:56:22,082  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:56:22,200  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:56:22,211  INFO [                                    root] (proc.00069) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 12:56:22,254 ERROR [                 omeroweb.feedback.views] (proc.00069) handler500():196 handler500: Server error
+2023-10-03 12:56:22,272 ERROR [                 omeroweb.feedback.views] (proc.00069) handler500():199 Traceback (most recent call last):
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 470, in parse
+    compile_func = self.tags[command]
+
+KeyError: 'endblock'
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/utils/decorators.py", line 43, in _wrapper
+    return bound_method(*args, **kwargs)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/decorators/debug.py", line 89, in sensitive_post_parameters_wrapper
+    return view(request, *args, **kwargs)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webgateway/views.py", line 3368, in dispatch
+    return super(LoginView, self).dispatch(*args, **kwargs)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/generic/base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webclient/views.py", line 242, in get
+    return self.handle_not_logged_in(request)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webclient/views.py", line 338, in handle_not_logged_in
+    return render(request, self.template, context)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/backends/django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loaders/cached.py", line 58, in get_template
+    template = super().get_template(template_name, skip)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loaders/base.py", line 30, in get_template
+    contents, origin, origin.template_name, self.engine,
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 193, in compile_nodelist
+    return parser.parse()
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 478, in parse
+    raise self.error(token, e)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader_tags.py", line 278, in do_extends
+    nodelist = parser.parse()
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 472, in parse
+    self.invalid_block_tag(token, command, parse_until)
+
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 534, in invalid_block_tag
+    "or load this tag?" % (token.lineno, command)
+
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 172: 'endblock'. Did you forget to register or load this tag?
+
+2023-10-03 12:56:22,370 ERROR [                          django.request] (proc.00069) log_response():230 Internal Server Error: /webclient/login/
+Traceback (most recent call last):
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 470, in parse
+    compile_func = self.tags[command]
+KeyError: 'endblock'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/utils/decorators.py", line 43, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/decorators/debug.py", line 89, in sensitive_post_parameters_wrapper
+    return view(request, *args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webgateway/views.py", line 3368, in dispatch
+    return super(LoginView, self).dispatch(*args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/generic/base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webclient/views.py", line 242, in get
+    return self.handle_not_logged_in(request)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webclient/views.py", line 338, in handle_not_logged_in
+    return render(request, self.template, context)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/backends/django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loaders/cached.py", line 58, in get_template
+    template = super().get_template(template_name, skip)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loaders/base.py", line 30, in get_template
+    contents, origin, origin.template_name, self.engine,
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 478, in parse
+    raise self.error(token, e)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader_tags.py", line 278, in do_extends
+    nodelist = parser.parse()
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 472, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 534, in invalid_block_tag
+    "or load this tag?" % (token.lineno, command)
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 172: 'endblock'. Did you forget to register or load this tag?
+2023-10-03 12:56:22,370 ERROR [                          django.request] (proc.00069) log_response():230 HTTP 500 <WSGIRequest: GET '/webclient/login/'>
+Traceback (most recent call last):
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 470, in parse
+    compile_func = self.tags[command]
+KeyError: 'endblock'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/core/handlers/exception.py", line 47, in inner
+    response = get_response(request)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/core/handlers/base.py", line 181, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/generic/base.py", line 70, in view
+    return self.dispatch(request, *args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/utils/decorators.py", line 43, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/decorators/debug.py", line 89, in sensitive_post_parameters_wrapper
+    return view(request, *args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webgateway/views.py", line 3368, in dispatch
+    return super(LoginView, self).dispatch(*args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/views/generic/base.py", line 98, in dispatch
+    return handler(request, *args, **kwargs)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webclient/views.py", line 242, in get
+    return self.handle_not_logged_in(request)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/omeroweb/webclient/views.py", line 338, in handle_not_logged_in
+    return render(request, self.template, context)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/shortcuts.py", line 19, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/backends/django.py", line 34, in get_template
+    return Template(self.engine.get_template(template_name), self)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/engine.py", line 143, in get_template
+    template, origin = self.find_template(template_name)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/engine.py", line 125, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loaders/cached.py", line 58, in get_template
+    template = super().get_template(template_name, skip)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loaders/base.py", line 30, in get_template
+    contents, origin, origin.template_name, self.engine,
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 155, in __init__
+    self.nodelist = self.compile_nodelist()
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 193, in compile_nodelist
+    return parser.parse()
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 478, in parse
+    raise self.error(token, e)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 476, in parse
+    compiled_result = compile_func(self, token)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/loader_tags.py", line 278, in do_extends
+    nodelist = parser.parse()
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 472, in parse
+    self.invalid_block_tag(token, command, parse_until)
+  File "/opt/omero/web/venv3/lib64/python3.6/site-packages/django/template/base.py", line 534, in invalid_block_tag
+    "or load this tag?" % (token.lineno, command)
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 172: 'endblock'. Did you forget to register or load this tag?
+2023-10-03 12:56:22,842  INFO [                omeroweb.webclient.views] (proc.00068) <module>():138 INIT '68'
+2023-10-03 12:56:22,865  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 12:56:22,879  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 12:56:23,036  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 12:56:23,052  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:14,041  INFO [                omeroweb.webclient.views] (proc.00050) <module>():138 INIT '50'
+2023-10-03 13:01:14,053  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 13:01:14,064  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 13:01:14,122  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 13:01:14,134  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:44,018  INFO [                omeroweb.webclient.views] (proc.00050) <module>():138 INIT '50'
+2023-10-03 13:01:44,034  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 13:01:44,066  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 13:01:44,130  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 13:01:44,143  INFO [                                    root] (proc.00050) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:47,116  INFO [                omeroweb.webclient.views] (proc.00066) <module>():138 INIT '66'
+2023-10-03 13:01:47,126  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 13:01:47,134  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 13:01:47,226  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 13:01:47,238  INFO [                                    root] (proc.00066) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:48,662  INFO [                omeroweb.webclient.views] (proc.00070) <module>():138 INIT '70'
+2023-10-03 13:01:48,674  INFO [                                    root] (proc.00070) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 13:01:48,683  INFO [                                    root] (proc.00070) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 13:01:48,773  INFO [                                    root] (proc.00070) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 13:01:48,786  INFO [                                    root] (proc.00070) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:49,060  INFO [                omeroweb.webclient.views] (proc.00067) <module>():138 INIT '67'
+2023-10-03 13:01:49,071  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 13:01:49,079  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 13:01:49,178  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 13:01:49,189  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:52,753  INFO [                           omero.gateway] (proc.00070) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:53,166  INFO [                 omero.util.UpgradeCheck] (proc.00070) run():150 no update needed
+2023-10-03 13:01:53,178  INFO [                           omero.gateway] (proc.00070) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:53,206  INFO [                           omero.gateway] (proc.00067) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:53,630  INFO [                           omero.gateway] (proc.00067) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:53,987 WARNI [                 omeroweb.feedback.views] (proc.00067) handler404():233 Not Found: /static/3rdparty/hammer-2.0.8/hammer.min.js.map
+2023-10-03 13:01:53,993  INFO [                           omero.gateway] (proc.00066) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,018 WARNI [                          django.request] (proc.00067) log_response():230 Not Found: /static/3rdparty/hammer-2.0.8/hammer.min.js.map
+2023-10-03 13:01:54,026  INFO [                           omero.gateway] (proc.00066) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,018 WARNI [                          django.request] (proc.00067) log_response():230 HTTP 404 <WSGIRequest: GET '/static/3rdparty/hammer-2.0.8/hammer.min.js.map'>
+2023-10-03 13:01:54,230  INFO [                omeroweb.webclient.views] (proc.00072) <module>():138 INIT '72'
+2023-10-03 13:01:54,244  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 13:01:54,254  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 13:01:54,254  INFO [                           omero.gateway] (proc.00066) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,278  INFO [                           omero.gateway] (proc.00070) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,361  INFO [                           omero.gateway] (proc.00066) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,444  INFO [                           omero.gateway] (proc.00070) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,506  INFO [                           omero.gateway] (proc.00066) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:54,539  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 13:01:54,558  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 13:01:54,924  INFO [                           omero.gateway] (proc.00072) connect():2274 created connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:55,207  INFO [                           omero.gateway] (proc.00066) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 13:01:55,264  INFO [                           omero.gateway] (proc.00072) close():1987 closed connection (uuid=78382807-e7f9-4ff1-b5cb-c7819d44ffdb)
+2023-10-03 14:49:22,000  INFO [                omeroweb.webclient.views] (proc.00051) <module>():138 INIT '51'
+2023-10-03 14:49:22,021  INFO [                                    root] (proc.00051) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 14:49:22,065  INFO [                                    root] (proc.00051) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 14:49:22,125  INFO [                                    root] (proc.00051) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 14:49:22,138  INFO [                                    root] (proc.00051) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 14:49:28,633  INFO [                omeroweb.webclient.views] (proc.00067) <module>():138 INIT '67'
+2023-10-03 14:49:28,662  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 14:49:28,725  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 14:49:28,889  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 14:49:28,907  INFO [                                    root] (proc.00067) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 14:49:30,112  INFO [                omeroweb.webclient.views] (proc.00074) <module>():138 INIT '74'
+2023-10-03 14:49:30,144  INFO [                                    root] (proc.00074) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 14:49:30,281  INFO [                                    root] (proc.00074) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 14:49:30,485  INFO [                                    root] (proc.00074) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 14:49:30,501  INFO [                                    root] (proc.00074) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 14:49:33,027  INFO [                omeroweb.webclient.views] (proc.00068) <module>():138 INIT '68'
+2023-10-03 14:49:33,059  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 14:49:33,131  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 14:49:33,294  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 14:49:33,310  INFO [                                    root] (proc.00068) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 14:49:39,780  INFO [                           omero.gateway] (proc.00067) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:39,985  INFO [                 omero.util.UpgradeCheck] (proc.00067) run():150 no update needed
+2023-10-03 14:49:39,996  INFO [                           omero.gateway] (proc.00067) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:40,565  INFO [                omeroweb.webclient.views] (proc.00072) <module>():138 INIT '72'
+2023-10-03 14:49:40,587  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 14:49:40,636  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 14:49:40,747  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 14:49:40,757  INFO [                                    root] (proc.00072) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 14:49:40,947  INFO [                           omero.gateway] (proc.00072) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:41,955  INFO [                           omero.gateway] (proc.00072) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,313 WARNI [                 omeroweb.feedback.views] (proc.00072) handler404():233 Not Found: /static/3rdparty/hammer-2.0.8/hammer.min.js.map
+2023-10-03 14:49:42,346  INFO [                           omero.gateway] (proc.00067) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,350  INFO [                           omero.gateway] (proc.00074) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,370  INFO [                           omero.gateway] (proc.00067) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,383 WARNI [                          django.request] (proc.00072) log_response():230 Not Found: /static/3rdparty/hammer-2.0.8/hammer.min.js.map
+2023-10-03 14:49:42,383 WARNI [                          django.request] (proc.00072) log_response():230 HTTP 404 <WSGIRequest: GET '/static/3rdparty/hammer-2.0.8/hammer.min.js.map'>
+2023-10-03 14:49:42,526  INFO [                           omero.gateway] (proc.00074) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,549  INFO [                           omero.gateway] (proc.00068) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,604  INFO [                           omero.gateway] (proc.00068) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,714  INFO [                           omero.gateway] (proc.00068) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:42,984  INFO [                           omero.gateway] (proc.00068) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:43,312  INFO [                omeroweb.webclient.views] (proc.00071) <module>():138 INIT '71'
+2023-10-03 14:49:43,333  INFO [                                    root] (proc.00071) process_custom_settings():1364 Processing custom settings for module omeroweb.api.api_settings
+2023-10-03 14:49:43,382  INFO [                                    root] (proc.00071) process_custom_settings():1364 Processing custom settings for module omero_iviewer.iviewer_settings
+2023-10-03 14:49:43,489  INFO [                                    root] (proc.00071) process_custom_settings():1364 Processing custom settings for module omero_mapr.mapr_settings
+2023-10-03 14:49:43,500  INFO [                                    root] (proc.00071) process_custom_settings():1364 Processing custom settings for module omero_parade.parade_settings
+2023-10-03 14:49:43,694  INFO [                           omero.gateway] (proc.00071) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:44,035  INFO [                           omero.gateway] (proc.00071) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:48,123  INFO [                           omero.gateway] (proc.00074) connect():2274 created connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
+2023-10-03 14:49:48,145  INFO [                           omero.gateway] (proc.00074) close():1987 closed connection (uuid=d7e8dc7e-edf6-4539-8306-ae9ec1ed51bc)
