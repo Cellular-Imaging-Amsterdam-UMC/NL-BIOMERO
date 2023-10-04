@@ -219,7 +219,7 @@
 		}
 
 		/* NEW: Clearer Scripts and Activity button */
-		#scriptButton::before, #launch_activities::before {
+		#scriptButton::before, #launch_activities::before, #dataUploadButton::before {
 		    content: attr(title);
 		    display: flex;
 		    align-items: center;
@@ -233,7 +233,7 @@
 		    height: calc(100% - 1em); /* Adjust for padding */
 		}
 
-		#scriptButton:hover::before, #launch_activities:hover::before {
+		#scriptButton:hover::before, #launch_activities:hover::before, #dataUploadButton:hover::before {
 			color: white; /* Color when hovered */
 		}
 		
@@ -244,6 +244,10 @@
 		#launch_activities::before{
 		    content: "Activities Log";
 		}
+
+       #dataUploadButton::before{
+           content: "Upload Data";
+       }
 		/* NEW: Ends */
 		#script_notifications li:first-child {
 			 -webkit-border-top-left-radius:3px; /* Saf3+, Chrome */
@@ -273,7 +277,16 @@
 			position:relative;
 			cursor:pointer;	
 		}
-		
+
+       #dataUploadButton {
+           display: inline-block;
+           min-width: 32px !important;
+           height: 23px;
+           position: relative;
+           cursor: pointer;
+           background: url(../img/icon_data_upload.png) center center no-repeat; /* Replace with your actual image path */
+           /* Add other properties as needed */
+       }
 		
 		
 		
