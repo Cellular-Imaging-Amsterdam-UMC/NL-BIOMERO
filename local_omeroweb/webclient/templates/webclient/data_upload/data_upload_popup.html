@@ -1,0 +1,82 @@
+{% extends "webgateway/core_html.html" %}
+{% load i18n %}
+
+{% block title %}
+    Upload Data
+{% endblock %}
+
+{% block link %}
+    <style type="text/css">
+        body {
+            font-family: Arial;
+            background: #eee;
+            margin: 0px;
+            padding: 0px;
+        }
+        div.footer {
+            background: #ddd; 
+            position:fixed; 
+            bottom:0px; left:0px; right:0px;
+            padding: 7px;
+            border-top: 1px solid #aaa;
+            font-size: 80%;
+        }
+        h3 {
+            margin-top: 0px;
+            padding-bottom: 10px;
+            border-bottom: solid #aaa 1px;
+        }
+        input[type='text'] {
+            border: solid 1px rgba(0,0,0,.2);
+            border-top: solid 1px rgba(0,0,0,.3);
+            box-shadow: 0 1px 0 white, inset 0 1px 1px rgba(0,0,0,.1);
+            border-radius: 2px;
+            padding: 5px;
+        }
+        #spinner {
+            display: none;
+            margin: -2px 0;
+        }
+    </style>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // You can add your JavaScript code here
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <form id='data_upload_form' method="post" action="{% url 'data_upload' %}">{% csrf_token %}
+        <div style="padding:10px; margin-bottom:40px">
+            <h3 id="dataUploadName">Upload Data</h3>
+
+            <p>
+                <label>Choose data to upload:</label>
+                <input id="data_file" name="data_file" type="file" />
+            </p>
+
+            <p>
+                <label>Upload into folder:</label><br>
+                <input type="text" placeholder="/top_menu/sub_menu" name="data_path" id="dataFolder" style="width:350px"/>
+                <select id="data_folders" style="width:150px">
+                </select>
+            </p>
+
+            <p id="targetInfo" style="display:none">
+                <span id="targetMessage"></span>
+                <pre><code id="targetPath"></code></pre>
+            </p>
+        </div>
+        <div class="footer">
+            <div style="float:right">
+                <a href="#" tabIndex="3" onClick="self.close()">Close</a>
+                <input id="submit" tabIndex="2" type="submit" value="Upload Data" />
+                <img id="spinner" src ="{% static "webgateway/img/spinner.gif" %}"/>
+            </div>
+        </div>
+    </form>
+{% endblock %}

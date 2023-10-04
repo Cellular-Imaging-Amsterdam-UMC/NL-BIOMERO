@@ -312,6 +312,9 @@ urlpatterns = [
         r"^script_run/(?P<scriptId>[0-9]+)/$", views.script_run, name="script_run"
     ),  # runs the script - parameters in POST
     re_path(r"^script_upload/$", views.script_upload, name="script_upload"),
+    #NEW: Data Upload
+    re_path(r"^data_upload/$", views.data_upload, name="data_upload"),
+    re_path(r"^data_upload_popup/$", views.data_upload_popup, name="data_upload_popup"),
     re_path(
         r"^get_original_file/(?:(?P<fileId>[0-9]+)/)?$",
         views.get_original_file,

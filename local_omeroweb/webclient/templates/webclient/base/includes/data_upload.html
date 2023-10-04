@@ -1,4 +1,13 @@
 <!-- Data Upload button -->
 <li>
-    <span id="dataUploadButton" class="toolbar_button" title="Upload Data"></span>
+    <a id="dataUploadButton" class="toolbar_button" title="Upload Data" href="{% url 'data_upload_popup' %}"></a>
 </li>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#dataUploadButton').click(function(event) {
+            OME.openDataUploadWindow(event, 500, 500);
+            return false;  // prevent the default action
+        });
+    });
+</script>

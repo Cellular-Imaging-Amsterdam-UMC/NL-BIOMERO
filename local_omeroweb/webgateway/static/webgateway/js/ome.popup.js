@@ -326,6 +326,19 @@ OME.openScriptWindow = function(event, width, height) {
     return false;
 };
 
+/*
+NEW: POPUP for Data Upload
+**/
+OME.openDataUploadWindow = function(event, width, height) {
+    // open data upload url
+    var upload_url = $(event.target).attr('href');
+    if (upload_url == "#") return false;
+
+    // You can add specific conditions or operations for data_upload here
+
+    OME.openCenteredWindow(upload_url, width, height);
+    return false;
+};
 
 /*
  *  Returns a string representing the currently selected items in the $.jstree.

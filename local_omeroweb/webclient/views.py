@@ -4932,6 +4932,39 @@ def script_upload(request, conn=None, **kwargs):
 
     return {"Message": message, "script_id": script_id}
 
+#NEW: Data Upload Functions
+
+@login_required(isAdmin=True)
+@render_response()
+def data_upload(request, conn=None, **kwargs):
+    """Data upload UI"""
+
+    if request.method != "POST":
+        return {"template": "webclient/data_upload/data_upload_popup.html"}
+
+    # Get data path, name and text
+    data_path = request.POST.get("data_path")
+    data_file = request.FILES["data_file"]
+    data_file.seek(0)
+    data_text = data_file.read().decode("utf-8")
+
+    if not data_path.endswith("/"):
+        data_path = data_path + "/"
+    data_path = data_path + data_file.name
+
+    # You can add your data upload logic here when you're ready
+
+    return {"Message": "Data uploaded successfully"}
+
+@login_required()
+@render_response()
+def data_upload_popup(request, conn=None, **kwargs):
+    """Data upload popup UI"""
+
+    # Render the data_upload_popup.html template
+    return {"template": "webclient/data_upload/data_upload_popup.html"}
+
+# New Ends    
 
 @require_POST
 @login_required()
