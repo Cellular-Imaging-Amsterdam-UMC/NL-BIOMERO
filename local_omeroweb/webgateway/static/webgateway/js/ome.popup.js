@@ -334,7 +334,27 @@ OME.openDataUploadWindow = function(event, width, height) {
     var upload_url = $(event.target).attr('href');
     if (upload_url == "#") return false;
 
-    // You can add specific conditions or operations for data_upload here
+    // selected is list of {'id':'image-123'} etc.
+    var selected = $("body").data("selected_objects.ome"),
+        sel_types = {};
+
+    if (typeof selected !== "undefined") {
+        for (var i=0; i<selected.length; i++) {
+            var type = selected[i].id.split("-")[0],
+                oid = selected[i].id.split("-")[1];
+            if (typeof sel_types[type] === "undefined") {
+                sel_types[type] = [];
+            }
+            sel_types[type].push(oid);
+        }
+        var args = [];
+        for (var key in sel_types) {
+            if (sel_types.hasOwnProperty(key)){
+                args.push(key.capitalize() + "=" + sel_types[key].join(","));
+            }
+        }
+        upload_url += "?" + args.join("&");
+    }
 
     OME.openCenteredWindow(upload_url, width, height);
     return false;

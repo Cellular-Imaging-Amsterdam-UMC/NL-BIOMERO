@@ -50,6 +50,10 @@
         .column.right {
             background-color: #b0c4de; /* Blue gray */
         }
+        .column.id {
+            flex: 20%;
+            background-color: #b0c4de; /* Blue gray */
+        }
         /* Table styles */
         table {
             width: 100%;
@@ -107,49 +111,55 @@
     </script>
 {% endblock %}
 {% block body %}
+    {% if selected_dataset %}
     <form id='data_upload_form' method="post" action="{% url 'data_upload_form' %}">{% csrf_token %}
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
-            <div id="descriptionDiv">
-                <p>description of Upload process and script info</p>
+            <!-- Description Div -->
+            <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 10px;">
+                <!-- Description Text -->
+                <p style="font-size: 0.8em;">
+                    This script uses the selected Dataset and the files chosen by the user, 
+                    along with the metadata specified through XML files, to upload well-annotated 
+                    data to the selected Dataset folder. Please ensure that you have selected 
+                    the correct Dataset and files before proceeding with the upload.
+                </p>
+                <p style="font-size: 0.8em;"><strong>Author:</strong> Rodrigo Rosas-Bertolini</p>
+                <p style="font-size: 0.8em;"><strong>Contact:</strong> r.rosas@amsterdamumc.nl</p>
+                <p style="font-size: 0.8em;"><strong>Version:</strong> 0.0.0</p>
             </div>
         
             <!-- Active Group Display -->
             <div class="row">
                 <div class="column left">
-                    <p>Group:</p>
+                    <p><strong>Selected Group:</strong></p>
                 </div>
                 <div class="column right">
                     <p><strong>{{ activeGroup.name }}</strong></p>
                 </div>
-            </div>
-
-            <!-- Project Selection Dropdown -->
-            <div class="row">
-                <div class="column left">
-                    <label>Select Project:</label>
-                </div>
-                <div class="column right">
-                    <select id="projectSelect" name="project">
-                        <option value="">--Select Project--</option>
-                        {% if projects %}
-                        {% for project in projects %}
-                            <option value="{{ project.id }}">{{ project.name }}</option>
-                        {% endfor %}
-                        {% else %}
-                            <p>No projects were found in the active group. Please Make projects.</p>
-                        {% endif %}
-                    </select>
+                <div class="column id">
+                    <p>ID: {{ activeGroup.id }}</p>
                 </div>
             </div>
 
-            <!-- Dataset Name Input -->
+            <!-- Dataset Selection Dropdown -->
             <div class="row">
                 <div class="column left">
-                    <label>Enter Dataset Name:</label>
+                    <p><strong>Selected Dataset:</strong></p>
                 </div>
                 <div class="column right">
-                    <input type="text" id="datasetName" name="datasetName" />
+                    {% if selected_dataset %}
+                        <p><strong>{{ selected_dataset.name }}</strong></p>
+                    {% else %}
+                        <p>No Dataset Selected</p>
+                    {% endif %}
+                </div>
+                <div class="column id">
+                    {% if selected_dataset %}
+                        <p>ID: {{ selected_dataset.id }}</p>
+                    {% else %}
+                        <p>No ID</p>
+                    {% endif %}
                 </div>
             </div>
         
@@ -157,7 +167,7 @@
             <p id="errorMessage" style="display: none; color: red;"></p>
         
             <p>
-                <label>Choose files to upload:</label>
+                <strong>Choose files to upload:</strong>
                 <input id="data_files" name="data_files" type="file" multiple />
             </p>
             
@@ -176,4 +186,16 @@
             </div>
         </div>
     </form>
+    {% else %}
+        <!-- Warning message -->
+        <div style="padding:10px; margin-bottom:40px">
+            <h3 id="dataUploadName">Upload Data</h3>
+            <p style="color: red;">Select a Dataset in the left-side 'Explore' menu before running 'Upload Data'. If the Dataset where you want to upload data does not yet exist, create it by clicking on the green folder icon of the same menu.</p>
+        </div>
+        <div class="footer">
+            <div style="float:right">
+                <a href="#" tabIndex="3" onClick="self.close()">Close</a>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -4933,7 +4933,7 @@ def script_upload(request, conn=None, **kwargs):
     return {"Message": message, "script_id": script_id}
 
 #NEW: Data Upload Functions
-
+#TODO remove the data_upload_form. We are not using it anylonger.
 @login_required()
 @render_response()
 def data_upload_form(request, conn=None, **kwargs):
@@ -5007,6 +5007,16 @@ def data_upload_popup(request, conn=None, **kwargs):
     active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
     active_group = conn.getObject("ExperimenterGroup", active_group_id)
 
+    # Extract selected objects from the URL
+    selected_objects = request.GET
+
+    # Check if a Dataset is selected
+    selected_dataset_id = selected_objects.get('Dataset')
+    if selected_dataset_id:
+        selected_dataset = conn.getObject("Dataset", selected_dataset_id)
+    else:
+        selected_dataset = None
+
     if active_group is None:
         # No active group found, use default values
         active_group_dict = {
@@ -5036,10 +5046,11 @@ def data_upload_popup(request, conn=None, **kwargs):
             }
             project_dicts.append(project_dict)
 
-    # Pass the active group and projects to the template
+    # Pass the active group, projects, and selected dataset to the template
     context = {
         'activeGroup': active_group_dict,
         'projects': project_dicts,
+        'selected_dataset': selected_dataset,
     }
 
     # Render the data_upload_popup.html template
