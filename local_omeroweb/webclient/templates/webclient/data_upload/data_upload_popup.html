@@ -37,34 +37,84 @@
             display: none;
             margin: -2px 0;
         }
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #b0c4de; /* Blue gray */
+        }
+        th {
+            background-color: #808080; /* Darker gray */
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-top: 1px solid #fff;
+        }
     </style>
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
-            // You can add your JavaScript code here
+        // Use jQuery's no-conflict mode
+        var $j = jQuery.noConflict();
+        $j(document).ready(function() {
+            if ($j('#groupSelect option').length <= 1) {
+                showError('Error: No groups were passed to the template.');
+            }
+            $j('#groupSelect').change(function() {
+                var selectedGroup = $j(this).val();
+                if (selectedGroup) {
+                    $j('#projectSelect').show();  // Show the project dropdown when a group is selected
+                } else {
+                    $j('#projectSelect').hide();
+                    $j('#datasetSelect').hide();
+                }
+            });
+
+            $j('#data_files').change(function() {
+                var files = this.files;
+                $j('#fileList').empty(); // Clear the list
+
+                // Add table header
+                var tableHeader = '<table><thead><tr><th>File Name</th><th>Metadata File</th></tr></thead><tbody>';
+                $j('#fileList').append(tableHeader);
+
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    var fileName = file.name;
+
+                    var fileRow = '<tr><td>' + fileName + '</td><td><input type="file" name="metadata_file_' + i + '" /></td></tr>';
+                    $j('#fileList tbody').append(fileRow);
+                }
+
+                $j('#fileList').append('</tbody></table>');
+            });
         });
     </script>
 {% endblock %}
-
 {% block body %}
     <form id='data_upload_form' method="post" action="{% url 'data_upload' %}">{% csrf_token %}
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
+            <div id="descriptionDiv">
+                <p>description of Upload process and script info</p>
+            </div>
+            {% include "webclient/data_upload/user_auth_get.html" with authorizedGroups=authorizedGroups %}
+            <script>console.log("Loading data_upload_popup template");</script>
 
+            {% for group in authorizedGroups %}
+                <script>console.log("Group: " + "{{ group.getName }}");</script>
+            {% endfor %}
             <p>
-                <label>Choose data to upload:</label>
-                <input id="data_file" name="data_file" type="file" />
+                <label>Choose files to upload:</label>
+                <input id="data_files" name="data_files" type="file" multiple />
             </p>
-
-            <p>
-                <label>Upload into folder:</label><br>
-                <input type="text" placeholder="/top_menu/sub_menu" name="data_path" id="dataFolder" style="width:350px"/>
-                <select id="data_folders" style="width:150px">
-                </select>
-            </p>
+            
+            <div id="fileList"></div>
 
             <p id="targetInfo" style="display:none">
                 <span id="targetMessage"></span>

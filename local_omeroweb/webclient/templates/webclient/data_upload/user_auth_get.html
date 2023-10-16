@@ -1,0 +1,104 @@
+{% load common_tags %}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        console.log("Loading user_auth_get template");
+        // Rest of your JavaScript code
+    });
+    </script>
+    
+<!-- Group Selection Dropdown -->
+<label>Select Group:</label>
+<select id="groupSelect" name="group">
+    <option value="">--Select Group--</option>
+    {% if authorizedGroups %}
+    {% for grp in authorizedGroups %}
+        <script>console.log("Group: {{ grp.getName }}");</script>
+        <option value="{{ grp.id }}">{{ grp.getName }}</option>
+    {% endfor %}
+    {% else %}
+        <script>console.error("Error: No groups were passed to the template.");</script>
+    {% endif %}
+</select>
+
+<!-- Error Message -->
+<p id="errorMessage" style="display: none; color: red;"></p>
+
+<script type="text/javascript">
+    // Use jQuery's no-conflict mode
+    var $j = jQuery.noConflict();
+
+    // Show an error message
+    function showError(message) {
+        var errorMessageElement = $j('#errorMessage');
+        errorMessageElement.text(message);
+        errorMessageElement.show();
+    }
+
+    // Rest of your JavaScript code
+</script>
+
+<!-- Project Selection Dropdown (Initially hidden) -->
+<div id="projectDiv" style="display:none;">
+    <label>Select Project:</label>
+    <select id="projectSelect" name="project">
+        <!-- Options will be populated dynamically using JavaScript -->
+    </select>
+</div>
+
+<div id="datasetDiv" style="display:none;">
+    <label>Select Dataset:</label>
+    <select id="datasetSelect" name="dataset">
+        <!-- Options will be populated dynamically using JavaScript -->
+    </select>
+</div>
+
+<script type="text/javascript">
+    // Use jQuery's no-conflict mode
+    var $j = jQuery.noConflict();
+
+    // On group selection change
+    $j('#groupSelect').on('change', function() {
+        var selectedGroup = $j(this).val();
+        if (selectedGroup) {
+            $j.ajax({
+                url: "/v0.2/m/projects/",  // Adjusted API version to 0.2
+                type: "GET",
+                success: function(data) {
+                    // Populate the projectSelect dropdown with the fetched projects
+                    $j.each(data, function(index, project) {
+                        $j("#projectSelect").append(new Option(project.name, project.id));
+                    });
+                    // Show the projectSelect dropdown
+                    $j("#projectSelect").show();
+                }
+            });
+        } else {
+            $j("#projectSelect").hide();
+            $j("#datasetSelect").hide();
+        }
+    });
+
+    // On project selection change
+    $j('#projectSelect').change(function() {
+        var selectedProject = $j(this).val();
+
+        // Fetch datasets for the selected project
+        if (selectedProject) {
+            $j.ajax({
+                url: "/v0.2/m/projects/" + selectedProject + "/datasets/",
+                type: "GET",
+                success: function(data) {
+                    // Populate the datasetSelect dropdown with the fetched datasets
+                    $j.each(data, function(index, dataset) {
+                        $j("#datasetSelect").append(new Option(dataset.name, dataset.id));
+                    });
+                    // Show the datasetSelect dropdown
+                    $j("#datasetSelect").show();
+                }
+            });
+        } else {
+            $j("#datasetSelect").hide();
+        }
+    });
+</script>
