@@ -4936,8 +4936,52 @@ def script_upload(request, conn=None, **kwargs):
 
 @login_required()
 @render_response()
-def data_upload(request, conn=None, **kwargs):
-    """Data upload popup UI"""
+def data_upload_form(request, conn=None, **kwargs):
+    # Get the active group
+    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
+    active_group = conn.getObject("ExperimenterGroup", active_group_id)
+
+    if active_group is None:
+        # No active group found, use default values
+        active_group_dict = {
+            'id': -1,
+            'name': 'Default Group',
+        }
+        project_dicts = [
+            {'id': -1, 'name': 'Fake Project 1'},
+            {'id': -2, 'name': 'Fake Project 2'},
+        ]
+    else:
+        # Convert the active group to a dictionary
+        active_group_dict = {
+            'id': active_group.getId(),
+            'name': active_group.getName(),
+        }
+
+        # Get all the projects in the active group
+        projects = list(conn.getObjects("Project", opts={'group': active_group_id}))
+
+        # Convert each project to a dictionary
+        project_dicts = []
+        for project in projects:
+            project_dict = {
+                'id': project.getId(),
+                'name': project.getName(),
+            }
+            project_dicts.append(project_dict)
+
+    # Pass the active group and projects to the template
+    context = {
+        'activeGroup': active_group_dict,
+        'projects': project_dicts,
+    }
+
+    return context
+
+@login_required()
+@render_response()
+def data_uploader(request, conn=None, **kwargs):
+    """Handle the data upload."""
 
     if request.method == "POST":
         # Get data path, name and text
@@ -4954,22 +4998,52 @@ def data_upload(request, conn=None, **kwargs):
 
         return {"Message": "Data uploaded successfully"}
 
-    # Get the current user
-    experimenter = conn.getObject("Experimenter", conn.getUserId())
-
-    # Get the groups that the current user is a member of
-    groups = conn.getGroupsMemberOf()
-
-    # Render the data_upload_popup.html template
-    return render(request, "webclient/data_upload/data_upload_popup.html", {"authorizedGroups": groups})
-
 @login_required()
 @render_response()
 def data_upload_popup(request, conn=None, **kwargs):
     """Data upload popup UI"""
 
+    # Get the active group
+    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
+    active_group = conn.getObject("ExperimenterGroup", active_group_id)
+
+    if active_group is None:
+        # No active group found, use default values
+        active_group_dict = {
+            'id': -1,
+            'name': 'Default Group',
+        }
+        project_dicts = [
+            {'id': -1, 'name': 'Fake Project 1'},
+            {'id': -2, 'name': 'Fake Project 2'},
+        ]
+    else:
+        # Convert the active group to a dictionary
+        active_group_dict = {
+            'id': active_group.getId(),
+            'name': active_group.getName(),
+        }
+
+        # Get all the projects in the active group
+        projects = list(conn.getObjects("Project", opts={'group': active_group_id}))
+
+        # Convert each project to a dictionary
+        project_dicts = []
+        for project in projects:
+            project_dict = {
+                'id': project.getId(),
+                'name': project.getName(),
+            }
+            project_dicts.append(project_dict)
+
+    # Pass the active group and projects to the template
+    context = {
+        'activeGroup': active_group_dict,
+        'projects': project_dicts,
+    }
+
     # Render the data_upload_popup.html template
-    return {"template": "webclient/data_upload/data_upload_popup.html"}
+    return render(request, "webclient/data_upload/data_upload_popup.html", context)
 
 # New Ends    
 
