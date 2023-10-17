@@ -4932,71 +4932,49 @@ def script_upload(request, conn=None, **kwargs):
 
     return {"Message": message, "script_id": script_id}
 
-#NEW: Data Upload Functions
-#TODO remove the data_upload_form. We are not using it anylonger.
-@login_required()
-@render_response()
-def data_upload_form(request, conn=None, **kwargs):
-    # Get the active group
-    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
-    active_group = conn.getObject("ExperimenterGroup", active_group_id)
-
-    if active_group is None:
-        # No active group found, use default values
-        active_group_dict = {
-            'id': -1,
-            'name': 'Default Group',
-        }
-        project_dicts = [
-            {'id': -1, 'name': 'Fake Project 1'},
-            {'id': -2, 'name': 'Fake Project 2'},
-        ]
-    else:
-        # Convert the active group to a dictionary
-        active_group_dict = {
-            'id': active_group.getId(),
-            'name': active_group.getName(),
-        }
-
-        # Get all the projects in the active group
-        projects = list(conn.getObjects("Project", opts={'group': active_group_id}))
-
-        # Convert each project to a dictionary
-        project_dicts = []
-        for project in projects:
-            project_dict = {
-                'id': project.getId(),
-                'name': project.getName(),
-            }
-            project_dicts.append(project_dict)
-
-    # Pass the active group and projects to the template
-    context = {
-        'activeGroup': active_group_dict,
-        'projects': project_dicts,
-    }
-
-    return context
+### NEW: Data Upload Functions
 
 @login_required()
 @render_response()
-def data_uploader(request, conn=None, **kwargs):
+def data_uploader_scrip_launcher(request, conn=None, **kwargs):
     """Handle the data upload."""
 
     if request.method == "POST":
-        # Get data path, name and text
+        # Get data path
         data_path = request.POST.get("data_path")
-        data_file = request.FILES["data_file"]
-        data_file.seek(0)
-        data_text = data_file.read().decode("utf-8")
 
-        if not data_path.endswith("/"):
-            data_path = data_path + "/"
-        data_path = data_path + data_file.name
+        # Get the active group
+        active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
 
-        # You can add your data upload logic here when you're ready
+        # Get the dataset id
+        dataset_id = request.POST.get("dataset_id")
 
-        return {"Message": "Data uploaded successfully"}
+        # Set the active group
+        conn.SERVICE_OPTS.setOmeroGroup(active_group_id)
+
+        # Prepare the inputs for the script
+        input_map = {
+            "Data_Path": omero.rtypes.rstring(data_path),
+            "Active_Group_Id": omero.rtypes.rlong(active_group_id),
+            "Dataset_Id": omero.rtypes.rstring(dataset_id),
+        }
+
+        # Call the 'data_uploader' script
+        script_service = conn.getScriptService()
+        sid = script_service.getScriptID('/Data_Uploader.py')
+        if sid <= 0:
+            return {"Message": "Script 'data_uploader' not found"}
+
+        # Run the script using the run_script function
+        rsp = run_script(request, conn, sid, input_map, scriptName='Data Uploader')
+
+        # The run_script function returns a dictionary with the status and error message (if any)
+        if rsp['status'] == 'failed':
+            return {"Message": rsp['error'], "script_id": sid}
+        else:
+            return {"Message": "Data uploaded successfully", "script_id": sid}
+
+    return {"Message": "Invalid request method"}
 
 @login_required()
 @render_response()
@@ -5017,34 +4995,23 @@ def data_upload_popup(request, conn=None, **kwargs):
     else:
         selected_dataset = None
 
-    if active_group is None:
-        # No active group found, use default values
-        active_group_dict = {
-            'id': -1,
-            'name': 'Default Group',
-        }
-        project_dicts = [
-            {'id': -1, 'name': 'Fake Project 1'},
-            {'id': -2, 'name': 'Fake Project 2'},
-        ]
-    else:
-        # Convert the active group to a dictionary
-        active_group_dict = {
-            'id': active_group.getId(),
-            'name': active_group.getName(),
-        }
+    # Convert the active group to a dictionary
+    active_group_dict = {
+        'id': active_group.getId(),
+        'name': active_group.getName(),
+    }
 
-        # Get all the projects in the active group
-        projects = list(conn.getObjects("Project", opts={'group': active_group_id}))
+    # Get all the projects in the active group
+    projects = list(conn.getObjects("Project", opts={'group': active_group_id}))
 
-        # Convert each project to a dictionary
-        project_dicts = []
-        for project in projects:
-            project_dict = {
-                'id': project.getId(),
-                'name': project.getName(),
-            }
-            project_dicts.append(project_dict)
+    # Convert each project to a dictionary
+    project_dicts = []
+    for project in projects:
+        project_dict = {
+            'id': project.getId(),
+            'name': project.getName(),
+        }
+        project_dicts.append(project_dict)
 
     # Pass the active group, projects, and selected dataset to the template
     context = {
@@ -5056,7 +5023,7 @@ def data_upload_popup(request, conn=None, **kwargs):
     # Render the data_upload_popup.html template
     return render(request, "webclient/data_upload/data_upload_popup.html", context)
 
-# New Ends    
+### New Ends    
 
 @require_POST
 @login_required()

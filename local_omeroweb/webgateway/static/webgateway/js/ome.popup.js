@@ -329,7 +329,7 @@ OME.openScriptWindow = function(event, width, height) {
 /*
 NEW: POPUP for Data Upload
 **/
-OME.openDataUploadWindow = function(event, width, height) {
+OME.openDataUploadWindow = function(event, width, height, left, top) {
     // open data upload url
     var upload_url = $(event.target).attr('href');
     if (upload_url == "#") return false;
@@ -356,7 +356,7 @@ OME.openDataUploadWindow = function(event, width, height) {
         upload_url += "?" + args.join("&");
     }
 
-    OME.openCenteredWindow(upload_url, width, height);
+    OME.openCenteredWindow(upload_url, width, height, left, top);
     return false;
 };
 

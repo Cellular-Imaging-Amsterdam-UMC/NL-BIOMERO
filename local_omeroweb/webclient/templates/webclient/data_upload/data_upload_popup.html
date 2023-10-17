@@ -69,6 +69,7 @@
             padding: 10px;
             border-top: 1px solid #fff;
         }
+
     </style>
 {% endblock %}
 
@@ -97,13 +98,19 @@
                 var tableHeader = '<table><thead><tr><th>File Name</th><th>Metadata File</th></tr></thead><tbody>';
                 $j('#fileList').append(tableHeader);
 
+                var filePaths = [];
                 for (var i = 0; i < files.length; i++) {
                     var file = files[i];
                     var fileName = file.name;
 
+                    filePaths.push(file.webkitRelativePath || file.name);  // Save file paths
+
                     var fileRow = '<tr><td>' + fileName + '</td><td><input type="file" name="metadata_file_' + i + '" /></td></tr>';
                     $j('#fileList tbody').append(fileRow);
                 }
+
+                // Set the hidden input field value to the joined file paths
+                $j('#data_path').val(filePaths.join(','));
 
                 $j('#fileList').append('</tbody></table>');
             });
@@ -112,9 +119,14 @@
 {% endblock %}
 {% block body %}
     {% if selected_dataset %}
-    <form id='data_upload_form' method="post" action="{% url 'data_upload_form' %}">{% csrf_token %}
+    <form id='data_uploader_scrip_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_scrip_launcher' %}">{% csrf_token %}
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
+            
+             <!-- Add these hidden input fields -->
+            <input type="hidden" id="data_path" name="data_path">
+            <input type="hidden" id="dataset_id" name="dataset_id" value="{{ selected_dataset.id }}">
+
             <!-- Description Div -->
             <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 10px;">
                 <!-- Description Text -->
@@ -128,7 +140,7 @@
                 <p style="font-size: 0.8em;"><strong>Contact:</strong> r.rosas@amsterdamumc.nl</p>
                 <p style="font-size: 0.8em;"><strong>Version:</strong> 0.0.0</p>
             </div>
-        
+            
             <!-- Active Group Display -->
             <div class="row">
                 <div class="column left">
@@ -190,7 +202,7 @@
         <!-- Warning message -->
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
-            <p style="color: red;">Select a Dataset in the left-side 'Explore' menu before running 'Upload Data'. If the Dataset where you want to upload data does not yet exist, create it by clicking on the green folder icon of the same menu.</p>
+            <p style="color: red;">Select a single Dataset in the left-side 'Explore' menu before running 'Upload Data'. If the Dataset where you want to upload data does not yet exist, create it by clicking on the green folder icon of the same menu.</p>
         </div>
         <div class="footer">
             <div style="float:right">
