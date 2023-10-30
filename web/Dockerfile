@@ -12,6 +12,7 @@ RUN /opt/omero/web/venv3/bin/pip install \
         omero-parade \
         omero-webtagging-autotag \
         omero-webtagging-tagsearch \
+        ezomero\
         whitenoise
         # # omero-fpbioimage 
 

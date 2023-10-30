@@ -313,7 +313,7 @@ urlpatterns = [
     ),  # runs the script - parameters in POST
     re_path(r"^script_upload/$", views.script_upload, name="script_upload"),
     #NEW: Data Upload
-    re_path(r"^data_uploader_scrip_launcher/$", views.data_uploader_scrip_launcher, name="data_uploader_scrip_launcher"),
+    re_path(r"^data_uploader_script_launcher/$", views.data_uploader_script_launcher, name="data_uploader_script_launcher"),
     re_path(r"^data_upload_popup/$", views.data_upload_popup, name="data_upload_popup"),
     re_path(
         r"^get_original_file/(?:(?P<fileId>[0-9]+)/)?$",

@@ -4936,22 +4936,38 @@ def script_upload(request, conn=None, **kwargs):
 
 @login_required()
 @render_response()
-def data_uploader_scrip_launcher(request, conn=None, **kwargs):
+def data_uploader_script_launcher(request, conn=None, **kwargs):
     """Handle the data upload."""
 
-    if request.method == "POST":
-        # Get data path
-        data_path = request.POST.get("data_path")
+    if request.method != "POST":
+        return [{"Message": "Invalid request method"}]
 
-        # Get the active group
-        active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
+    # Get data paths
+    data_paths = request.POST.get("data_path", "").split(',')
+    if not data_paths:
+        return [{"Message": "No data paths provided"}]
 
-        # Get the dataset id
-        dataset_id = request.POST.get("dataset_id")
+    # Get the active group
+    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
+    if active_group_id is None:
+        return [{"Message": "No active group ID provided"}]
 
-        # Set the active group
-        conn.SERVICE_OPTS.setOmeroGroup(active_group_id)
+    # Get the dataset id
+    dataset_id = request.POST.get("dataset_id")
+    if dataset_id is None:
+        return [{"Message": "No dataset ID provided"}]
 
+    # Set the active group
+    conn.SERVICE_OPTS.setOmeroGroup(active_group_id)
+
+    # Get the script ID
+    script_service = conn.getScriptService()
+    sid = script_service.getScriptID('/RemoteImporter.py')
+    if sid <= 0:
+        return [{"Message": "Script 'RemoteImporter' not found"}]
+
+    responses = []
+    for data_path in data_paths:
         # Prepare the inputs for the script
         input_map = {
             "Data_Path": omero.rtypes.rstring(data_path),
@@ -4959,27 +4975,41 @@ def data_uploader_scrip_launcher(request, conn=None, **kwargs):
             "Dataset_Id": omero.rtypes.rstring(dataset_id),
         }
 
-        # Call the 'data_uploader' script
-        script_service = conn.getScriptService()
-        sid = script_service.getScriptID('/Data_Uploader.py')
-        if sid <= 0:
-            return {"Message": "Script 'data_uploader' not found"}
-
         # Run the script using the run_script function
-        rsp = run_script(request, conn, sid, input_map, scriptName='Data Uploader')
+        try:
+            rsp = run_script(request, conn, sid, input_map, scriptName='RemoteImporter')
+        except Exception as e:
+            responses.append({"Message": str(e), "script_id": sid, "data_path": data_path})
+            continue
 
         # The run_script function returns a dictionary with the status and error message (if any)
-        if rsp['status'] == 'failed':
-            return {"Message": rsp['error'], "script_id": sid}
+        if rsp.get('status') == 'failed':
+            responses.append({"Message": rsp.get('error'), "script_id": sid, "data_path": data_path})
         else:
-            return {"Message": "Data uploaded successfully", "script_id": sid}
+            responses.append({"Message": "Data uploaded successfully", "script_id": sid, "data_path": data_path})
 
-    return {"Message": "Invalid request method"}
+    return responses
 
 @login_required()
 @render_response()
 def data_upload_popup(request, conn=None, **kwargs):
     """Data upload popup UI"""
+    # Mount data dir (will be L drive after testing)
+    directory_path = "/data"
+
+    # Directories in /data
+    group_directories = [f for f in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, f))]
+
+    # Data files
+    files_in_data_dir = {}
+
+    for directory in group_directories:
+        files_in_data_dir[directory] = []
+        for root, dirs, files in os.walk(os.path.join(directory_path, directory)):
+            for name in files:
+                files_in_data_dir[directory].append({"type": "file", "name": name})
+            for name in dirs:
+                files_in_data_dir[directory].append({"type": "dir", "name": name})
 
     # Get the active group
     active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
@@ -5013,11 +5043,13 @@ def data_upload_popup(request, conn=None, **kwargs):
         }
         project_dicts.append(project_dict)
 
-    # Pass the active group, projects, and selected dataset to the template
+    # Pass the active group, projects, selected dataset, and files in data dir to the template
     context = {
         'activeGroup': active_group_dict,
         'projects': project_dicts,
         'selected_dataset': selected_dataset,
+        'group_directories': group_directories,
+        'files_in_data_dir': files_in_data_dir
     }
 
     # Render the data_upload_popup.html template

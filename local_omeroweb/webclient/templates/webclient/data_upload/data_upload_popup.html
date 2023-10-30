@@ -7,6 +7,10 @@
 
 {% block link %}
     <style type="text/css">
+        .section_title {
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
         body {
             font-family: Arial;
             background: #eee;
@@ -33,12 +37,22 @@
             border-radius: 2px;
             padding: 5px;
         }
+        .btn-default:focus, .btn-default:active {
+        background-color: lightgray;
+        color: black;
+        box-shadow: none;
+        outline: none;
+        }
         #spinner {
             display: none;
             margin: -2px 0;
         }
         .row {
         display: flex;
+        padding-top: 0px; 
+        padding-bottom: 0px;
+        margin-top: 0px; 
+        margin-bottom: 0px; 
         }
         .column {
             flex: 50%;
@@ -69,6 +83,9 @@
             padding: 10px;
             border-top: 1px solid #fff;
         }
+        .data_destination_fields {
+        margin: 0px;
+        }
 
     </style>
 {% endblock %}
@@ -79,47 +96,49 @@
     <script type="text/javascript">
         // Use jQuery's no-conflict mode
         var $j = jQuery.noConflict();
-
+    
         $j(document).ready(function() {
             console.log("Loading data_upload_popup template");
-
+    
             // Show an error message
             function showError(message) {
                 var errorMessageElement = $j('#errorMessage');
                 errorMessageElement.text(message);
                 errorMessageElement.show();
             }
-
+    
             $j('#data_files').change(function() {
-                var files = this.files;
+                var selectedFiles = $j(this).val();
                 $j('#fileList').empty(); // Clear the list
-
+    
                 // Add table header
                 var tableHeader = '<table><thead><tr><th>File Name</th><th>Metadata File</th></tr></thead><tbody>';
                 $j('#fileList').append(tableHeader);
-
-                var filePaths = [];
-                for (var i = 0; i < files.length; i++) {
-                    var file = files[i];
-                    var fileName = file.name;
-
-                    filePaths.push(file.webkitRelativePath || file.name);  // Save file paths
-
+                
+                for (var i = 0; i < selectedFiles.length; i++) {
+                    var fileName = selectedFiles[i];
                     var fileRow = '<tr><td>' + fileName + '</td><td><input type="file" name="metadata_file_' + i + '" /></td></tr>';
                     $j('#fileList tbody').append(fileRow);
                 }
-
-                // Set the hidden input field value to the joined file paths
-                $j('#data_path').val(filePaths.join(','));
-
+            
                 $j('#fileList').append('</tbody></table>');
+            });
+    
+            // Set the data_path input field's value when the form is submitted
+            $j('#data_uploader_script_launcher').submit(function() {
+                var directoryPath = "/data";  // Update this to your actual directory path
+                var selectedFiles = $j('#data_files').val();
+                var fullPaths = selectedFiles.map(function(fileName) {
+                    return directoryPath + "/" + fileName;
+                });
+                $j('#data_path').val(fullPaths.join(','));
             });
         });
     </script>
 {% endblock %}
 {% block body %}
     {% if selected_dataset %}
-    <form id='data_uploader_scrip_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_scrip_launcher' %}">{% csrf_token %}
+    <form id='data_uploader_script_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_script_launcher' %}">{% csrf_token %}
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
             
@@ -140,50 +159,89 @@
                 <p style="font-size: 0.8em;"><strong>Contact:</strong> r.rosas@amsterdamumc.nl</p>
                 <p style="font-size: 0.8em;"><strong>Version:</strong> 0.0.0</p>
             </div>
-            
+
+            <p class="section_title"><strong>Data Destination:</strong></p>
+
             <!-- Active Group Display -->
             <div class="row">
                 <div class="column left">
-                    <p><strong>Selected Group:</strong></p>
+                    <p class="data_destination_fields"><strong>Selected Group:</strong></p>
                 </div>
                 <div class="column right">
-                    <p><strong>{{ activeGroup.name }}</strong></p>
+                    <p class="data_destination_fields"><strong>{{ activeGroup.name }}</strong></p>
                 </div>
                 <div class="column id">
-                    <p>ID: {{ activeGroup.id }}</p>
+                    <p class="data_destination_fields">ID: {{ activeGroup.id }}</p>
                 </div>
             </div>
-
+            
             <!-- Dataset Selection Dropdown -->
             <div class="row">
                 <div class="column left">
-                    <p><strong>Selected Dataset:</strong></p>
+                    <p class="data_destination_fields"><strong>Selected Dataset:</strong></p>
                 </div>
                 <div class="column right">
                     {% if selected_dataset %}
-                        <p><strong>{{ selected_dataset.name }}</strong></p>
+                        <p class="data_destination_fields"><strong>{{ selected_dataset.name }}</strong></p>
                     {% else %}
-                        <p>No Dataset Selected</p>
+                        <p class="data_destination_fields">No Dataset Selected</p>
                     {% endif %}
                 </div>
                 <div class="column id">
                     {% if selected_dataset %}
-                        <p>ID: {{ selected_dataset.id }}</p>
+                        <p class="data_destination_fields">ID: {{ selected_dataset.id }}</p>
                     {% else %}
-                        <p>No ID</p>
+                        <p class="data_destination_fields">No ID</p>
                     {% endif %}
                 </div>
             </div>
-        
-            <!-- Error Message -->
-            <p id="errorMessage" style="display: none; color: red;"></p>
-        
-            <p>
-                <strong>Choose files to upload:</strong>
-                <input id="data_files" name="data_files" type="file" multiple />
-            </p>
             
-            <div id="fileList"></div>
+            <p class="section_title"><strong>Data Source:</strong></p>
+            <div style="background-color: #b0c4de; padding: 10px;">
+                {% for directory in group_directories %}
+                    <button type="button" class="btn btn-default" id="{{ directory }}" onclick="selectGroupDirectory(this.id)">{{ directory }}</button>
+                {% endfor %}
+                <script>
+                    var filesInDataDir = JSON.parse('{{ files_in_data_dir|escapejs|safe }}');
+                
+                    function selectGroupDirectory(id) {
+                        // Reset the color of the previously selected button, if any
+                        if (window.selectedButtonId) {
+                            var previousButton = document.getElementById(window.selectedButtonId);
+                            previousButton.style.backgroundColor = ""; // Change this to the original color
+                            previousButton.style.color = "";
+                        }
+                
+                        // Change the color of the selected button
+                        var selectedButton = document.getElementById(id);
+                        selectedButton.style.backgroundColor = "gray";
+                        selectedButton.style.color = "white";
+                
+                        // Store the id of the selected button
+                        window.selectedButtonId = id;
+                
+                        // Populate the data_files select element with the contents of the selected directory
+                        var dataFilesSelect = document.getElementById('data_files');
+                        dataFilesSelect.innerHTML = ""; // Clear the select element
+                        var selectedDirectoryContents = filesInDataDir[id];
+                        for (var i = 0; i < selectedDirectoryContents.length; i++) {
+                            var option = document.createElement('option');
+                            option.value = selectedDirectoryContents[i].name;
+                            option.text = (selectedDirectoryContents[i].type == 'file' ? 'f: ' : 'd: ') + selectedDirectoryContents[i].name;
+                            dataFilesSelect.appendChild(option);
+                        }
+                
+                        // Show the data_files select element
+                        dataFilesSelect.style.display = 'block';
+                    }
+                </script>
+                
+                <p style="display: none;">
+                    <strong>Choose files from /data volume:</strong>
+                    <select id="data_files" name="data_files" multiple></select>
+                </p>
+                
+                <div id="fileList"></div>
         
             <p id="targetInfo" style="display:none">
                 <span id="targetMessage"></span>

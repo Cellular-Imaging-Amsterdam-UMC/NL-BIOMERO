@@ -55,6 +55,7 @@ services:
     # Define named volume and map a folder from the host machine
     volumes:
       - "omero:/OMERO"
+      - ./data:/data
 
   # Name of our worker node, can be anything 
   omeroworker-1:
@@ -71,6 +72,7 @@ services:
     # Named volume to share data access and persist data
     volumes:
       - "omero:/OMERO"
+      - ./data:/data
 
   # Define our processor worker
   omeroworker-processor:
@@ -95,6 +97,7 @@ services:
     volumes:
       - "omero:/OMERO"
       - "~/.ssh:/tmp/.ssh:ro"
+      - ./data:/data
 
   # Service for the omero.web UI
   omeroweb:
@@ -116,6 +119,7 @@ services:
     volumes: # Added this line for local development
       - ./local_omeroweb:/opt/omero/web/venv3/lib/python3.6/site-packages/omeroweb/
       - ./local_omeroweb_config:/opt/omero/web/config/
+      - ./data:/data
 
   
 
