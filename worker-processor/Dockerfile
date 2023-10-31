@@ -18,8 +18,6 @@ COPY worker-processor/ice.config worker-processor/worker.cfg /opt/omero/server/O
 RUN yum install -y openssh-clients
 COPY worker-processor/10-mount-ssh.sh /startup/10-mount-ssh.sh
 RUN chmod +x /startup/10-mount-ssh.sh
-## Setup slurm-config for omero-slurm-client
-COPY worker-processor/slurm-config.ini /etc/slurm-config.ini
 
 ## Setup OME ZARR & TIFF modules for data export
 RUN python3 -m pip install omero-cli-zarr==0.5.3
@@ -50,6 +48,8 @@ RUN python3 -m venv $VIRTUAL_ENV \
     && python3 -m pip install 'git+https://github.com/NL-BioImaging/omero-slurm-client' \
     && python3 -m pip install ezomero==1.1.1 tifffile==2020.9.3
 
+## Setup slurm-config for omero-slurm-client
+COPY worker-processor/slurm-config.ini /etc/slurm-config.ini
 
 ## OMERO: Replace the default startup scripts
 RUN rm /startup/60-database.sh
