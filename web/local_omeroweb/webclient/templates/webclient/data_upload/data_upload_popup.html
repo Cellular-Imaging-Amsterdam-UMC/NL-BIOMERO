@@ -1,0 +1,272 @@
+{% extends "webgateway/core_html.html" %}
+{% load i18n %}
+
+{% block title %}
+    Upload Data
+{% endblock %}
+
+{% block link %}
+    <style type="text/css">
+        .section_title {
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+        body {
+            font-family: Arial;
+            background: #eee;
+            margin: 0px;
+            padding: 0px;
+        }
+        div.footer {
+            background: #ddd; 
+            position:fixed; 
+            bottom:0px; left:0px; right:0px;
+            padding: 7px;
+            border-top: 1px solid #aaa;
+            font-size: 80%;
+        }
+        h3 {
+            margin-top: 0px;
+            padding-bottom: 10px;
+            border-bottom: solid #aaa 1px;
+        }
+        input[type='text'] {
+            border: solid 1px rgba(0,0,0,.2);
+            border-top: solid 1px rgba(0,0,0,.3);
+            box-shadow: 0 1px 0 white, inset 0 1px 1px rgba(0,0,0,.1);
+            border-radius: 2px;
+            padding: 5px;
+        }
+        .btn-default:focus, .btn-default:active {
+        background-color: lightgray;
+        color: black;
+        box-shadow: none;
+        outline: none;
+        }
+        #spinner {
+            display: none;
+            margin: -2px 0;
+        }
+        .row {
+        display: flex;
+        padding-top: 0px; 
+        padding-bottom: 0px;
+        margin-top: 0px; 
+        margin-bottom: 0px; 
+        }
+        .column {
+            flex: 50%;
+            padding: 10px;
+        }
+        .column.left {
+            background-color: #808080; /* Darker gray */
+        }
+        .column.right {
+            background-color: #b0c4de; /* Blue gray */
+        }
+        .column.id {
+            flex: 20%;
+            background-color: #b0c4de; /* Blue gray */
+        }
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #b0c4de; /* Blue gray */
+        }
+        th {
+            background-color: #808080; /* Darker gray */
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-top: 1px solid #fff;
+        }
+        .data_destination_fields {
+        margin: 0px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        // Use jQuery's no-conflict mode
+        var $j = jQuery.noConflict();
+    
+        $j(document).ready(function() {
+            console.log("Loading data_upload_popup template");
+    
+            // Show an error message
+            function showError(message) {
+                var errorMessageElement = $j('#errorMessage');
+                errorMessageElement.text(message);
+                errorMessageElement.show();
+            }
+    
+            $j('#data_files').change(function() {
+                var selectedFiles = $j(this).val();
+                $j('#fileList').empty(); // Clear the list
+    
+                // Add table header
+                var tableHeader = '<table><thead><tr><th>File Name</th><th>Metadata File</th></tr></thead><tbody>';
+                $j('#fileList').append(tableHeader);
+                
+                for (var i = 0; i < selectedFiles.length; i++) {
+                    var fileName = selectedFiles[i];
+                    var fileRow = '<tr><td>' + fileName + '</td><td><input type="file" name="metadata_file_' + i + '" /></td></tr>';
+                    $j('#fileList tbody').append(fileRow);
+                }
+            
+                $j('#fileList').append('</tbody></table>');
+            });
+    
+            // Set the data_path input field's value when the form is submitted
+            $j('#data_uploader_script_launcher').submit(function() {
+                var directoryPath = "/data";  // Update this to your actual directory path
+                var selectedFiles = $j('#data_files').val();
+                var fullPaths = selectedFiles.map(function(fileName) {
+                    return directoryPath + "/" + fileName;
+                });
+                $j('#data_path').val(fullPaths.join(','));
+            });
+        });
+    </script>
+{% endblock %}
+{% block body %}
+    {% if selected_dataset %}
+    <form id='data_uploader_script_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_script_launcher' %}">{% csrf_token %}
+        <div style="padding:10px; margin-bottom:40px">
+            <h3 id="dataUploadName">Upload Data</h3>
+            
+             <!-- Add these hidden input fields -->
+            <input type="hidden" id="data_path" name="data_path">
+            <input type="hidden" id="dataset_id" name="dataset_id" value="{{ selected_dataset.id }}">
+
+            <!-- Description Div -->
+            <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 10px;">
+                <!-- Description Text -->
+                <p style="font-size: 0.8em;">
+                    This script uses the selected Dataset and the files chosen by the user, 
+                    along with the metadata specified through XML files, to upload well-annotated 
+                    data to the selected Dataset folder. Please ensure that you have selected 
+                    the correct Dataset and files before proceeding with the upload.
+                </p>
+                <p style="font-size: 0.8em;"><strong>Author:</strong> Rodrigo Rosas-Bertolini</p>
+                <p style="font-size: 0.8em;"><strong>Contact:</strong> r.rosas@amsterdamumc.nl</p>
+                <p style="font-size: 0.8em;"><strong>Version:</strong> 0.0.0</p>
+            </div>
+
+            <p class="section_title"><strong>Data Destination:</strong></p>
+
+            <!-- Active Group Display -->
+            <div class="row">
+                <div class="column left">
+                    <p class="data_destination_fields"><strong>Selected Group:</strong></p>
+                </div>
+                <div class="column right">
+                    <p class="data_destination_fields"><strong>{{ activeGroup.name }}</strong></p>
+                </div>
+                <div class="column id">
+                    <p class="data_destination_fields">ID: {{ activeGroup.id }}</p>
+                </div>
+            </div>
+            
+            <!-- Dataset Selection Dropdown -->
+            <div class="row">
+                <div class="column left">
+                    <p class="data_destination_fields"><strong>Selected Dataset:</strong></p>
+                </div>
+                <div class="column right">
+                    {% if selected_dataset %}
+                        <p class="data_destination_fields"><strong>{{ selected_dataset.name }}</strong></p>
+                    {% else %}
+                        <p class="data_destination_fields">No Dataset Selected</p>
+                    {% endif %}
+                </div>
+                <div class="column id">
+                    {% if selected_dataset %}
+                        <p class="data_destination_fields">ID: {{ selected_dataset.id }}</p>
+                    {% else %}
+                        <p class="data_destination_fields">No ID</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <p class="section_title"><strong>Data Source:</strong></p>
+            <div style="background-color: #b0c4de; padding: 10px;">
+                {% for directory in group_directories %}
+                    <button type="button" class="btn btn-default" id="{{ directory }}" onclick="selectGroupDirectory(this.id)">{{ directory }}</button>
+                {% endfor %}
+                <script>
+                    var filesInDataDir = JSON.parse('{{ files_in_data_dir|escapejs|safe }}');
+                
+                    function selectGroupDirectory(id) {
+                        // Reset the color of the previously selected button, if any
+                        if (window.selectedButtonId) {
+                            var previousButton = document.getElementById(window.selectedButtonId);
+                            previousButton.style.backgroundColor = ""; // Change this to the original color
+                            previousButton.style.color = "";
+                        }
+                
+                        // Change the color of the selected button
+                        var selectedButton = document.getElementById(id);
+                        selectedButton.style.backgroundColor = "gray";
+                        selectedButton.style.color = "white";
+                
+                        // Store the id of the selected button
+                        window.selectedButtonId = id;
+                
+                        // Populate the data_files select element with the contents of the selected directory
+                        var dataFilesSelect = document.getElementById('data_files');
+                        dataFilesSelect.innerHTML = ""; // Clear the select element
+                        var selectedDirectoryContents = filesInDataDir[id];
+                        for (var i = 0; i < selectedDirectoryContents.length; i++) {
+                            var option = document.createElement('option');
+                            option.value = selectedDirectoryContents[i].name;
+                            option.text = (selectedDirectoryContents[i].type == 'file' ? 'f: ' : 'd: ') + selectedDirectoryContents[i].name;
+                            dataFilesSelect.appendChild(option);
+                        }
+                
+                        // Show the data_files select element and its parent paragraph
+                        dataFilesSelect.style.display = 'block';
+                        dataFilesSelect.parentElement.style.display = 'block'; // Show the parent paragraph
+                    }
+                </script>
+                
+                <p style="display: none;">
+                    <strong>Choose files from /data volume:</strong>
+                    <select id="data_files" name="data_files" multiple></select>
+                </p>
+                
+                <div id="fileList"></div>
+        
+            <p id="targetInfo" style="display:none">
+                <span id="targetMessage"></span>
+                <pre><code id="targetPath"></code></pre>
+            </p>
+        </div>
+        <div class="footer">
+            <div style="float:right">
+                <a href="#" tabIndex="3" onClick="self.close()">Close</a>
+                <input id="submit" tabIndex="2" type="submit" value="Upload Data" />
+                <img id="spinner" src ="{% static "webgateway/img/spinner.gif" %}"/>
+            </div>
+        </div>
+    </form>
+    {% else %}
+        <!-- Warning message -->
+        <div style="padding:10px; margin-bottom:40px">
+            <h3 id="dataUploadName">Upload Data</h3>
+            <p style="color: red;">Select a single Dataset in the left-side 'Explore' menu before running 'Upload Data'. If the Dataset where you want to upload data does not yet exist, create it by clicking on the green folder icon of the same menu.</p>
+        </div>
+        <div class="footer">
+            <div style="float:right">
+                <a href="#" tabIndex="3" onClick="self.close()">Close</a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
