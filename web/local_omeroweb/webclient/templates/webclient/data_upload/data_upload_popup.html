@@ -30,6 +30,10 @@
             padding-bottom: 10px;
             border-bottom: solid #aaa 1px;
         }
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
         input[type='text'] {
             border: solid 1px rgba(0,0,0,.2);
             border-top: solid 1px rgba(0,0,0,.3);
@@ -138,6 +142,7 @@
 {% endblock %}
 {% block body %}
     {% if selected_dataset %}
+    <script src="{% static 'webclient/javascript/cute_file_selector.js' %}"></script>
     <form id='data_uploader_script_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_script_launcher' %}">{% csrf_token %}
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
@@ -220,35 +225,22 @@
                         // Store the id of the selected button
                         window.selectedButtonId = id;
                 
-                        // Populate the data_files select element with the contents of the selected directory
-                        var dataFilesSelect = document.getElementById('data_files');
-                        dataFilesSelect.innerHTML = ""; // Clear the select element
-                        var selectedDirectoryContents = filesInDataDir[id];
-                        for (var i = 0; i < selectedDirectoryContents.length; i++) {
-                            var option = document.createElement('option');
-                            option.value = selectedDirectoryContents[i].name;
-                            option.text = (selectedDirectoryContents[i].type == 'file' ? 'f: ' : 'd: ') + selectedDirectoryContents[i].name;
-                            dataFilesSelect.appendChild(option);
-                        }
-                
-                        // Show the data_files select element and its parent paragraph
-                        dataFilesSelect.style.display = 'block';
-                        dataFilesSelect.parentElement.style.display = 'block'; // Show the parent paragraph
+                        // Build and render the file tree for the selected directory
+                        var fileData = filesInDataDir[id];
+                        var fileTree = buildFileTree(fileData);
+                        var fileTreeDiv = document.getElementById('fileTree');
+                        fileTreeDiv.innerHTML = ""; // Clear the div
+                        renderFileTree(fileTree, fileTreeDiv);
                     }
                 </script>
-                
-                <p style="display: none;">
-                    <strong>Choose files from /data volume:</strong>
-                    <select id="data_files" name="data_files" multiple></select>
+                <p class="section_title"><strong>Select Files:</strong></p>
+                <div id="fileTree"></div>
+                <p id="targetInfo" style="display:none">
+                    <span id="targetMessage"></span>
+                    <pre><code id="targetPath"></code></pre>
                 </p>
-                
-                <div id="fileList"></div>
-        
-            <p id="targetInfo" style="display:none">
-                <span id="targetMessage"></span>
-                <pre><code id="targetPath"></code></pre>
-            </p>
-        </div>
+            </div>
+
         <div class="footer">
             <div style="float:right">
                 <a href="#" tabIndex="3" onClick="self.close()">Close</a>

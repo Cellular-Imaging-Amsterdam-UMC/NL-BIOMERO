@@ -4990,6 +4990,21 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 
     return responses
 
+#Gets the data files to make the file selector
+def record_files_in_directory(directory):
+    """Recursively record all files in a directory and its subdirectories."""
+    recorded_files = []
+
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            full_path = os.path.join(root, file)
+            recorded_files.append({
+                "path": full_path,
+                "filename": file
+            })
+
+    return recorded_files
+
 @login_required()
 @render_response()
 def data_upload_popup(request, conn=None, **kwargs):
@@ -4998,10 +5013,15 @@ def data_upload_popup(request, conn=None, **kwargs):
     directory_path = "/data"
 
     # Directories in /data
-    group_directories = [f for f in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, f))]
+    group_directories = [f for f in os.listdir(directory_path) if os.path.isdir(os.path.join(directory_path, f)) and f.startswith('core')]
 
     # Data files
     files_in_data_dir = {}
+
+    for directory in group_directories:
+        full_directory_path = os.path.join(directory_path, directory)
+        files_in_data_dir[directory] = record_files_in_directory(full_directory_path)
+
 
     for directory in group_directories:
         files_in_data_dir[directory] = []
