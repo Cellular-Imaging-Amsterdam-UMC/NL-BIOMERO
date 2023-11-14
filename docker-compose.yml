@@ -117,8 +117,8 @@ services:
       - "4080:4080"
     # Map local volume for development purpouses
     volumes: # Added this line for local development
-      - ./web/local_omeroweb:/opt/omero/web/venv3/lib/python3.6/site-packages/omeroweb/
-      - ./web/local_omeroweb_config:/opt/omero/web/config/
+      - ./local_omeroweb:/opt/omero/web/venv3/lib/python3.6/site-packages/omeroweb/
+      - ./local_omeroweb_config:/opt/omero/web/config/
       - ./data:/data
 
 # Define the network(s) to communicate between containers
