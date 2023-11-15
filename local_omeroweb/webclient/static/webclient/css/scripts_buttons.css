@@ -1,0 +1,121 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: hsl(215,9%,88%);
+    margin: 0;
+    padding: 0;
+}
+
+#topContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#buttonsContainer, #searchBox {
+    display: inline-flex;
+    margin: 10px;
+}
+
+.button, #searchInput {
+    padding: 10px 20px;
+    margin: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    width: 100px; /* Set a fixed width */
+}
+
+#searchInput {
+    border: 1px solid gray;
+    background: white;
+    width: 80px; /* Make the search field narrower */
+}
+
+.button:active {
+    background-color: #3e8e41; /* Even darker green */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Less shadow to simulate being pressed */
+    transform: translateY(1px); /* Move the button down to simulate pressing */
+}
+
+#scriptsContainer, #searchContainer {
+    margin-top: 20px; /* Add top margin to make room for the topContainer */
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button {
+    background-color: #4CAF50;
+    padding: 10px 20px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white; /* Ensure text is readable on random background colors */
+    background: var(--tw-gradient-to);
+    background-clip: text;
+    -webkit-background-clip: text;
+    font-weight: bold; /* Make text bold */
+    text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.5); /* Add a more delicate text shadow for better visibility */
+}
+
+.dict {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 80%; /* Adjust as needed */
+    padding: 10px;
+    margin: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--tw-gradient-to);
+}
+
+.button:hover {
+    background-color: #45a049; /* Slightly different green */
+    color: black;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add shadow for a lifted effect */
+    transform: translateY(-2px); /* Slightly move the button up */
+}
+
+#scriptsContainer {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0;
+}
+
+.script {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 150px; /* Adjust as needed */
+    margin: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    padding: 20px;
+    cursor: pointer; /* Change cursor to indicate it's clickable */
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s; /* Smooth transition for hover and active states */
+}
+
+.script:hover {
+    background-color: #f0f0f0; /* Light grey background on hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add shadow for a lifted effect */
+    transform: translateY(-2px); /* Slightly move the script up */
+}
+
+.script:active {
+    background-color: #e0e0e0; /* Slightly darker on click */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Less shadow to simulate being pressed */
+    transform: translateY(1px); /* Move the script down to simulate pressing */
+}
+
+
+.button, .script {
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
