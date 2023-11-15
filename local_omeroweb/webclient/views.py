@@ -4987,10 +4987,7 @@ def record_files_in_directory(directory):
                 "filename": file
             })
 
-    return recorded_files
-
-
-### New Ends    
+    return recorded_files  
 
 @login_required()
 @render_response()
@@ -5053,6 +5050,8 @@ def data_upload_popup(request, conn=None, **kwargs):
 
     # Render the data_upload_popup.html template
     return render(request, "webclient/data_upload/data_upload_popup.html", context)
+
+### New Ends  
 
 @require_POST
 @login_required()

@@ -6,92 +6,7 @@
 {% endblock %}
 
 {% block link %}
-    <style type="text/css">
-        .section_title {
-            margin-top: 16px;
-            margin-bottom: 8px;
-        }
-        body {
-            font-family: Arial;
-            background: #eee;
-            margin: 0px;
-            padding: 0px;
-        }
-        div.footer {
-            background: #ddd; 
-            position:fixed; 
-            bottom:0px; left:0px; right:0px;
-            padding: 7px;
-            border-top: 1px solid #aaa;
-            font-size: 80%;
-        }
-        h3 {
-            margin-top: 0px;
-            padding-bottom: 10px;
-            border-bottom: solid #aaa 1px;
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 20px;
-        }
-        input[type='text'] {
-            border: solid 1px rgba(0,0,0,.2);
-            border-top: solid 1px rgba(0,0,0,.3);
-            box-shadow: 0 1px 0 white, inset 0 1px 1px rgba(0,0,0,.1);
-            border-radius: 2px;
-            padding: 5px;
-        }
-        .btn-default:focus, .btn-default:active {
-        background-color: lightgray;
-        color: black;
-        box-shadow: none;
-        outline: none;
-        }
-        #spinner {
-            display: none;
-            margin: -2px 0;
-        }
-        .row {
-        display: flex;
-        padding-top: 0px; 
-        padding-bottom: 0px;
-        margin-top: 0px; 
-        margin-bottom: 0px; 
-        }
-        .column {
-            flex: 50%;
-            padding: 10px;
-        }
-        .column.left {
-            background-color: #b0c4de; /* Darker gray */
-        }
-        .column.right {
-            background-color: #b0c4de; /* Blue gray */
-        }
-        .column.id {
-            flex: 20%;
-            background-color: #b0c4de; /* Blue gray */
-        }
-        /* Table styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #b0c4de; /* Blue gray */
-        }
-        th {
-            background-color: #808080; /* Darker gray */
-            padding: 10px;
-            text-align: left;
-        }
-        td {
-            padding: 10px;
-            border-top: 1px solid #fff;
-        }
-        .data_destination_fields {
-        margin: 0px;
-        }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'webclient/css/data_upload_popup.css' %}">
 {% endblock %}
 
 {% block script %}
@@ -144,7 +59,7 @@
     <script src="{% static 'webclient/javascript/cute_file_selector.js' %}"></script>
     <form id='data_uploader_script_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_script_launcher' %}">{% csrf_token %}
         
-        <div style="padding:10px; margin-bottom:40px">
+        <div style="padding:10px; margin-bottom:10px">
             <h3 id="dataUploadName">Upload Data</h3>
             
             <!-- Add these hidden input fields -->
@@ -153,7 +68,7 @@
             <input type="hidden" id="active_group_id" name="active_group_id" value="{{ activeGroup.id }}">
 
             <!-- Description Div -->
-            <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 10px;">
+            <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 0px; margin-bottom: 0px;">
                 <!-- Description Text -->
                 <p style="font-size: 0.8em;">
                     This script uses the selected Dataset and the files chosen by the user, 
