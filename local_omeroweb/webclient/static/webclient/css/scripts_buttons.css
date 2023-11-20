@@ -119,3 +119,30 @@ body {
 .button, .script {
     transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
+
+.category {
+    width: 100%; /* Take up a full 'line' in the div */
+    font-weight: bold; /* Make the text bold */
+    color: white; /* Make the text white */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow to make the text pop */
+    margin-top: 10px; /* Add some top margin for separation */
+    text-align: center; /* Center the category title */
+    position: relative; /* Position relative to the pseudo-element */
+    overflow: hidden; /* Hide the parts of the pseudo-element that are outside this element */
+}
+
+.category::before {
+    content: ""; /* This is necessary for the pseudo-element to work */
+    position: absolute; /* Position absolutely within the .category element */
+    top: 50%; /* Center vertically */
+    left: 0; /* Start from the left edge */
+    width: 100%; /* Take up the full width */
+    height: 1px; /* Set the height of the line */
+    background: white; /* Make the line white */
+    z-index: -1; /* Place it behind the text */
+}
+
+.category span {
+    background: hsl(215,9%,88%); /* Same as the background color of the body */
+    padding: 0 10px; /* Add some padding on the sides */
+}

@@ -4932,6 +4932,18 @@ def script_upload(request, conn=None, **kwargs):
 
     return {"Message": message, "script_id": script_id}
 
+### NEW: Scritps Menu Popup
+@login_required()
+@login_required()
+def scripts_menu_popup(request, conn=None, **kwargs):
+    """View for the scripts menu popup."""
+    context = {
+        'scripts_url': reverse('list_scripts'),  # replace 'list_scripts' with the name of your view function
+        # other context variables...
+    }
+    return render(request, 'webclient/base/includes/scripts_menu_popup.html', context)
+
+###
 ### NEW: Data Upload Functions
 @login_required(setGroupContext=True)
 def data_uploader_script_launcher(request, conn=None, **kwargs):

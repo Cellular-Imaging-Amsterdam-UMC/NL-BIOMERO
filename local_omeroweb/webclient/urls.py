@@ -312,6 +312,8 @@ urlpatterns = [
         r"^script_run/(?P<scriptId>[0-9]+)/$", views.script_run, name="script_run"
     ),  # runs the script - parameters in POST
     re_path(r"^script_upload/$", views.script_upload, name="script_upload"),
+    #NEW: Script Menu Popup
+    re_path(r"^scripts_menu_popup/$", views.scripts_menu_popup, name="scripts_menu_popup"),
     #NEW: Data Upload
     re_path(r"^data_uploader_script_launcher/$", views.data_uploader_script_launcher, name="data_uploader_script_launcher"),
     re_path(r"^data_upload_popup/$", views.data_upload_popup, name="data_upload_popup"),

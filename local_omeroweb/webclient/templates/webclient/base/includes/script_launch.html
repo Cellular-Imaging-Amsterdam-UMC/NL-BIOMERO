@@ -19,12 +19,33 @@
 {% endcomment %}
 
 
+<body>
+    <!-- Your HTML content -->
+
     <li>
         <!-- Script launcher -->
-        <span id="scriptButton" class="scriptButton toolbar_button" href="{% url 'list_scripts' %}" title="Scripts"></span>
-        <div id="scriptList" class="sub_menu info_panel" style="min-width: 200px !important">
-        <img id="scriptSpinner" style="display:none" src="{% static "webgateway/img/spinner.gif" %}" />
-            <!-- script list-items loaded here by AJAX -->
-        </div>
+        <span id="scriptButton" class="scriptButton toolbar_button" data-scripts-url="{% url 'scripts_menu_popup' %}" title="Scripts"></span>
     </li>
+    
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        var $j = jQuery.noConflict();
+    </script>
+    <!-- Include ome.popup.js first -->
+    <script type="text/javascript" src="{% static "webgateway/js/ome.popup.js" %}"></script>
+    
+    <!-- Then include scripts_popup.js -->
+    <script type="text/javascript" src="{% static "webclient/javascript/scripts_popup.js" %}"></script>
 
+    <!-- Your JavaScript code -->
+    <script>
+        $j(document).ready(function() {
+            $j('#scriptButton').on('click', function(e) {
+                e.preventDefault();
+                var url = "{% url 'scripts_menu_popup' %}";
+                OME.openCenteredWindow(url, 1000, 500);
+            });
+        });
+    </script>
+</body>

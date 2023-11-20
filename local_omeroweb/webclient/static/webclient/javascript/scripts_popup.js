@@ -1,64 +1,46 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const scriptData = [
-        {
-            "name": "omero",
-            "ul": [
-                {"name": "script1", "id": 1},
-                {"name": "script2", "id": 2},
-                {"name": "script3", "id": 3},
-                {"name": "script4", "id": 4},
-                {"name": "script5", "id": 5},
-            ],
-        },
-        {
-            "name": "SLURM",
-            "ul": [
-                {"name": "script6", "id": 6},
-                {"name": "script7", "id": 7},
-                {"name": "script8", "id": 8},
-                {"name": "script9", "id": 9},
-                {"name": "script10", "id": 10},
-            ],
-        },
-        {
-            "name": "User",
-            "ul": [
-                {"name": "script6", "id": 11},
-                {"name": "script7", "id": 12},
-                {"name": "script8", "id": 13},
-                {"name": "script9", "id": 14},
-            ],
-        },
-    ];
-
+    console.log('DOMContentLoaded event fired');
     const buttonsContainer = document.getElementById('buttonsContainer');
     const scriptsContainer = document.getElementById('scriptsContainer');
     const searchContainer = document.getElementById('searchContainer');
     const searchInput = document.getElementById('searchInput');
+    const scriptsUrl = document.body.dataset.scriptsUrl;
     let selectedDictionaries = {};
 
-    // Function to create buttons for each dictionary
-    scriptData.forEach(dict => {
-        const button = document.createElement('button');
-        button.className = 'button';
-        button.textContent = dict.name;
-        button.style.background = getRandomColor(); // Set random gradient color
-        button.dataset.color = button.style.background; // Store color in dataset
-        button.dataset.name = dict.name; // Store dictionary name in dataset
-        button.onclick = () => toggleDictionary(dict);
-        buttonsContainer.appendChild(button);
-    });
+    // Fetch the script data from the server
+    fetch(scriptsUrl)
+        .then(response => response.text())  // get the response text
+        .then(text => {
+            console.log('Received response from server:', text);
+            return JSON.parse(text);  // try to parse the response text as JSON
+        })
+        .then(scriptData => {
+            console.log('Parsed script data:', scriptData);
+            // Function to create buttons for each dictionary that contains a 'ul' property
+            scriptData.forEach(dict => {
+                if (dict.ul) { // Check if the dictionary has a 'ul' property
+                    const button = document.createElement('button');
+                    button.className = 'button';
+                    button.textContent = dict.name;
+                    button.style.background = getRandomColor(); // Set random gradient color
+                    button.dataset.color = button.style.background; // Store color in dataset
+                    button.dataset.name = dict.name; // Store dictionary name in dataset
+                    button.onclick = () => toggleDictionary(dict);
+                    buttonsContainer.appendChild(button);
+                }
+            });
 
-    // Search functionality
-    searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        if (searchTerm) {
-            const matchingScripts = scriptData.flatMap(dict => dict.ul.filter(script => script.name.toLowerCase().includes(searchTerm)));
-            displayScripts(matchingScripts.slice(0, 5), searchContainer); // Limit the results to a maximum of 5
-        } else {
-            searchContainer.innerHTML = ''; // Clear the search results if the search field is empty
-        }
-    });
+            // Search functionality
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                if (searchTerm) {
+                    const matchingScripts = scriptData.flatMap(dict => dict.ul.filter(script => script.name.toLowerCase().includes(searchTerm)));
+                    displayScripts(matchingScripts.slice(0, 5), searchContainer); // Limit the results to a maximum of 5
+                } else {
+                    searchContainer.innerHTML = ''; // Clear the search results if the search field is empty
+                }
+            });
+        });
 
     // Function to toggle dictionaries
     function toggleDictionary(dict) {
@@ -72,18 +54,53 @@ document.addEventListener("DOMContentLoaded", function() {
             dictDiv.id = dict.name;
             dictDiv.className = 'dict';
             dictDiv.style.background = document.querySelector(`button[data-name="${dict.name}"]`).dataset.color;
-    
-            dict.ul.forEach(script => {
-                const scriptDiv = document.createElement('div');
-                scriptDiv.className = 'script';
-                scriptDiv.textContent = script.name;
-                scriptDiv.onclick = () => {
-                    console.log(`Script ${script.id} clicked: Would call {% url 'script_ui' ${script.id} %}`);
-                    // Here you can simulate a server call or any other action
-                };
-                dictDiv.appendChild(scriptDiv);
-            });
-    
+
+            // Recursive function to iterate over all levels of 'ul' arrays
+            function processScripts(scripts, category) {
+                if (category) {  // Only create a category div if the category is not null, undefined, or an empty string
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category';
+                    categoryDiv.textContent = category;
+                    dictDiv.appendChild(categoryDiv);
+                }
+            
+                scripts.forEach(script => {
+                    if (script.ul) {
+                        // If the script has a 'ul' property, recursively process its scripts
+                        processScripts(script.ul, script.name);
+                    } else {
+                        // If the script doesn't have a 'ul' property, it's a leaf script
+                        script.script_category = category;  // Add the script_category property
+                        const scriptDiv = document.createElement('div');
+                        scriptDiv.className = 'script';
+                        scriptDiv.textContent = script.name;
+                        scriptDiv.dataset.id = script.id;  // Store the script's ID in a data attribute
+                        scriptDiv.onclick = () => {
+                            const scriptUrl = `/webclient/script_ui/${scriptDiv.dataset.id}/`;  // Use the script's ID from the data attribute
+                            console.log('Script URL:', scriptUrl);
+                            // Create a synthetic event object
+                            const event = {
+                                target: {
+                                    getAttribute: () => scriptUrl
+                                }
+                            };
+                            // Open the script window
+                            console.log('Opening script window with event:', event);
+                            console.log(OME)
+                            OME.openScriptWindow(event);
+                                                
+                            // Close the popup
+                            window.close();
+                        };
+
+                        dictDiv.appendChild(scriptDiv);
+                    }
+                });
+            }
+
+            // Start the recursive processing with the top-level scripts
+            processScripts(dict.ul, null);
+
             scriptsContainer.prepend(dictDiv); // Add the dictionary div at the top
         }
     }
@@ -99,6 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const scriptDiv = document.createElement('div');
                 scriptDiv.className = 'script';
                 scriptDiv.textContent = script.name;
+                scriptDiv.dataset.id = script.id;  // Store the script's ID in a data attribute
                 dictDiv.appendChild(scriptDiv);
             });
             container.appendChild(dictDiv); // Add the dictionary div

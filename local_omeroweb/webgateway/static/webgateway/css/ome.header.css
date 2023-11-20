@@ -217,13 +217,13 @@
 	/* NEW: Clearer Scripts and Activity button */
 		#scriptButton::before {
 			content: attr(title);
-			background: url(../img/scripts_icon_blue.png) no-repeat left center;
+			background: url(../img/script-text-play.svg) no-repeat left center;
 			background-size: contain; /* or 'cover' depending on your needs */
-			background-blend-mode: lighten;
 			padding-left: 27px; /* Adjust as needed */
 			padding-top: 0.5em;
 			padding-bottom: 0.5em;
 			padding-right: 0.5em;
+			filter: drop-shadow(0 1px 0px rgba(0,0,0,.4));
 		}
 
 
