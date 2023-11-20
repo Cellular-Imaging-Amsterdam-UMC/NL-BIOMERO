@@ -5,96 +5,75 @@ body {
     padding: 0;
 }
 
-#topContainer {
+#topContainer, #scriptsContainer, #searchContainer {
     display: flex;
     justify-content: center;
+    flex-direction: column;
     align-items: center;
 }
 
-#buttonsContainer, #searchBox {
+#searchBox {
     display: inline-flex;
     margin: 10px;
 }
 
-.button, #searchInput {
+#searchInput {
     padding: 10px 20px;
     margin: 5px;
-    border: 1px solid #ddd;
+    border: 1px solid gray;
     border-radius: 5px;
     font-family: Arial, sans-serif;
     font-weight: bold;
     text-align: center;
-    width: 100px; /* Set a fixed width */
-}
-
-#searchInput {
-    border: 1px solid gray;
     background: white;
     width: 80px; /* Make the search field narrower */
 }
 
-.button:active {
-    background-color: #3e8e41; /* Even darker green */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Less shadow to simulate being pressed */
-    transform: translateY(1px); /* Move the button down to simulate pressing */
-}
-
-#scriptsContainer, #searchContainer {
-    margin-top: 20px; /* Add top margin to make room for the topContainer */
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-}
-
-.button {
-    background-color: #4CAF50;
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    color: white; /* Ensure text is readable on random background colors */
-    background: var(--tw-gradient-to);
-    background-clip: text;
-    -webkit-background-clip: text;
-    font-weight: bold; /* Make text bold */
-    text-shadow: 0.5px 0.5px 1px rgba(255, 255, 255, 0.5); /* Add a more delicate text shadow for better visibility */
-}
-
 .dict {
+    position: relative; /* Set the position to relative */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    width: 80%; /* Adjust as needed */
+    width: 95%;
     padding: 10px;
     margin: 10px;
     border-radius: 8px;
-    overflow: hidden;
-    background: var(--tw-gradient-to);
 }
 
-.button:hover {
-    background-color: #45a049; /* Slightly different green */
-    color: black;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add shadow for a lifted effect */
-    transform: translateY(-2px); /* Slightly move the button up */
-}
+.titleBubble {
+    position: absolute; /* Position absolutely */
+    top: -10px; /* Position partially outside the top edge of the parent div */
+    left: -10px; /* Position partially outside the left edge of the parent div */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Add a box shadow to make the div pop */
+    padding: 10px; /* Add some padding */
+    color: white; /* Make the text color white */
+    border: 1px solid white; /* Add a white border */
+    font-size: 20px; /* Increase the font size */
+    border-radius: 8px; /* Add rounded corners */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow to the text */
+    }
 
-#scriptsContainer {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 0;
+.category {
+    width: 100%; /* Take up a full 'line' in the div */
+    font-size: 14px;
+    font-weight: bold; /* Make the text bold */
+    color: white; /* Make the text white */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow to make the text pop */
+    margin-top: 10px; /* Add some top margin for separation */
+    text-align: center; /* Center the category title */
+    position: relative; /* Position relative to the pseudo-elements */
+    overflow: hidden; /* Hide the parts of the pseudo-elements that are outside this element */
+    padding-bottom: 10px; /* Add some bottom padding */
 }
 
 .script {
-    background-color: white;
+    font-size: 12px;
+    font-weight: bold; /* Make the text bold */
+    color: white; /* Make the text white */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); 
     border: 1px solid #ddd;
     border-radius: 8px;
-    width: 150px; /* Adjust as needed */
+    width: auto; 
     margin: 10px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-align: center;
@@ -107,42 +86,11 @@ body {
     background-color: #f0f0f0; /* Light grey background on hover */
     box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Add shadow for a lifted effect */
     transform: translateY(-2px); /* Slightly move the script up */
+    color: black;
 }
 
 .script:active {
     background-color: #e0e0e0; /* Slightly darker on click */
     box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Less shadow to simulate being pressed */
     transform: translateY(1px); /* Move the script down to simulate pressing */
-}
-
-
-.button, .script {
-    transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
-}
-
-.category {
-    width: 100%; /* Take up a full 'line' in the div */
-    font-weight: bold; /* Make the text bold */
-    color: white; /* Make the text white */
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add a shadow to make the text pop */
-    margin-top: 10px; /* Add some top margin for separation */
-    text-align: center; /* Center the category title */
-    position: relative; /* Position relative to the pseudo-element */
-    overflow: hidden; /* Hide the parts of the pseudo-element that are outside this element */
-}
-
-.category::before {
-    content: ""; /* This is necessary for the pseudo-element to work */
-    position: absolute; /* Position absolutely within the .category element */
-    top: 50%; /* Center vertically */
-    left: 0; /* Start from the left edge */
-    width: 100%; /* Take up the full width */
-    height: 1px; /* Set the height of the line */
-    background: white; /* Make the line white */
-    z-index: -1; /* Place it behind the text */
-}
-
-.category span {
-    background: hsl(215,9%,88%); /* Same as the background color of the body */
-    padding: 0 10px; /* Add some padding on the sides */
 }
