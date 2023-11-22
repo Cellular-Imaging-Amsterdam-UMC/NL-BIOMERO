@@ -1,6 +1,5 @@
 document.addEventListener("DOMContentLoaded", function() {
     console.log('DOMContentLoaded event fired');
-    const buttonsContainer = document.getElementById('buttonsContainer');
     const scriptsContainer = document.getElementById('scriptsContainer');
     const searchContainer = document.getElementById('searchContainer');
     const searchInput = document.getElementById('searchInput');
