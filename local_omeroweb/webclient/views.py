@@ -4985,22 +4985,35 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
     else:
         return JsonResponse({"message": "Data uploaded successfully"})
 
-#Gets the data files to make the file selector
-def record_files_in_directory(directory):
-    """Recursively record all files in a directory and its subdirectories."""
-    recorded_files = []
+@login_required(setGroupContext=True)
+def record_files_in_directory_launcher(request, directory, conn=None, **kwargs):
+    """Handle the file recording."""
+    script_service = conn.getScriptService()
+    script_id = script_service.getScriptID('/record_files_in_directory.py')
+    if script_id <= 0:
+        return HttpResponse("Script 'record_files_in_directory.py' not found")
 
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            file_path = os.path.join(root, file)
-            relative_path = os.path.relpath(file_path, directory)
-            relative_path = os.path.join(directory, relative_path)
-            recorded_files.append({
-                "path": relative_path,
-                "filename": file
-            })
+    # Prepare the input map
+    input_map = {'directory': rstring(directory)}
 
-    return recorded_files  
+    # Run the script using the script_run function
+    try:
+        rsp = script_run(request, script_id, conn=None, **input_map)
+    except Exception as e:
+        return HttpResponse(str(e))
+
+    # The script_run function returns a dictionary with the status and error message (if any)
+    if rsp.get('status') == 'failed':
+        return HttpResponse(rsp.get('error'))
+    else:
+        # Extract the recorded files from the script output
+        recorded_files = rsp.get('output', {}).get('Recorded Files')
+        if recorded_files is not None:
+            # Convert the recorded files from a string to a list of dictionaries
+            recorded_files = [eval(file) for file in recorded_files.split('\n')]
+        else:
+            recorded_files = []
+        return JsonResponse({"recorded_files": recorded_files})
 
 @login_required()
 @render_response()
@@ -5016,9 +5029,19 @@ def data_upload_popup(request, conn=None, **kwargs):
     files_in_data_dir = {}
 
     for directory in group_directories:
-        full_directory_path = os.path.join(base_data_directory, directory)
-        files_in_data_dir[directory] = record_files_in_directory(full_directory_path)
-
+        full_core_directory_path = os.path.join(base_data_directory, directory)
+        response = record_files_in_directory_launcher(request, directory=full_core_directory_path)
+        if response.status_code == 200:
+            if response.content:
+                try:
+                    files_in_data_dir[directory] = json.loads(response.content.decode('utf-8'))
+                except json.JSONDecodeError:
+                    return HttpResponse("Invalid JSON response: " + response.content.decode('utf-8'))
+            else:
+                return HttpResponse("Empty response content")
+        else:
+            return HttpResponse("Error recording files in directory: " + response.content.decode('utf-8'))
+              
     # Get the active group
     active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
     active_group = conn.getObject("ExperimenterGroup", active_group_id)
