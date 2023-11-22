@@ -94,3 +94,29 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Less shadow to simulate being pressed */
     transform: translateY(1px); /* Move the script down to simulate pressing */
 }
+
+.upload_script {
+    padding: 10px 20px;
+    margin: 5px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    text-align: center;
+    background: white;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+.upload_script:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+    color: black;
+}
+
+.upload_script:active {
+    background-color: #e0e0f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: translateY(1px);
+}

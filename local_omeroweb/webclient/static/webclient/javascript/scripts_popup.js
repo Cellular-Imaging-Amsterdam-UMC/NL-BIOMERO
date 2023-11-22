@@ -1,10 +1,24 @@
 document.addEventListener("DOMContentLoaded", function() {
     console.log('DOMContentLoaded event fired');
+    const currentAdminPrivileges = document.body.dataset.adminPrivileges.split(',');
+    const scriptUploadUrl = document.body.dataset.scriptUploadUrl;
     const scriptsContainer = document.getElementById('scriptsContainer');
     const searchContainer = document.getElementById('searchContainer');
     const searchInput = document.getElementById('searchInput');
     const scriptsUrl = document.body.dataset.scriptsUrl;
     let selectedDictionaries = {};
+
+    // Add the "Upload Script" button if the user has the "WriteScriptRepo" privilege
+    if (currentAdminPrivileges.indexOf("WriteScriptRepo") > -1) {
+        const searchBox = document.getElementById('searchBox');
+        const uploadScriptButton = document.createElement('button');
+        uploadScriptButton.className = 'upload_script';
+        uploadScriptButton.textContent = 'Upload Script';
+        uploadScriptButton.onclick = function() {
+            window.location.href = scriptUploadUrl;
+        };
+        searchBox.appendChild(uploadScriptButton);
+    }
 
     // Fetch the script data from the server
     fetch(scriptsUrl)

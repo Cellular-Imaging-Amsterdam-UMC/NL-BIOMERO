@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block body %}
-<body data-scripts-url="{{ scripts_url }}">
+<body data-scripts-url="{{ scripts_url }}" data-script-upload-url="{{ script_upload_url }}" data-admin-privileges="{{ current_admin_privileges|join:',' }}">
     <div id="topContainer">
         <div id="buttonsContainer">
         </div>

@@ -4939,7 +4939,8 @@ def scripts_menu_popup(request, conn=None, **kwargs):
     """View for the scripts menu popup."""
     context = {
         'scripts_url': reverse('list_scripts'),  # replace 'list_scripts' with the name of your view function
-        # other context variables...
+        'script_upload_url': reverse('script_upload'),
+        'current_admin_privileges': conn.getCurrentAdminPrivileges(),  # get the current admin privileges
     }
     return render(request, 'webclient/base/includes/scripts_menu_popup.html', context)
 
