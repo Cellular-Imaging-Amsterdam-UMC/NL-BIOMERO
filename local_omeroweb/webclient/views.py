@@ -4961,12 +4961,6 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
     # Prepare the input map
     input_map = {key: rstring(value) for key, value in request.POST.items()}
 
-    # Run the script using the script_run function
-    try:
-        rsp = script_run(request, sid, conn=None, **input_map)
-    except Exception as e:
-        return HttpResponse(str(e))
-
     # Get the active group ID from the request
     active_group_id = request.POST.get("active_group_id")
     if active_group_id is None:
@@ -4977,39 +4971,60 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
     gid = conn.SERVICE_OPTS.getOmeroGroup()  # Save the current group ID
     conn.SERVICE_OPTS.setOmeroGroup(active_group_id)  # Set the group ID to the active group
 
+    # Run the script using the script_run function
+    try:
+        rsp = script_run(request, sid, conn=None, **input_map)
+    except Exception as e:
+        return HttpResponse(str(e))
+    finally:
+        conn.SERVICE_OPTS.setOmeroGroup(gid)  # Restore the original group ID
+
     # The script_run function returns a dictionary with the status and error message (if any)
     if rsp.get('status') == 'failed':
         return HttpResponse(rsp.get('error'))
     else:
         return JsonResponse({"message": "Data uploaded successfully"})
 
-def record_files_in_directory_launcher(request, conn=None, **kwargs):
+@login_required()
+def record_files_in_directory_launcher(request, directory, conn=None, **kwargs):
     """Handle the record files in directory script."""
-    # Get the directory from kwargs
-    directory = kwargs.get('directory')
-
     # Get the script ID
     script_service = conn.getScriptService()
     sid = script_service.getScriptID('/My_scripts/record_files_in_directory.py')
     if sid <= 0:
         return HttpResponse("Script '/My_scripts/record_files_in_directory.py' not found")
 
-    # Prepare the input map
-    input_map = {'directory': rstring(directory)}
+    # Backup the original POST data
+    original_post_data = request.POST
 
-    # Run the script using the script_run function
+    # Temporarily replace request.POST with a custom dictionary
     try:
-        rsp = script_run(request, sid, conn=None, **input_map)
-    except Exception as e:
-        return HttpResponse(str(e))
+        request.POST = {'directory': str(directory)}
+        
+        # Run the script using the script_run function
+        try:
+            rsp = script_run(request, sid, conn=None, **kwargs)
+        except Exception as e:
+            return HttpResponse(str(e))
 
-    # The script_run function returns a dictionary with the status and error message (if any)
-    if rsp.get('status') == 'failed':
-        return HttpResponse(rsp.get('error'))
-    else:
-        # Extract the recorded files from the response
-        recorded_files = rsp.get('Recorded Files')
-        return recorded_files   # Return the output instead of a JsonResponse
+        # Handle the response from script_run
+        if rsp.get('status') == 'failed':
+            return HttpResponse(rsp.get('error'))
+        else:
+            # Extract the recorded files from the 'Message' field
+            message = rsp.get('Message')
+            # The recorded files are after the "Recorded Files: " substring
+            recorded_files_str = message.split("Recorded Files: ", 1)[1]
+            # The recorded files are before the "directory: " substring
+            recorded_files_str = recorded_files_str.split("directory: ", 1)[0]
+            # Convert the recorded files string to a list of dictionaries
+            recorded_files = ast.literal_eval(recorded_files_str)
+            return recorded_files
+
+    finally:
+        # Restore the original POST data
+        request.POST = original_post_data
+
 
 @login_required()
 @render_response()
@@ -5021,16 +5036,14 @@ def data_upload_popup(request, conn=None, **kwargs):
     # Directories in /data
     group_directories = [f for f in os.listdir(base_data_directory) if os.path.isdir(os.path.join(base_data_directory, f)) and f.startswith('core')]
 
-    # Call the record_files_in_directory_launcher function for each directory and get its output
+    # Call the record_files_in_directory_launcher function and get its output
     outputs = []
     for directory in group_directories:
-        response = record_files_in_directory_launcher(request, conn, directory=directory)
+        full_directory_path = os.path.join(base_data_directory, directory)
+        response = record_files_in_directory_launcher(request, full_directory_path, conn=None)
         if isinstance(response, HttpResponse):
             # If the response is an HttpResponse, get the content of the response and decode it to a string
             output = response.content.decode()
-            # Log the output
-            logger.info(f"Output for directory {directory}: {output}")
-            print(f"Output for directory {directory}: {output}")
         else:
             # Otherwise, use the response as is
             output = response
