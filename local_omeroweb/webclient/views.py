@@ -5001,25 +5001,42 @@ def record_files_in_directory_launcher(request, directory, conn=None, **kwargs):
     try:
         request.POST = {'directory': str(directory)}
         
-        # Run the script using the script_run function
+        # Run the script using the run_script function
         try:
-            rsp = script_run(request, sid, conn=None, **kwargs)
+            kwargs = {'directory': directory}
+            rsp = script_run(request, sid, **kwargs)
         except Exception as e:
             return HttpResponse(str(e))
 
-        # Handle the response from script_run
+        # Handle the response from run_script
         if rsp.get('status') == 'failed':
             return HttpResponse(rsp.get('error'))
         else:
-            # Extract the recorded files from the 'Message' field
-            message = rsp.get('Message')
-            # The recorded files are after the "Recorded Files: " substring
-            recorded_files_str = message.split("Recorded Files: ", 1)[1]
-            # The recorded files are before the "directory: " substring
-            recorded_files_str = recorded_files_str.split("directory: ", 1)[0]
-            # Convert the recorded files string to a list of dictionaries
-            recorded_files = ast.literal_eval(recorded_files_str)
-            return recorded_files
+            # Get the jobId from the response
+            jobId = rsp.get('jobId')
+
+            # Wait for the script to finish
+            while True:
+                proc = script_service.getScriptProcess(jobId)
+                if not proc.isRunning():
+                    break  # script has finished
+                time.sleep(0.5)  # wait for a while before checking again
+
+            # Retrieve the output
+            if not proc.isRunning():
+                rv = proc.getResults(0)  # 0 ms; RtypeDict
+                if "Recorded Files" in rv:
+                    recorded_files = rv["Recorded Files"].getValue()
+                    return recorded_files
+                elif "Message" in rv:
+                    message = rv["Message"].getValue()
+                    # The recorded files are after the "Recorded Files: " substring
+                    recorded_files_str = message.split("Recorded Files: ", 1)[1]
+                    # The recorded files are before the "directory: " substring
+                    recorded_files_str = recorded_files_str.split("directory: ", 1)[0]
+                    # Convert the recorded files string to a list of dictionaries
+                    recorded_files = ast.literal_eval(recorded_files_str)
+                    return recorded_files
 
     finally:
         # Restore the original POST data
@@ -5040,7 +5057,7 @@ def data_upload_popup(request, conn=None, **kwargs):
     outputs = []
     for directory in group_directories:
         full_directory_path = os.path.join(base_data_directory, directory)
-        response = record_files_in_directory_launcher(request, full_directory_path, conn=None)
+        response = record_files_in_directory_launcher(request, full_directory_path)
         if isinstance(response, HttpResponse):
             # If the response is an HttpResponse, get the content of the response and decode it to a string
             output = response.content.decode()
