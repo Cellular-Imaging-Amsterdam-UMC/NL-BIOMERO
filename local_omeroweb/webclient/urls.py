@@ -315,6 +315,7 @@ urlpatterns = [
     #NEW: Script Menu Popup
     re_path(r"^scripts_menu_popup/$", views.scripts_menu_popup, name="scripts_menu_popup"),
     #NEW: Data Upload
+    re_path(r"^record_files_in_directory_launcher/$", views.record_files_in_directory_launcher, name="record_files_in_directory_launcher"),
     re_path(r"^data_uploader_script_launcher/$", views.data_uploader_script_launcher, name="data_uploader_script_launcher"),
     re_path(r"^data_upload_popup/$", views.data_upload_popup, name="data_upload_popup"),
     re_path(
