@@ -35,6 +35,7 @@ import json
 import re
 import sys
 import warnings
+from time import sleep
 from past.builtins import unicode
 from future.utils import bytes_to_native_str
 from django.utils.html import escape
@@ -4984,9 +4985,9 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
         return HttpResponse(rsp.get('error'))
     else:
         return JsonResponse({"message": "Data uploaded successfully"})
-
-@login_required()
-def record_files_in_directory_launcher(request, directory, conn=None, **kwargs):
+    
+@login_required(setGroupContext=True)
+def record_files_in_directory_launcher(request, directory, active_group_id, conn=None, **kwargs):
     """Handle the record files in directory script."""
     # Get the script service
     script_service = conn.getScriptService()
@@ -5004,23 +5005,39 @@ def record_files_in_directory_launcher(request, directory, conn=None, **kwargs):
     # Prepare the input map
     inputs = {'directory': omero.rtypes.rstring(directory)}
 
-    # Run the script
+    # Save the current group ID
+    original_group_id = conn.SERVICE_OPTS.getOmeroGroup()
+
+    # Set the group context to the provided active_group_id
+    conn.SERVICE_OPTS.setOmeroGroup(active_group_id)
+
+    # Run the script using the run_script function
     try:
-        proc = script_service.runScript(script_id, inputs, None)
-        print(f"Started script {script_id} at {datetime.datetime.now()}: Omero Job ID {proc.getJob()._id}")
+        rsp = run_script(request, conn, script_id, inputs, script_name)
     except Exception as e:
         return HttpResponse(str(e))
-
-    # Wait for the script to finish and retrieve the results
-    try:
-        return_code = proc.poll()
-        if return_code is not None:  # None if not finished
-            results = proc.getResults(0)  # 0 ms; RtypeDict
-            if "Recorded Files" in results:
-                recorded_files = results["Recorded Files"].getValue()
-                return recorded_files
     finally:
-        proc.close(False)
+        # Restore the original group ID
+        conn.SERVICE_OPTS.setOmeroGroup(original_group_id)
+
+    # Check the status of the script
+    while True:
+        # Get the script job
+        script_job = conn.getQueryService().get("ScriptJob", int(rsp.get('jobId')))
+        # Get the status of the script job
+        status = script_job.status.val
+
+        if status not in ('Pending', 'Running'):
+            break
+
+        # Wait for a short period of time before checking the status again
+        sleep(2)
+
+    # Check the final status of the script
+    if status == 'Error':
+        return HttpResponse(rsp.get('error'))
+    else:
+        return JsonResponse({"message": "Script run successfully", "jobId": rsp.get('jobId')})
 
 @login_required()
 @render_response()
@@ -5032,11 +5049,15 @@ def data_upload_popup(request, conn=None, **kwargs):
     # Directories in /data
     group_directories = [f for f in os.listdir(base_data_directory) if os.path.isdir(os.path.join(base_data_directory, f)) and f.startswith('core')]
 
+    # Get the active group
+    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
+    active_group = conn.getObject("ExperimenterGroup", active_group_id)
+    
     # Call the record_files_in_directory_launcher function and get its output
     outputs = []
     for directory in group_directories:
         full_directory_path = os.path.join(base_data_directory, directory)
-        response = record_files_in_directory_launcher(request, full_directory_path)
+        response = record_files_in_directory_launcher(request, full_directory_path, active_group_id, conn=None, **kwargs)
         if isinstance(response, HttpResponse):
             # If the response is an HttpResponse, get the content of the response and decode it to a string
             output = response.content.decode()
@@ -5044,10 +5065,6 @@ def data_upload_popup(request, conn=None, **kwargs):
             # Otherwise, use the response as is
             output = response
         outputs.append(output)
-
-    # Get the active group
-    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
-    active_group = conn.getObject("ExperimenterGroup", active_group_id)
 
     # Extract selected objects from the URL
     selected_objects = request.GET
