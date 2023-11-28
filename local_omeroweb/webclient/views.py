@@ -4988,60 +4988,39 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 @login_required()
 def record_files_in_directory_launcher(request, directory, conn=None, **kwargs):
     """Handle the record files in directory script."""
-    # Get the script ID
+    # Get the script service
     script_service = conn.getScriptService()
-    sid = script_service.getScriptID('/My_scripts/record_files_in_directory.py')
-    if sid <= 0:
-        return HttpResponse("Script '/My_scripts/record_files_in_directory.py' not found")
 
-    # Backup the original POST data
-    original_post_data = request.POST
+    # Define the script name
+    script_name = 'record_files_in_directory.py'  # Use just the name of the script, not the full path
 
-    # Temporarily replace request.POST with a custom dictionary
+    # Get the script ID
+    scripts = script_service.getScripts()
+    script_ids = [unwrap(s.id) for s in scripts if unwrap(s.getName()) == script_name]
+    if not script_ids:
+        return HttpResponse(f"Script '{script_name}' not found")
+    script_id = script_ids[0]
+
+    # Prepare the input map
+    inputs = {'directory': omero.rtypes.rstring(directory)}
+
+    # Run the script
     try:
-        request.POST = {'directory': str(directory)}
-        
-        # Run the script using the run_script function
-        try:
-            kwargs = {'directory': directory}
-            rsp = script_run(request, sid, **kwargs)
-        except Exception as e:
-            return HttpResponse(str(e))
+        proc = script_service.runScript(script_id, inputs, None)
+        print(f"Started script {script_id} at {datetime.datetime.now()}: Omero Job ID {proc.getJob()._id}")
+    except Exception as e:
+        return HttpResponse(str(e))
 
-        # Handle the response from run_script
-        if rsp.get('status') == 'failed':
-            return HttpResponse(rsp.get('error'))
-        else:
-            # Get the jobId from the response
-            jobId = rsp.get('jobId')
-
-            # Wait for the script to finish
-            while True:
-                proc = script_service.getScriptProcess(jobId)
-                if not proc.isRunning():
-                    break  # script has finished
-                time.sleep(0.5)  # wait for a while before checking again
-
-            # Retrieve the output
-            if not proc.isRunning():
-                rv = proc.getResults(0)  # 0 ms; RtypeDict
-                if "Recorded Files" in rv:
-                    recorded_files = rv["Recorded Files"].getValue()
-                    return recorded_files
-                elif "Message" in rv:
-                    message = rv["Message"].getValue()
-                    # The recorded files are after the "Recorded Files: " substring
-                    recorded_files_str = message.split("Recorded Files: ", 1)[1]
-                    # The recorded files are before the "directory: " substring
-                    recorded_files_str = recorded_files_str.split("directory: ", 1)[0]
-                    # Convert the recorded files string to a list of dictionaries
-                    recorded_files = ast.literal_eval(recorded_files_str)
-                    return recorded_files
-
+    # Wait for the script to finish and retrieve the results
+    try:
+        return_code = proc.poll()
+        if return_code is not None:  # None if not finished
+            results = proc.getResults(0)  # 0 ms; RtypeDict
+            if "Recorded Files" in results:
+                recorded_files = results["Recorded Files"].getValue()
+                return recorded_files
     finally:
-        # Restore the original POST data
-        request.POST = original_post_data
-
+        proc.close(False)
 
 @login_required()
 @render_response()
