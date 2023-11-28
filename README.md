@@ -1,9 +1,9 @@
-# OMERO server with Omero-Slurm-Client
+# OMERO server with OMERO-Slurm-Client
 
 
 This is an adaptation of [OMERO.server grid and OMERO.web (docker-compose)](https://github.com/ome/docker-example-omero-grid)
 
-This is an example of running [OMERO.server components on multiple nodes using OMERO.grid](http://www.openmicroscopy.org/site/support/omero5/sysadmins/grid.html#nodes-on-multiple-hosts) in Docker, but with a connection to Omero Slurm Client.
+This is an example of running [OMERO.server components on multiple nodes using OMERO.grid](http://www.openmicroscopy.org/site/support/omero5/sysadmins/grid.html#nodes-on-multiple-hosts) in Docker, but with a connection to OMERO Slurm Client.
 
 OMERO.server is listening on the standard OMERO ports `4063` and `4064`.
 OMERO.web is listening on port `4080` (http://localhost:4080/).
@@ -50,7 +50,7 @@ If you want, follow along with the logs on your commandline:
 
     docker-compose logs -f
     
-You can exit the logs with CTRL+C (your Omero will keep running, because we ran them with `-d` = `detached`)
+You can exit the logs with CTRL+C (your OMERO will keep running, because we ran them with `-d` = `detached`)
 
 Log in on web (`localhost:4080`) as user `root` password `omero`. This might take a bit to get ready as the servers start up.
 
@@ -64,9 +64,9 @@ For now you need [OMERO.insight app](https://downloads.openmicroscopy.org/help/p
 
 Connect to `localhost`, login as `root`/`omero` again and upload some nice images.
 
-## Omero Slurm Client
+## OMERO Slurm Client
 
-Checkout the [Omero Slurm Client documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for details on how to use the library and example scripts.
+Checkout the [OMERO Slurm Client documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for details on how to use the library and example scripts.
 
 In short:
 1. Run script `slurm/init/SLURM Init environment...`
@@ -76,7 +76,7 @@ In short:
     - Select a fun workflow, e.g. `cellpose`.
         - Change the `nuc channel` to the channel to segment
         - Uncheck the `use gpu` unless you setup a nice Slurm w/ GPU
-    - Refresh your Omero `Explore` tab to see your `hello world` dataset with a mask image when the workflow is done.
+    - Refresh your OMERO `Explore` tab to see your `hello world` dataset with a mask image when the workflow is done.
 
 
 
@@ -110,7 +110,7 @@ Exit back to your commandline by typing `exit`.
 
 ## Slurm specifics
 
-Checkout the [Omero Slurm Client documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for more details on how to setup your Slurm connection with Omero. 
+Checkout the [OMERO Slurm Client documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for more details on how to setup your Slurm connection with OMERO. 
 
 In short, you always need:
 - (headless) SSH setup to Slurm server from your host computer. See for example `ssh.config.example`.
