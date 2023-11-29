@@ -1,24 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 """
 RemoteImport.py
 
-Start import via OMERO.script for data stored at one of the supported workstations.
-Source data are located under OMERO_ImportData/<username>/ on the selected workstation.
-Appends non-image files with specified suffixes to project or dataset.
-Possible configurations:
-* INPLACE_IMPORT = true: use inplace import instead of normal import
-* COPY_SOURCES = true: creates  directories in DATA_PATH like <username>_<userID>/yyyy-MM/dd/HH-mm-ss.SSS/
- and transfer data before import to this target
+This script is modified to import only the files listed in a given JSON object.
+The JSON object includes the paths to the files, the dataset ID, and the active group ID.
 
 Usage:
-Select PROJECT as TARGET for import :
-A Dataset object is created for each subdirectory on OMERO_ImportData/<username>/
-The name of the dataset includes parent directory names. For example:
-/<mountpath>/dirA/dirB will result in datasetname: dirA_dirB
+- The script reads the JSON object from a form with specific fields.
+- It then imports the files listed in the 'data_path' field into the dataset specified by 'dataset_id'.
 
-Select DATASET as TARGET for import :
-All images (also images in subdirectories) are imported into this Dataset
 ------------------------------------------------------------------------
 Copyright (C) 2022
   This program is free software; you can redistribute it and/or modify
@@ -70,20 +62,11 @@ INPLACE_IMPORT = False
 COPY_SOURCES = True
 # main directory of mount points #TODO: How do I mount this to the podman container so it actually opens the real Ldrive?
 #MOUNT_PATH = "/OMERO/L-Drive/" # <-- for 378
-MOUNT_PATH = "/data/"
+#MOUNT_PATH = "/data/"
 # mount point names/ workstations
-WORKSTATION_NAMES=["coreKrawczyk","coreReits"] #TODO: make getting this list dyanamic based on dirs starting with core in the appropiate Ldrive path.
+#WORKSTATION_NAMES=["coreKrawczyk","coreReits"] #TODO: make getting this list dyanamic based on dirs starting with core in the appropiate Ldrive path.
 
 #####################################################################
-
-PARAM_WS = "Group Folders"
-PARAM_DATATYPE = "Data_Type"
-PARAM_ID = "IDs"
-PARAM_ATTACH = "Attach non image files"
-PARAM_DEST_ATTACH = "Attach to object type"
-PARAM_ATTACH_FILTER = "Filter attachment by extension"
-PARAM_SKIP_EXISTING = "Skip already imported files"
-
 IDLETIME = 5
 
 
@@ -95,6 +78,7 @@ def get_formated_date():
 
     return year_m,day,time
 
+
 # creates directories: <username>_<userID>/yyyy-MM/dd/HH-mm-ss.SSS/
 def create_new_repo_path(conn):
     p1= "%s_%s"%(conn.getUser().getName(),conn.getUser().getId())
@@ -103,43 +87,6 @@ def create_new_repo_path(conn):
     print(repo_path)
     os.makedirs(repo_path, exist_ok=True)
     return repo_path
-
-def createDataset(conn,pID,dName):
-    # create dataset for experiment dir
-    dataset = omero.model.DatasetI()
-    dataset.name = rstring(dName)
-    dataset = conn.getUpdateService().saveAndReturnObject(dataset)
-    # link to project
-    link = omero.model.ProjectDatasetLinkI()
-    link.setParent(omero.model.ProjectI(pID, False))
-    link.setChild(dataset)
-    conn.getUpdateService().saveObject(link)
-    datasetID = dataset.getId().getValue()
-    print("\t* Create Dataset with name %s -- ID: %d"%(dName,datasetID))
-
-    return datasetID
-
-
-def getImportTarget(conn,params):
-    id = params.get(PARAM_ID)
-
-    destID = None
-    destType = None
-    destObj = None
-
-    if id is not None:
-        destObj = conn.getObject(params.get(PARAM_DATATYPE), id)
-        if destObj:
-            destID = id
-            destType = params.get(PARAM_DATATYPE)
-    else:
-        print("ERROR: please specify a target object like project or dataset!")
-
-    if destType is None:
-        print("ERROR: please specify a target object like project or dataset!")
-
-    return destID,destObj,destType
-
 
 def createArgumentList(ipath,id,skip,depth):
     import_args =["import"]
@@ -159,8 +106,6 @@ def createArgumentList(ipath,id,skip,depth):
     import_args.extend([Path(ipath).resolve().as_posix().replace("\ "," ")])
 
     return import_args
-
-
 
 
 def parseLogFile(stderr):
@@ -252,18 +197,15 @@ def getFiles(pattern,dir,depth):
     return result
 
 
-def attachFiles(conn, destID, destType,values,srcPath,namespace,depth):
+def attachFiles(conn, dataset_id,values,srcPath,namespace,depth):
     try:
         if len(values)==0:
             print ("\t WARN: No extension filter specified! No files will be attached.")
             return
         extFilters = values.split(",")
         destObj = None
-        if destType == 'Dataset':
-            destObj = conn.getObject("Dataset", destID)
-        else:
-            if destType == 'Project':
-                destObj = conn.getObject("Dataset", destID).getParent()
+        destObj = conn.getObject("Dataset", dataset_id)
+
 
         if destObj is None:
             print("ERROR attach files: can not attach files to object: None")
@@ -298,9 +240,9 @@ def attachFiles(conn, destID, destType,values,srcPath,namespace,depth):
         print('ERROR: attach file: %s\n %s %s'%(str(e),exc_type, exc_tb.tb_lineno))
 
 
-def cliImport(client,ipath,destID,skip,depth,namespace,dataset=None,conn=None):
+def cliImport(client,ipath,dataset_id,skip,depth,namespace,dataset=None,conn=None):
     # create import call string
-    args = createArgumentList(ipath,destID,skip,depth)
+    args = createArgumentList(ipath,dataset_id,skip,depth)
     print(args)
     images_skipped = None
     images_imported = None
@@ -336,8 +278,6 @@ def cliImport(client,ipath,destID,skip,depth,namespace,dataset=None,conn=None):
         return images_skipped,images_imported,None
 
 
-
-
 def retryImport(client, destinationID, filesForNewlyImport, images_skipped, numOfImportedFiles, skip,namespace):
     # retry failed imports
     not_imported_imgList = []
@@ -362,60 +302,54 @@ def retryImport(client, destinationID, filesForNewlyImport, images_skipped, numO
     return messageRetry, not_imported_imgList,images_skipped,numOfImportedFiles, retry
 
 
-
-def importContent(conn, params,jobs,depth):
-    message=None
+def importContent(conn, dataset_id, jobs, depth):
+    message = None
     try:
-        namespace = params.get(PARAM_WS)
-        client=conn.c
+        namespace = ""  # Set namespace to an empty string
+        client = conn.c
 
-        all_skipped_img=[]
-        all_notImported_img=[]
+        all_skipped_img = []
+        all_notImported_img = []
 
         for ipath in jobs:
             if ipath is not None:
 
                 print("#--------------------------------------------------------------------\n")
-                destID =jobs[ipath]
-                destDataset = conn.getObject('Dataset', destID)
+                dataset_id = jobs[ipath]
+                destDataset = conn.getObject('Dataset', dataset_id)
 
                 if destDataset is not None:
-                    skip=params.get(PARAM_SKIP_EXISTING)
+                    skip = False
 
                     # call import
                     ipath = ipath.replace(" ", "\\ ")
-                    print("\n Import files from : %s \n"%ipath)
-                    images_skipped,images_imported,log=cliImport(client,ipath,destID,skip,depth,namespace,destDataset,conn)
+                    print("\n Import files from : %s \n" % ipath)
+                    images_skipped, images_imported, log = cliImport(client, ipath, dataset_id, skip, depth, namespace, destDataset, conn)
 
                     # validate import
-                    filesForNewlyImport,other_fList=validateImport(images_skipped,images_imported,ipath)
+                    filesForNewlyImport, other_fList = validateImport(images_skipped, images_imported, ipath)
 
-                    # attach files
-                    if params.get(PARAM_ATTACH):
-                        attachFiles(conn,destID,params.get(PARAM_DEST_ATTACH),
-                                    params.get(PARAM_ATTACH_FILTER),ipath,namespace,depth)
+                    messageRetry, not_imported_imgList, images_skipped, numOfImportedFiles, retry = \
+                        retryImport(client, dataset_id, filesForNewlyImport, images_skipped, len(images_imported), skip, namespace)
 
-                    messageRetry,not_imported_imgList,images_skipped,numOfImportedFiles, retry = \
-                        retryImport(client, destID, filesForNewlyImport,images_skipped, len(images_imported),skip,namespace)
-
-                    message="Imports Finished! "
+                    message = "Imports Finished! "
 
                     all_notImported_img.extend(not_imported_imgList)
                     all_skipped_img.extend(images_skipped)
 
     # todo attach files in separates try catch
-    except Exception as e: # work on python 3.x
+    except Exception as e:  # work on python 3.x
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        print ('ERROR: Failed to import: %s\n %s %s'%(str(e),exc_type, exc_tb.tb_lineno))
+        print('ERROR: Failed to import: %s\n %s %s' % (str(e), exc_type, exc_tb.tb_lineno))
         return "ERROR"
     finally:
 
-        if all_notImported_img is not None and len(all_notImported_img)>0:
+        if all_notImported_img is not None and len(all_notImported_img) > 0:
             print(messageRetry)
             print("NOT IMPORTED FILES:")
             print('\n'.join(map(str, all_notImported_img)))
-            errmessage="ATTENTION: there are failed imports (%d), please check the activity report" \
-                       "or the dataset comment report"%(len(all_notImported_img))
+            errmessage = "ATTENTION: there are failed imports (%d), please check the activity report" \
+                         "or the dataset comment report" % (len(all_notImported_img))
             message = errmessage
 
         if not message:
@@ -423,71 +357,11 @@ def importContent(conn, params,jobs,depth):
         return message
 
 
-
-
-def existsAsChildOf(destObj,name):
-    for dSet in destObj.listChildren():
-        if dSet.getName() == name:
-            print ("\t* Dataset directory still exists: ",name)
-            return dSet.getId()
-    return None
-
-
-def scanSubdir(conn,currentdir,pName,jobs,destObj):
-    # creation of new dataset if not exists
-    if not currentdir.endswith(os.sep):
-        currentdir = currentdir + os.sep
-    dName = os.path.split(os.path.dirname(currentdir))[1]
-    if pName:
-        datasetName = "%s_%s"%(pName,dName)
-    else:
-        datasetName = dName
-
-    existingID = existsAsChildOf(destObj,datasetName)
-
-    if not existingID:
-        existingID = createDataset(conn,destObj.getId(),datasetName)
-    # dir append to joblist
-    jobs[currentdir]=existingID
-
-    # recursion for subdirs
-    subdirs = filter(os.path.isdir, [os.path.join(currentdir, x) for x in os.listdir(currentdir)])
-    for dir in subdirs:
-        jobs = scanSubdir(conn,dir,datasetName,jobs,destObj)
-
-    return jobs
-
 # jobs={path_0:tID_0,...,path_N:tID_N}
-def getJobsAndTargets(conn,datapath,destType,destID,destObj,namespace):
-    '''Returns list of src paths and list of target object ids'''
-    if destType=="Dataset":
-        # only file paths
-        jobs={}
-        jobs[datapath] = destID
-        return jobs,DEPTH
-    else: # target = project
-        # create common dataset for direct files under Omero_Importdir/<user>/
-        datasetName = namespace
-        existingID = existsAsChildOf(destObj,datasetName)
-
-        if not existingID:
-            existingID = createDataset(conn,destObj.getId(),datasetName)
-
-        jobs={}
-        jobs[datapath]=existingID
-
-        # create datasets like directories
-        try:
-            subdirs = filter(os.path.isdir, [os.path.join(datapath, x) for x in os.listdir(datapath)])
-            for dir in subdirs:
-                jobs = scanSubdir(conn,dir,None,jobs,destObj)
-        except Exception as e:
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            print('ERROR: while reading mount dir: %s\n %s %s'%(str(e),exc_type, exc_tb.tb_lineno))
-            return None,1
-
-        return jobs,1
-
+def getJobsAndTargets(conn, data_paths, dataset_id, destObj):
+    '''Returns dictionary of src file paths and target object id'''
+    jobs = {file_path: dataset_id for file_path in data_paths}
+    return jobs, DEPTH
 
 # copy files from source to destination
 def copy_files(src_paths, dest_dir):
@@ -499,48 +373,40 @@ def copy_files(src_paths, dest_dir):
         print(f'.copied {src_path} to {dest_path}', flush=True)
 
 
-def transfer_data(conn,src):
-    # see https://superfastpython.com/multithreaded-file-copying/
+def transfer_data(conn, data_paths):
     # create the destination directory if needed
-    dest=create_new_repo_path(conn)
+    dest = create_new_repo_path(conn)
 
-    cmd="cp -r %s %s"%(os.path.join(src,"*"),dest)
-    status=subprocess.call(cmd, shell=True)
-    if status != 0:
-        if status < 0:
-            print("Killed by signal", status)
-        else:
-            print("Command failed with return code - ", status)
-
-    multithreaded=False
+    multithreaded = False
     if multithreaded:
-        # create full paths for all files we wish to copy
-        files = [os.path.join(src,name) for name in os.listdir(src)]
-        print("# files:",len(files))
         # determine chunksize
         n_workers = 4
-        chunksize = round(len(files) / n_workers)
-        if chunksize==0:
-            chunksize=1
+        chunksize = round(len(data_paths) / n_workers)
+        if chunksize == 0:
+            chunksize = 1
         # create the process pool
         with ProcessPoolExecutor(n_workers) as exe:
             # split the copy operations into chunks
-            for i in range(0, len(files), chunksize):
+            for i in range(0, len(data_paths), chunksize):
                 # select a chunk of filenames
-                filenames = files[i:(i + chunksize)]
+                filenames = data_paths[i:(i + chunksize)]
                 # submit the batch copy task
-                _ = exe.submit(copy_files, filenames, dest)
+                for filename in filenames:
+                    _ = exe.submit(shutil.copy, filename, dest)
         print('Done')
+    else:
+        # copy files one by one in a single thread
+        for file_path in data_paths:
+            shutil.copy(file_path, dest)
+
     return dest
 
 
-def remoteImport(conn,params,datapath):
-    destID,destObj,destType=getImportTarget(conn,params)
-    if destObj is None:
-        return None,"ERROR: No correct target specified for import data!"
+def remoteImport(conn,dataset_id,data_paths):
+    destObj = conn.getObject("Dataset", dataset_id)
 
-    if destType != "Dataset" and destType !="Project":
-        return None,"ERROR:Please specify as target dataset or project!"
+    if destObj is None:
+        return None, "ERROR: No correct target specified for import data!"
 
     startTime = time.time()
 
@@ -561,9 +427,9 @@ def remoteImport(conn,params,datapath):
 
     if COPY_SOURCES:
         # copy files to server
-        datapath=transfer_data(conn,datapath)
+        dest=transfer_data(conn,data_paths)
 
-    jobs,depth = getJobsAndTargets(conn,datapath,destType,destID,destObj,params.get(PARAM_WS))
+    jobs,depth = getJobsAndTargets(conn,data_paths,dataset_id,destObj)
 
     if jobs is None:
         return destObj,"No files found!"
@@ -572,142 +438,56 @@ def remoteImport(conn,params,datapath):
     for key in jobs:
         print(key, '->', jobs[key])
 
-    message = importContent(conn, params,jobs,depth)
+    message = importContent(conn, dataset_id, jobs, depth)
 
     endTime = time.time()
     print("Duration Import: ", str(endTime - startTime))
 
     return destObj, message
 
-
-
-def checkWorkstation(conn,workstation_name,mnt_path):
-    try:
-        srcPath = os.path.join(mnt_path,workstation_name)+os.sep
-        print("Check mountpath: ",srcPath)
-        if not os.path.isdir(srcPath):
-            print('ERROR: Remote system not available: ',srcPath)
-        else:
-            print("==> available")
-
-        return srcPath
-    except Exception as e:
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        print('ERROR: while reading mount dir: %s\n %s %s'%(str(e),exc_type, exc_tb.tb_lineno))
-
-    return None
-
 #####################################################################
 
 def run_script():
+    client = scripts.client(
+        'RemoteImporter.py',
+        """Description of your script.""",
 
-    dataTypes = [rstring('Project'),rstring('Dataset')]
-    # TODO: enable attaching to images
-    dataTypes_attach = [rstring('Dataset'), rstring('Project')]
+        scripts.String("csrfmiddlewaretoken", optional=False),
+        scripts.String("data_paths", optional=False),
+        scripts.String("dataset_id", optional=False),
+        scripts.String("active_group_id", optional=False),
 
-    """
-    The main entry point of the script, as called by the client via the
-    scripting service, passing the required parameters.
-    """
-    if COPY_SOURCES:
-        client = scripts.client(
-            'Remote_Import.py',
-            """Remote import from core* groups in the L Drive:
-            
-            Uploads all data from the selected group into the indicated Project or Dataset
-            ---------------------------------------------------------------
-            INPUT:
-            Select PROJECT as TARGET for import : : A Dataset object is created for each subdirectory in the group
-    
-            Select DATASET as TARGET for import : : All images (also images in subdirectories) are imported into this Dataset
-    
-    
-            """,
-            # skip already imported files will not work, because the source path change because of the timestamp
-            scripts.String(PARAM_WS, optional=False, grouping="1",
-                           description="Choose a group folder (core*) where you want to import from",
-                           values=WORKSTATION_NAMES),
-            scripts.String(PARAM_DATATYPE, optional=True, grouping="2",
-                           description="Choose kind of destination object.",
-                           values=dataTypes),
-            scripts.Long(PARAM_ID, optional=False, grouping="3",
-                         description="ID of destination object. Please select only ONE object."),
-            scripts.Bool(PARAM_ATTACH, grouping="5",
-                         description="Attach containing non image files", default=False),
-            scripts.String(PARAM_DEST_ATTACH, grouping="5.1",
-                           description="Object to that should be attach",
-                           values=dataTypes_attach, default="Dataset"),
-            scripts.String(PARAM_ATTACH_FILTER, grouping="5.2",
-                           description="Filter files by given file extension (for example txt, pdf). Separated by ','."),
-            namespaces=[omero.constants.namespaces.NSDYNAMIC],
-            version="1.1.0",
-            authors=["Susanne Kunis", "CellNanOs"],
-            institutions=["University of Osnabrueck"],
-            contact="sukunis@uos.de",
-        )
-    else:
-        client = scripts.client(
-            'Remote_Import.py',
-            """Remote import from dedicated workstations:
-    
-            * Import the content of the OMERO_ImportData/<username>/ folder on the selected workstation.
-            * Appends files with the specified suffix to the Project or Dataset.
-            * The scanned subfolder depth is 10
-            ---------------------------------------------------------------
-            INPUT:
-            ---------------------------------------------------------------
-            Select PROJECT as TARGET for import : : A Dataset object is created for each subdirectory on OMERO_ImportData/<username>/
-    
-            Select DATASET as TARGET for import : : All images (also images in subdirectories) are imported into this Dataset
-    
-    
-            """,
-            scripts.String(PARAM_WS, optional=False, grouping="1",
-                           description="Choose a workstation where you want to import from",
-                           values=WORKSTATION_NAMES),
-            scripts.String(PARAM_DATATYPE, optional=True, grouping="2",
-                           description="Choose kind of destination object.",
-                           values=dataTypes),
-            scripts.Long(PARAM_ID, optional=False, grouping="3",
-                         description="ID of destination object. Please select only ONE object."),
-            scripts.Bool(PARAM_SKIP_EXISTING, grouping="4",
-                         description="skip files that are already uploaded (checked 'import from' path).",
-                         default=False),
-            scripts.Bool(PARAM_ATTACH, grouping="5",
-                         description="Attach containing non image files", default=False),
-            scripts.String(PARAM_DEST_ATTACH, grouping="5.1",
-                           description="Object to that should be attach",
-                           values=dataTypes_attach, default="Dataset"),
-            scripts.String(PARAM_ATTACH_FILTER, grouping="5.2",
-                           description="Filter files by given file extension (for example txt, pdf). Separated by ','."),
-            namespaces=[omero.constants.namespaces.NSDYNAMIC],
-            version="1.2.0",
-            authors=["Susanne Kunis", "CellNanOs"],
-            institutions=["University of Osnabrueck"],
-           
-    )  # noqa
+
+        authors=["RRB"],
+        institutions=["AMC"],
+        contact="what is your insta shawty?",
+    )
 
     try:
-        params = client.getInputs(unwrap=True)
-        if os.path.exists(MOUNT_PATH):
-            conn = BlitzGateway(client_obj=client)
-            conn.c.enableKeepAlive(60)
+        csrfmiddlewaretoken = client.getInput("csrfmiddlewaretoken").getValue()
+        data_paths = client.getInput("data_paths").getValue()
+        dataset_id = client.getInput("dataset_id").getValue()
+        active_group_id = client.getInput("active_group_id").getValue()  # Get the 'form' input parameter
+        
 
-            datapath=checkWorkstation(conn,params.get(PARAM_WS),MOUNT_PATH)
-            if datapath:
-                robj,message=remoteImport(conn,params,datapath)
-            else:
-                message = "No data available on %s for user"%(params.get(PARAM_WS))
-                robj=None
+        # Create a connection
+        conn = BlitzGateway(client_obj=client)
 
-            client.setOutput("Message", rstring(message))
-            if robj is not None:
-                client.setOutput("Result", robject(robj._obj))
-        else:
-            client.setOutput("ERROR", rstring(f"No such Mount directory: {MOUNT_PATH}."))
+        # Convert data_paths from string to list
+        data_paths = data_paths.split(',')
+
+        # Call remoteImport
+        destObj, message = remoteImport(conn,dataset_id,data_paths)
+
+        # Set the outputs
+        client.setOutput("Import Message", rstring(str(message)))
+        client.setOutput("csrfmiddlewaretoken Output", rstring(str(csrfmiddlewaretoken)))
+        client.setOutput("data_paths Output", rstring(str(data_paths)))
+        client.setOutput("dataset_id Output", rstring(str(dataset_id)))
+        client.setOutput("active_group_id Output", rstring(str(active_group_id)))
+
     finally:
-        client.closeSession()
-
+        client.closeSession()  # Close the session
 
 if __name__ == "__main__":
     run_script()
