@@ -4955,7 +4955,7 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 
     # Get the script ID
     script_service = conn.getScriptService()
-    sid = script_service.getScriptID('./My_scripts/RemoteImporter.py')
+    sid = script_service.getScriptID('RemoteImporter.py')
     if sid <= 0:
         return HttpResponse("Script 'RemoteImporter' not found")
 

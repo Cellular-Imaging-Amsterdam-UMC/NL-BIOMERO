@@ -11,8 +11,8 @@ ADD "https://api.github.com/repos/NL-BioImaging/omero-slurm-scripts/commits?per_
 RUN  cd /opt/omero/server/OMERO.server/lib/scripts/ && \
     git clone https://github.com/NL-BioImaging/omero-slurm-scripts.git slurm
 
-ADD RemoteImporter.py /opt/omero/server/OMERO.server/lib/scripts/
-ADD record_files_in_directory.py /opt/omero/server/OMERO.server/lib/scripts/
+ADD ./server/RemoteImporter.py /opt/omero/server/OMERO.server/lib/scripts/
+ADD ./server/record_files_in_directory.py /opt/omero/server/OMERO.server/lib/scripts/
 
 # Overwrite ICE configuration
 # COPY ice.config /opt/omero/server/OMERO.server/etc/templates/
