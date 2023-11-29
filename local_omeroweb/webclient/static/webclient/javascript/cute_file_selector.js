@@ -1,5 +1,14 @@
-function buildFileTree(data) {
+function buildFileTree(dataString) {
+    console.log("Building file tree with data:", dataString);
     const tree = {};
+    var dataString = dataString.replace(/'/g, "\"");
+    console.log("Building file tree with data replaced:", dataString);
+    // Format the data string into a valid JSON array string
+    dataString = '{ "results": [' + dataString.replace(/\}\s*\{/g, '},{') + ']}';
+    console.log("data:",dataString)
+    // Parse the string into an array of objects
+    var data = JSON.parse(dataString);
+    data = data.results;
 
     data.forEach(item => {
         const parts = item.path.split('/');
@@ -27,6 +36,7 @@ function buildFileTree(data) {
 }
 
 function renderFileTree(node, parentElement) {
+    console.log("Rendering file tree with node:", node);
     const ul = document.createElement('ul');
 
     for (const key in node) {
@@ -62,16 +72,50 @@ function renderFileTree(node, parentElement) {
     parentElement.appendChild(ul);
 }
 
-function selectGroupDirectory(directory) {
-    const fileTreeDiv = document.getElementById('fileTree');
-    fileTreeDiv.innerHTML = ""; // Clear the div
+function selectGroupDirectory(id) {
+    console.log("Selecting group directory with id:", id);
+    // Get the file data for the selected directory
+    var fileDataString = filesInDataDir[id];
 
-    let fileData = files_in_data_dir[directory];
-    if (fileData) {
-        const fileTree = buildFileTree(fileData);
-        renderFileTree(fileTree, fileTreeDiv);
+    // Check if fileDataString is a non-empty string
+    if (typeof fileDataString === 'string' && fileDataString.trim() !== '') {
+        // Split the string into lines
+        var lines = fileDataString.split('\n');
+        console.log("lines:", lines);
+        // Parse each line as JSON to get an array of file objects
+        var fileData = lines.map(line => {
+            try {
+                var parsed = JSON.parse(line.replace(/'/g, "\""));
+                // Ensure parsed is an array
+                if (!Array.isArray(parsed)) {
+                    parsed = [parsed];
+                }
+                return parsed;
+            } catch (e) {
+                console.error('Error parsing file data:', e);
+                return null;
+            }
+        }).filter(item => item); // Remove null items
+
+        // Flatten fileData into a single array
+        fileData = [].concat.apply([], fileData);
+
+        // Check if fileData is an array
+        if (Array.isArray(fileData) && fileData.length > 0) {
+            // Build and render the file tree for the file data
+            var fileTree = buildFileTree(fileData);
+            console.log("fileTree:", fileTree);
+            var fileTreeDiv = document.getElementById('fileTree');
+            fileTreeDiv.innerHTML = ""; // Clear the div
+            renderFileTree(fileTree, fileTreeDiv);
+        } else {
+            var fileTreeDiv = document.getElementById('fileTree');
+            console.error('Invalid file data:', fileData);
+            fileTreeDiv.innerHTML = "No files found in this folder";
+        }
+    } else {
+        var fileTreeDiv = document.getElementById('fileTree');
+        console.error('Invalid file data:', fileDataString);
+        fileTreeDiv.innerHTML = "No files found in this folder";
     }
-
-    // Set the directory input field's value
-    $j('#directory').val(directory);
 }

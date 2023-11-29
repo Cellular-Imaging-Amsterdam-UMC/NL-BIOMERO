@@ -4955,7 +4955,7 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 
     # Get the script ID
     script_service = conn.getScriptService()
-    sid = script_service.getScriptID('/RemoteImporter.py')
+    sid = script_service.getScriptID('./My_scripts/RemoteImporter.py')
     if sid <= 0:
         return HttpResponse("Script 'RemoteImporter' not found")
 
@@ -5065,19 +5065,19 @@ def data_upload_popup(request, conn=None, **kwargs):
     active_group = conn.getObject("ExperimenterGroup", active_group_id)
     
     # Call the record_files_in_directory_launcher function and get its output
-    outputs = []
+    outputs = {}
     for directory in group_directories:
         full_directory_path = os.path.join(base_data_directory, directory)
         response = record_files_in_directory_launcher(request, full_directory_path, active_group_id, conn=None, **kwargs)
         if isinstance(response, HttpResponse):
             # If the response is an HttpResponse, get the content of the response and decode it to a string
             output = response.content.decode()
-            # Split the output into lines and parse each line as JSON
-            output = [json.loads(line) for line in output.split('\n') if line.strip()]
+            # Parse the entire output as JSON
+            output = json.loads(output)
         else:
             # Otherwise, use the response as is
             output = response
-        outputs.append(output)
+        outputs[directory] = output
 
     # Extract selected objects from the URL
     selected_objects = request.GET
