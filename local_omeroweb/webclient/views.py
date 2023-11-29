@@ -5020,24 +5020,35 @@ def record_files_in_directory_launcher(request, directory, active_group_id, conn
         # Restore the original group ID
         conn.SERVICE_OPTS.setOmeroGroup(original_group_id)
 
-    # Check the status of the script
-    while True:
-        # Get the script job
-        script_job = conn.getQueryService().get("ScriptJob", int(rsp.get('jobId')))
-        # Get the status of the script job
-        status = script_job.status.val
+    # Get the jobId from the response
+    job_id = rsp.get('jobId')
+    if job_id is None:
+        return str(rsp)  # Return the response as a string if jobId is not valid
 
-        if status not in ('Pending', 'Running'):
-            break
+    # Loop to wait for completion
+    for _ in range(10):
+        try:
+            proc = omero.grid.ScriptProcessPrx.checkedCast(conn.c.ic.stringToProxy(job_id))
+            cb = omero.scripts.ProcessCallbackI(conn.c, proc)
+            if cb.block(0):  # ms.
+                cb.close()
+                results = proc.getResults(0, conn.SERVICE_OPTS)
+                proc.close(False)
 
-        # Wait for a short period of time before checking the status again
+                # Return the recorded files if present
+                if 'Recorded Files' in results:
+                    recorded_files = results['Recorded Files'].getValue()
+                    return recorded_files  # Return recorded files directly
+                else:
+                    return "Failed to retrieve recorded files or no files recorded."
+        except Exception as e:
+            return str(job_id)  # Return the jobId as a string if getting the script job fails
+
+        # Wait a bit before checking again
         sleep(2)
 
-    # Check the final status of the script
-    if status == 'Error':
-        return HttpResponse(rsp.get('error'))
-    else:
-        return JsonResponse({"message": "Script run successfully", "jobId": rsp.get('jobId')})
+    # If we reach this point, script did not complete successfully
+    return "Script execution did not complete within the allowed time."
 
 @login_required()
 @render_response()
@@ -5061,6 +5072,8 @@ def data_upload_popup(request, conn=None, **kwargs):
         if isinstance(response, HttpResponse):
             # If the response is an HttpResponse, get the content of the response and decode it to a string
             output = response.content.decode()
+            # Split the output into lines and parse each line as JSON
+            output = [json.loads(line) for line in output.split('\n') if line.strip()]
         else:
             # Otherwise, use the response as is
             output = response

@@ -125,6 +125,7 @@
                 
                 <script>
                     var filesInDataDir = JSON.parse('{{ files_in_data_dir|escapejs }}');
+                    console.log('filesInDataDir:')
                     console.log(filesInDataDir);
 
                     function selectGroupDirectory(id) {
