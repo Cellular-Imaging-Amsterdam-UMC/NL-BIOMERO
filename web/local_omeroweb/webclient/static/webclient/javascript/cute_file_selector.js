@@ -75,7 +75,7 @@ function renderFileTree(node, parentElement) {
 function selectGroupDirectory(id) {
     console.log("Selecting group directory with id:", id);
     // Get the file data for the selected directory
-    var fileDataString = filesInDataDir[id];
+    var fileDataString = filesInGroupsDir[id];
 
     // Check if fileDataString is a non-empty string
     if (typeof fileDataString === 'string' && fileDataString.trim() !== '') {

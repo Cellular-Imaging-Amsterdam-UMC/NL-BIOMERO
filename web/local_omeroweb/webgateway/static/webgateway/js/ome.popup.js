@@ -285,43 +285,7 @@ OME.openScriptWindow = function(event, width, height) {
     }
 
     // selected is list of {'id':'image-123'} etc.
-    var selected = $("body").data("selected_objects.ome"),
-        sel_types = {};
-    if (typeof selected !== "undefined") {
-        for (var i=0; i<selected.length; i++) {
-            var type = selected[i].id.split("-")[0],
-                oid = selected[i].id.split("-")[1];
-            if (typeof sel_types[type] === "undefined") {
-                sel_types[type] = [];
-            }
-            sel_types[type].push(oid);
-        }
-        var args = [];
-        for (var key in sel_types) {
-            // If in SPW with wells selected, handy to know what 'field'
-            if (key === "well") {
-                // grab the index select value:
-                if ($("#id_index").length > 0) {
-                    args.push("Index=" + $("#id_index").val());
-                }
-            }
-            if (sel_types.hasOwnProperty(key)){
-                args.push(key.capitalize() + "=" + sel_types[key].join(","));
-            }
-        }
-        var fileAnnotationCheckboxes =
-            $("#fileanns_container input[type=checkbox]").filter(":checked");
-        if (fileAnnotationCheckboxes.length > 0) {
-            var fileAnnotationIds = [];
-            fileAnnotationCheckboxes.each(function() {
-                var li = $(this).parents("li").first();
-                var oid = li.attr('id').split('-')[1];
-                fileAnnotationIds.push(oid);
-            });
-            args.push("File_Annotation=" + fileAnnotationIds.join(","));
-        }
-        script_url += "?" + args.join("&");
-    }
+    script_url = OME.get_selected_objects(script_url);
     OME.openCenteredWindow(script_url, width, height);
     return false;
 };
@@ -982,3 +946,45 @@ if (false) {                    // set to 'true' to run. NB: Need to uncomment '
         console.dir(differences);     // comment out to keep jsHint happy!
     }, 1000);
 }
+
+OME.get_selected_objects = function(script_url) {
+    var selected = $("body").data("selected_objects.ome"), sel_types = {};
+
+    console.log(selected);
+
+    if (typeof selected !== "undefined") {
+        for (var i = 0; i < selected.length; i++) {
+            var type = selected[i].id.split("-")[0], oid = selected[i].id.split("-")[1];
+            if (typeof sel_types[type] === "undefined") {
+                sel_types[type] = [];
+            }
+            sel_types[type].push(oid);
+        }
+        var args = [];
+        for (var key in sel_types) {
+            // If in SPW with wells selected, handy to know what 'field'
+            if (key === "well") {
+                // grab the index select value:
+                if ($("#id_index").length > 0) {
+                    args.push("Index=" + $("#id_index").val());
+                }
+            }
+            if (sel_types.hasOwnProperty(key)) {
+                args.push(key.capitalize() + "=" + sel_types[key].join(","));
+            }
+        }
+        var fileAnnotationCheckboxes = $("#fileanns_container input[type=checkbox]").filter(":checked");
+        if (fileAnnotationCheckboxes.length > 0) {
+            var fileAnnotationIds = [];
+            fileAnnotationCheckboxes.each(function () {
+                var li = $(this).parents("li").first();
+                var oid = li.attr('id').split('-')[1];
+                fileAnnotationIds.push(oid);
+            });
+            args.push("File_Annotation=" + fileAnnotationIds.join(","));
+        }
+        script_url += "?" + args.join("&");
+    }
+    return script_url;
+}
+

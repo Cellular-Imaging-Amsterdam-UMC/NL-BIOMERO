@@ -40,12 +40,17 @@
 
     <!-- Your JavaScript code -->
     <script>
+        
         $j(document).ready(function() {
             $j('#scriptButton').on('click', function(e) {
                 e.preventDefault();
+                var upload_url = $(event.target).attr('href');
                 var url = "{% url 'scripts_menu_popup' %}";
+                url = OME.get_selected_objects(url);
                 OME.openCenteredWindow(url, 1000, 1000);
             });
         });
     </script>
 </body>
+
+

@@ -15,7 +15,7 @@
     <script type="text/javascript">
         // Use jQuery's no-conflict mode
         var $j = jQuery.noConflict();
-        var baseDataDirectory = '{{ base_data_directory }}';
+        //var baseDataDirectory = '{{ base_data_directory }}'; If we actually needed this, I will need to pass it from the record_files_in_directory script
     
         $j(document).ready(function() {
     
@@ -124,9 +124,9 @@
                 {% endfor %}
                 
                 <script>
-                    var filesInDataDir = JSON.parse('{{ files_in_data_dir|escapejs }}');
-                    console.log('filesInDataDir:')
-                    console.log(filesInDataDir);
+                    var filesInDataDir = JSON.parse('{{ files_in_group_directories|escapejs }}');
+                    console.log('filesInGroupsDir:')
+                    console.log(filesInGroupsDir);
 
                     function selectGroupDirectory(id) {
                         // Reset the color of the previously selected button, if any
@@ -145,7 +145,7 @@
                         window.selectedButtonId = id;
                 
                         // Build and render the file tree for the selected directory
-                        var fileData = filesInDataDir[id];
+                        var fileData = filesInGroupsDir[id];
                         var fileTree = buildFileTree(fileData);
                         var fileTreeDiv = document.getElementById('fileTree');
                         fileTreeDiv.innerHTML = ""; // Clear the div

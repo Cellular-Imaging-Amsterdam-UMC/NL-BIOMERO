@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function() {
-    console.log('DOMContentLoaded event fired');
     const currentAdminPrivileges = document.body.dataset.adminPrivileges.split(',');
     const scriptUploadUrl = document.body.dataset.scriptUploadUrl;
     const scriptsContainer = document.getElementById('scriptsContainer');
@@ -114,9 +113,11 @@ document.addEventListener("DOMContentLoaded", function() {
                             scriptDiv.className = 'script';
                             scriptDiv.textContent = script.name.replace(/.py$/, ''); // Remove .py from the end of the script name
                             scriptDiv.dataset.id = script.id;  // Store the script's ID in a data attribute
-                        
+                            
                             scriptDiv.onclick = () => {
-                                const scriptUrl = `/webclient/script_ui/${scriptDiv.dataset.id}/`;  // Use the script's ID from the data attribute
+                                var currentPageUrl = window.location.search;
+                                console.log(currentPageUrl);
+                                const scriptUrl = `/webclient/script_ui/${scriptDiv.dataset.id}/${currentPageUrl}`;  // Use the script's ID from the data attribute
                                 console.log('Script URL:', scriptUrl);
                                 // Create a synthetic event object
                                 const event = {
@@ -126,11 +127,10 @@ document.addEventListener("DOMContentLoaded", function() {
                                 };
                                 // Open the script window
                                 console.log('Opening script window with event:', event);
-                                console.log(OME)
                                 OME.openScriptWindow(event);
 
                                 // Close the popup
-                                window.close();
+                                //window.close();
                             };
 
                             dictDiv.appendChild(scriptDiv);
@@ -159,7 +159,9 @@ document.addEventListener("DOMContentLoaded", function() {
                 scriptDiv.dataset.id = script.id;  // Store the script's ID in a data attribute
     
                 scriptDiv.onclick = () => {
-                    const scriptUrl = `/webclient/script_ui/${scriptDiv.dataset.id}/`;  // Use the script's ID from the data attribute
+                    var currentPageUrl = window.location.search;
+                    console.log(currentPageUrl);
+                    const scriptUrl = `/webclient/script_ui/${scriptDiv.dataset.id}/${currentPageUrl}`;  // Use the script's ID from the data attribute
                     console.log('Script URL:', scriptUrl);
                     // Create a synthetic event object
                     const event = {
@@ -173,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     OME.openScriptWindow(event);
                                                                         
                     // Close the popup
-                    window.close();
+                    //window.close();
                 };
     
                 dictDiv.appendChild(scriptDiv);
