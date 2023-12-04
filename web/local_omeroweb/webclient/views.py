@@ -4982,37 +4982,47 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
     if rsp.get('status') == 'failed':
         return HttpResponse(rsp.get('error'))
 
-    
 @login_required(setGroupContext=True)
-def record_files_in_directory_launcher(request, conn=None, **kwargs):
-    """Handle the record files in directory script."""
-    # Get the script service
-    script_service = conn.getScriptService()
-
-    # Define the script name
-    script_name = 'record_files_in_directory.py'
-
-    # Get the script ID
-    scripts = script_service.getScripts()
-    script_ids = [unwrap(s.id) for s in scripts if unwrap(s.getName()) == script_name]
-    if not script_ids:
-        return HttpResponse(f"Script '{script_name}' not found")
-    script_id = script_ids[0]
-
-    # Run the script using the run_script function
+def record_files_in_directory_launcher(request, **kwargs):
+    conn = kwargs.get('conn')
     try:
-        rsp = run_script(request, conn, script_id, script_name)
-    except Exception as e:
-        return HttpResponse(str(e))
+        # Get the script service
+        script_service = conn.getScriptService()
+        script_name = 'record_files_in_directory.py'
 
-    # Get the jobId from the response
-    job_id = rsp.get('jobId')
-    if job_id is None:
-        return HttpResponse("Invalid jobId returned from script execution.")
+        # Get the script ID
+        scripts = script_service.getScripts()
+        script_ids = [s.id.val for s in scripts if s.getName().val == script_name]
+        if not script_ids:
+            return HttpResponse(f"Error: Script '{script_name}' not found")
 
-    # Loop to wait for completion
-    for _ in range(10):
+        script_id = script_ids[0]
+
+        # Get the active group ID from the request
+        active_group_id = request.POST.get("active_group_id")
+        if active_group_id is None:
+            return HttpResponse("No active group ID specified")
+        active_group_id = int(active_group_id)  # Convert the group ID to an integer
+
+        # Set the group context to the active group
+        gid = conn.SERVICE_OPTS.getOmeroGroup()  # Save the current group ID
+        conn.SERVICE_OPTS.setOmeroGroup(active_group_id)  # Set the group ID to the active group
+
+        # Run the script
         try:
+            rsp = run_script(request, conn, script_id, {}, script_name)
+        except Exception as e:
+            return HttpResponse(str(e))
+        finally:
+            conn.SERVICE_OPTS.setOmeroGroup(gid)  # Restore the original group ID
+
+        #return HttpResponse(f"Error: Script {script_ids} '{rsp}' not found")
+        job_id = rsp.get('jobId')
+        if job_id is None:
+            return HttpResponse("Error: Invalid jobId returned from script execution")
+
+        # Loop to wait for completion
+        for _ in range(10):
             proc = omero.grid.ScriptProcessPrx.checkedCast(conn.c.ic.stringToProxy(job_id))
             cb = omero.scripts.ProcessCallbackI(conn.c, proc)
             if cb.block(0):
@@ -5020,78 +5030,104 @@ def record_files_in_directory_launcher(request, conn=None, **kwargs):
                 results = proc.getResults(0, conn.SERVICE_OPTS)
                 proc.close(False)
 
-                # Check for a message in the script results
+                # Check for a message in the results
                 if 'Message' in results:
                     message = results['Message'].getValue()
                     if "error" in message.lower():
-                        return HttpResponse(message)
+                        return HttpResponse(f"Error in script execution: {message}")
 
-                # Return the recorded files if present
+                # Process and return the results if present
                 if 'Recorded Files' in results and 'Group Directories' in results:
-                    recorded_files_json = results['Recorded Files'].getValue()
-                    group_directories = results['Group Directories'].getValue()
-                    recorded_files = json.loads(recorded_files_json)
-                    group_directories = json.loads(group_directories)
-                    return recorded_files, group_directories
+                    recorded_files_str = results['Recorded Files'].getValue()
+                    group_directories_str = results['Group Directories'].getValue()
+
+                    # Convert strings into lists
+                    recorded_files_list = [file_line.split(", ") for file_line in recorded_files_str.split("\n") if file_line]
+                    group_directories_list = group_directories_str.split("\n")
+
+                    # Create a JSON object
+                    core_folders_structure = {
+                        "recorded_files": recorded_files_list,
+                        "group_directories": group_directories_list
+                    }
+                    core_folders_structure_json = json.dumps(core_folders_structure)
+
+                    return HttpResponse(core_folders_structure_json)
+
                 else:
-                    return HttpResponse("Failed to retrieve recorded files or no files recorded.")
-        except Exception as e:
-            return HttpResponse(f"Script job failed: {e}")
+                    return HttpResponse("Error: Failed to retrieve recorded files or no files recorded")
 
-        sleep(1)  # Wait a bit before checking again
+            sleep(1)  # Wait before checking again
 
-    return HttpResponse("Script execution did not complete within the allowed time.")
+        return HttpResponse("Error: Script execution did not complete within the allowed time")
+
+    except Exception as e:
+        return HttpResponse(f"Unexpected error: {str(e)}")
 
 
 @login_required()
 @render_response()
 def data_upload_popup(request, conn=None, **kwargs):
     """Data upload popup UI"""
-    # Get the active group
-    active_group_id = request.session.get("active_group") or conn.getEventContext().groupId
-    active_group = conn.getObject("ExperimenterGroup", active_group_id)
+    try:
+        # Get the active group ID
+        active_group_id = conn.getEventContext().groupId
 
-    response = record_files_in_directory_launcher(request, conn=None, **kwargs)
+        # Create a new request object with the active group ID in the POST data
+        request_copy = request.POST.copy()
+        request_copy.update({'active_group_id': active_group_id})
+        request.POST = request_copy
 
-    # Check if the response is an HttpResponse (indicating an error)
-    if isinstance(response, HttpResponse):
-        return response  # Return the error response
+        # Try running the launcher function
+        response = record_files_in_directory_launcher(request, **kwargs)
 
-    # If no error, unpack the response
-    recorded_files, group_directories = response
+        # Check if the response is an HttpResponse (indicating an error)
+        if isinstance(response, HttpResponse):
+            if response.status_code != 200:  # If status code is not 200, it's an error
+                return response  # Return the error response
+            else:
+                # If status code is 200, parse the JSON content
+                core_folders_structure = json.loads(response.content)
 
-    # Extract selected objects from the URL
-    selected_objects = request.GET
+        # Extract selected objects from the URL
+        selected_objects = request.GET
 
-    # Check if a Dataset is selected
-    selected_dataset_id = selected_objects.get('Dataset')
-    selected_dataset = None
-    if selected_dataset_id:
-        selected_dataset = conn.getObject("Dataset", selected_dataset_id)
+        # Check if a Dataset is selected
+        selected_dataset_id = selected_objects.get('Dataset')
+        selected_dataset = None
+        if selected_dataset_id:
+            selected_dataset = conn.getObject("Dataset", selected_dataset_id)
 
-    # Convert the active group to a dictionary
-    active_group_dict = {
-        'id': active_group.getId(),
-        'name': active_group.getName(),
-    }
+        # Prepare the context for the template
+        context = {
+            'activeGroup': {
+                'id': conn.getEventContext().groupId,
+                'name': conn.getEventContext().groupName,
+            },
+            'selected_dataset': selected_dataset,
+            'group_directories': core_folders_structure['group_directories'],
+            'files_in_group_directories': core_folders_structure['recorded_files'],
+        }
 
-    # Get all the projects in the active group
-    projects = list(conn.getObjects("Project", opts={'group': active_group_id}))
+        return render(request, "webclient/data_upload/data_upload_popup.html", context)
 
-    # Convert each project to a dictionary
-    project_dicts = [ {'id': project.getId(), 'name': project.getName()} for project in projects ]
+    except Exception as e:
+        # Formatting the exception information
+        error_type = type(e).__name__
+        error_message = str(e)
+        error_traceback = traceback.format_exc()
 
-    # Prepare the context for the template
-    context = {
-        'activeGroup': active_group_dict,
-        'projects': project_dicts,
-        'selected_dataset': selected_dataset,
-        'group_directories': group_directories,
-        'files_in_group_directories': recorded_files,
-    }
+        # Prepare a detailed error message
+        detailed_error_msg = f"Error Type: {error_type}\nMessage: {error_message}\nTraceback:\n{error_traceback}"
 
-    return render(request, "webclient/data_upload/data_upload_popup.html", context)
+        # Context for rendering error in the template
+        error_context = {
+            'error_message': detailed_error_msg,
+        }
 
+        # Use a template that is designed to show errors
+        html_content = f"<html><body><h1>Error</h1><p>{error_context['error_message']}</p></body></html>"
+        return HttpResponse(html_content)
 
 
 ### New Ends  

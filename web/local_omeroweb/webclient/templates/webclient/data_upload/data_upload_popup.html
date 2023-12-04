@@ -124,9 +124,9 @@
                 {% endfor %}
                 
                 <script>
-                    var filesInDataDir = JSON.parse('{{ files_in_group_directories|escapejs }}');
-                    console.log('filesInGroupsDir:')
-                    console.log(filesInGroupsDir);
+                    
+                    var filesInDataDirString = {{ files_in_group_directories|safe }};
+                    console.log('Files in group directories before parsing: ', filesInDataDirString);
 
                     function selectGroupDirectory(id) {
                         // Reset the color of the previously selected button, if any
