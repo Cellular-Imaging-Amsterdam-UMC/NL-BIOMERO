@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
 import omero.scripts as scripts
 from omero.rtypes import rstring
-from omero.gateway import BlitzGateway
 
 # The base directory is the folder in the LAN where all core* folders are stored
 base_directory = '/data'
@@ -23,7 +23,7 @@ def record_files_in_directory(directory):
                 "path": relative_path,
                 "filename": file
             })
-    return recorded_files  
+    return recorded_files
 
 def run_script():
     client = scripts.client(
@@ -31,8 +31,8 @@ def run_script():
         """Description of your script.""",
 
         authors=["Rodrigo Rosas-Bertolini"],
-        institutions=["Your Institution"],
-        contact="your.email@example.com",
+        institutions=["Amsterdam University Medical Center"],
+        contact="r.rosas@amsterdamumc.com",
     )
     try:
         # Check if base_directory exists
@@ -45,17 +45,18 @@ def run_script():
         if not group_directories:
             return client.setOutput("Message", rstring("No core group folders found"))
 
-        all_recorded_files = []
+        files_by_directory = {}
         for directory in group_directories:
             full_path = os.path.join(base_directory, directory)
-            recorded_files = record_files_in_directory(full_path)
-            all_recorded_files.extend(recorded_files)
+            files_by_directory[directory] = record_files_in_directory(full_path)
 
-        output_files = "\n".join([f"{file['path']}, {file['filename']}" for file in all_recorded_files])
-        output_directories = "\n".join(group_directories)
 
-        client.setOutput("Recorded Files", rstring(output_files))
-        client.setOutput("Group Directories", rstring(output_directories))
+        output = {
+            "Recorded Files": files_by_directory,
+            "Group Directories": group_directories
+        }
+        output_str = json.dumps(output)
+        client.setOutput("Output", rstring(output_str))
 
     finally:
         client.closeSession()

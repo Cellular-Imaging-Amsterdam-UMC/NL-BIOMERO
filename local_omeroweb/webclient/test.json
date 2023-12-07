@@ -1,0 +1,23 @@
+{
+    "core_directories" : ["coreKrawczyk", "coreReits"],
+    "files_by_subdirectory" : [
+        {"subdirectory_name" : "coreKrawczyk",
+        "files_in_subdirectory" : [
+            {"file_path": "/data/coreKrawczyk/Amsterdam-UMC - Copy.png",
+            "file_name" : "Amsterdam-UMC - Copy.png'"
+            }
+        ]}, 
+        {"subdirectory_name" : "coreReits",
+        "files_in_subdirectory" : [
+            {"file_path": "/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png",
+            "file_name" : "Barbie - I want to  imagine - Copy.png"},
+            {"file_path": "/data/coreReits/rrosas/valid_test.tif",
+            "file_name" : "valid_test.tif"}
+        ]}
+    ]
+}
+
+
+'{"coreKrawczyk": [["{\'coreKrawczyk\': [\'/data/coreKrawczyk/Amsterdam-UMC - Copy.png", "Amsterdam-UMC - Copy.png\']", "\'coreReits\': [\'/data/coreReits/Barbieland/Barbie - I want to imagine - Copy.png", "Barbie - I want to imagine - Copy.png\'", "\'/data/coreReits/rrosas/valid_test.tif", "valid_test.tif\']}"]]}'
+
+

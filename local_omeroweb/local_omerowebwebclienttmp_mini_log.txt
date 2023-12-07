@@ -1,0 +1,68 @@
+2023-12-07 10:25:12.522636: data_upload_popup: Function start
+2023-12-07 10:25:12.535865: data_upload_popup: Retrieved active group ID: 0
+2023-12-07 10:25:12.537973: data_upload_popup: Calling record_files_in_directory_launcher
+2023-12-07 10:25:12.560544: record_files_in_directory_launcher: Function start
+2023-12-07 10:25:12.668523: record_files_in_directory_launcher: Got script service
+2023-12-07 10:25:13.998361: Complete raw results: {'Output': object #0 (::omero::RString)
+{
+    _val = {"Recorded Files": {"coreKrawczyk": [{"path": "/data/coreKrawczyk/Amsterdam-UMC - Copy.png", "filename": "Amsterdam-UMC - Copy.png"}], "coreReits": [{"path": "/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png", "filename": "Barbie - I want to  imagine - Copy.png"}, {"path": "/data/coreReits/rrosas/valid_test.tif", "filename": "valid_test.tif"}]}, "Group Directories": ["coreKrawczyk", "coreReits"]}
+}}
+2023-12-07 10:25:14.006238: output: {'Recorded Files': {'coreKrawczyk': [{'path': '/data/coreKrawczyk/Amsterdam-UMC - Copy.png', 'filename': 'Amsterdam-UMC - Copy.png'}], 'coreReits': [{'path': '/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png', 'filename': 'Barbie - I want to  imagine - Copy.png'}, {'path': '/data/coreReits/rrosas/valid_test.tif', 'filename': 'valid_test.tif'}]}, 'Group Directories': ['coreKrawczyk', 'coreReits']}
+2023-12-07 10:25:14.007875: Raw Recorded Files JSON: {'coreKrawczyk': [{'path': '/data/coreKrawczyk/Amsterdam-UMC - Copy.png', 'filename': 'Amsterdam-UMC - Copy.png'}], 'coreReits': [{'path': '/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png', 'filename': 'Barbie - I want to  imagine - Copy.png'}, {'path': '/data/coreReits/rrosas/valid_test.tif', 'filename': 'valid_test.tif'}]}
+2023-12-07 10:25:14.009382: Raw group_directories_str: ['coreKrawczyk', 'coreReits']
+2023-12-07 10:25:14.010991: complete_data: {'files_by_subdirectory': [{'subdirectory_name': 'coreKrawczyk', 'files_in_subdirectory': [{'path': {'path': '/data/coreKrawczyk/Amsterdam-UMC - Copy.png', 'filename': 'Amsterdam-UMC - Copy.png'}, 'filename': {'path': '/data/coreKrawczyk/Amsterdam-UMC - Copy.png', 'filename': 'Amsterdam-UMC - Copy.png'}}]}, {'subdirectory_name': 'coreReits', 'files_in_subdirectory': [{'path': {'path': '/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png', 'filename': 'Barbie - I want to  imagine - Copy.png'}, 'filename': {'path': '/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png', 'filename': 'Barbie - I want to  imagine - Copy.png'}}, {'path': {'path': '/data/coreReits/rrosas/valid_test.tif', 'filename': 'valid_test.tif'}, 'filename': {'path': '/data/coreReits/rrosas/valid_test.tif', 'filename': 'valid_test.tif'}}]}], 'group_directories': ['coreKrawczyk', 'coreReits']}
+2023-12-07 10:25:14.014621: Raw response content: b'{"files_by_subdirectory": [{"subdirectory_name": "coreKrawczyk", "files_in_subdirectory": [{"path": {"path": "/data/coreKrawczyk/Amsterdam-UMC - Copy.png", "filename": "Amsterdam-UMC - Copy.png"}, "filename": {"path": "/data/coreKrawczyk/Amsterdam-UMC - Copy.png", "filename": "Amsterdam-UMC - Copy.png"}}]}, {"subdirectory_name": "coreReits", "files_in_subdirectory": [{"path": {"path": "/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png", "filename": "Barbie - I want to  imagine - Copy.png"}, "filename": {"path": "/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png", "filename": "Barbie - I want to  imagine - Copy.png"}}, {"path": {"path": "/data/coreReits/rrosas/valid_test.tif", "filename": "valid_test.tif"}, "filename": {"path": "/data/coreReits/rrosas/valid_test.tif", "filename": "valid_test.tif"}}]}], "group_directories": ["coreKrawczyk", "coreReits"]}'
+2023-12-07 10:25:14.017084: data_upload_popup: record_files_in_directory_launcher call completed
+2023-12-07 10:25:14.019192: data_upload_popup: Parsed response data: {'files_by_subdirectory': [{'subdirectory_name': 'coreKrawczyk', 'files_in_subdirectory': [{'path': {'path': '/data/coreKrawczyk/Amsterdam-UMC - Copy.png', 'filename': 'Amsterdam-UMC - Copy.png'}, 'filename': {'path': '/data/coreKrawczyk/Amsterdam-UMC - Copy.png', 'filename': 'Amsterdam-UMC - Copy.png'}}]}, {'subdirectory_name': 'coreReits', 'files_in_subdirectory': [{'path': {'path': '/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png', 'filename': 'Barbie - I want to  imagine - Copy.png'}, 'filename': {'path': '/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png', 'filename': 'Barbie - I want to  imagine - Copy.png'}}, {'path': {'path': '/data/coreReits/rrosas/valid_test.tif', 'filename': 'valid_test.tif'}, 'filename': {'path': '/data/coreReits/rrosas/valid_test.tif', 'filename': 'valid_test.tif'}}]}], 'group_directories': ['coreKrawczyk', 'coreReits']}
+2023-12-07 10:25:14.029517: data_upload_popup: Prepared context: {
+    "activeGroup": {
+        "id": 0,
+        "name": "system"
+    },
+    "selected_dataset": {
+        "id": 1,
+        "name": "test"
+    },
+    "files_by_subdirectory": [
+        {
+            "subdirectory_name": "coreKrawczyk",
+            "files_in_subdirectory": [
+                {
+                    "file_name": {
+                        "path": "/data/coreKrawczyk/Amsterdam-UMC - Copy.png",
+                        "filename": "Amsterdam-UMC - Copy.png"
+                    },
+                    "file_path": {
+                        "path": "/data/coreKrawczyk/Amsterdam-UMC - Copy.png",
+                        "filename": "Amsterdam-UMC - Copy.png"
+                    }
+                }
+            ]
+        },
+        {
+            "subdirectory_name": "coreReits",
+            "files_in_subdirectory": [
+                {
+                    "file_name": {
+                        "path": "/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png",
+                        "filename": "Barbie - I want to  imagine - Copy.png"
+                    },
+                    "file_path": {
+                        "path": "/data/coreReits/Barbieland/Barbie - I want to  imagine - Copy.png",
+                        "filename": "Barbie - I want to  imagine - Copy.png"
+                    }
+                },
+                {
+                    "file_name": {
+                        "path": "/data/coreReits/rrosas/valid_test.tif",
+                        "filename": "valid_test.tif"
+                    },
+                    "file_path": {
+                        "path": "/data/coreReits/rrosas/valid_test.tif",
+                        "filename": "valid_test.tif"
+                    }
+                }
+            ]
+        }
+    ]
+}

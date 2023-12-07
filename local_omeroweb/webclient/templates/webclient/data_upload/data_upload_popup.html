@@ -122,11 +122,26 @@
                 {% for directory in group_directories %}
                     <button type="button" class="btn btn-default" id="{{ directory }}" onclick="selectGroupDirectory(this.id)">{{ directory }}</button>
                 {% endfor %}
-                
+
+                <script type="text/javascript">
+                    var filesBySubdirectory = JSON.parse('{{ files_by_subdirectory|escapejs }}'.replace(/'/g, '"'));
+                </script>
                 <script>
-                    
-                    var filesInDataDirString = {{ files_in_group_directories|safe }};
-                    console.log('Files in group directories before parsing: ', filesInDataDirString);
+                    try {
+                        console.log('Files by Subdirectory:', filesBySubdirectory);
+
+                        // Iterate over each subdirectory object
+                        filesBySubdirectory.forEach(subdirectory => {
+                            console.log('Subdirectory:', subdirectory.subdirectory_name);
+
+                            // Iterate over the files in each subdirectory
+                            subdirectory.files_in_subdirectory.forEach(file => {
+                                console.log('File Path:', file.file_path, 'File Name:', file.file_name);
+                            });
+                        });
+                    } catch (e) {
+                        console.error("Error parsing JSON: ", e);
+                    }
 
                     function selectGroupDirectory(id) {
                         // Reset the color of the previously selected button, if any
