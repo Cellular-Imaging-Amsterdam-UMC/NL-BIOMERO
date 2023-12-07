@@ -4961,7 +4961,8 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 
     # Prepare the input map
     input_map = {key: rstring(value) for key, value in request.POST.items()}
-
+    # log_message(f"input_map: {input_map}")
+    
     # Get the active group ID from the request
     active_group_id = request.POST.get("active_group_id")
     if active_group_id is None:
@@ -4975,25 +4976,29 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
     # Run the script using the script_run function
     try:
         rsp = script_run(request, sid, conn=None, **input_map)
-    except Exception as e:
-        return HttpResponse(str(e))
-    finally:
-        conn.SERVICE_OPTS.setOmeroGroup(gid)  # Restore the original group ID
 
-    if rsp.get('status') == 'failed':
-        return HttpResponse(rsp.get('error'))
+        # Check the response of the script
+        if rsp.get('status') == 'failed':
+            return HttpResponse(rsp.get('error'))
+
+        # If the script did not fail, return a success response
+        return HttpResponse("Upload Started!")
+
+    except Exception as e:
+        # Return an error response if an exception occurs
+        return HttpResponse(str(e))
 
 #TMP only for development delete later
-def log_message(message):
-    with open('local_omeroweb\\webclient\\tmp_mini_log.txt', 'a') as log_file:
-        log_file.write(f"{datetime.datetime.now()}: {message}\n")
+# def  log_message(message):
+    # with open('local_omeroweb\\webclient\\tmp_mini_log.txt', 'a') as log_file:
+        # log_file.write(f"{datetime.datetime.now()}: {message}\n")
 
 #TMP ends
 
 @login_required(setGroupContext=True)
 def record_files_in_directory_launcher(request, **kwargs):
     conn = kwargs.get('conn')
-    log_message("record_files_in_directory_launcher: Function start")
+    # log_message("record_files_in_directory_launcher: Function start")
     try:
         # Get the script service
         script_service = conn.getScriptService()
@@ -5001,7 +5006,7 @@ def record_files_in_directory_launcher(request, **kwargs):
 
         # Get the script ID
         scripts = script_service.getScripts()
-        log_message("record_files_in_directory_launcher: Got script service")
+        # log_message("record_files_in_directory_launcher: Got script service")
         script_ids = [s.id.val for s in scripts if s.getName().val == script_name]
         if not script_ids:
             return HttpResponse(f"Error: Script '{script_name}' not found")
@@ -5037,19 +5042,19 @@ def record_files_in_directory_launcher(request, **kwargs):
             if cb.block(0):
                 cb.close()
                 results = proc.getResults(0, conn.SERVICE_OPTS)
-                log_message(f"Complete raw results: {results}")
+                # log_message(f"Complete raw results: {results}")
                 proc.close(False)
         
                 # Process and return the results if present
                 if 'Output' in results:
                     output_str = results['Output'].val  # Get the output string
                     output = json.loads(output_str)  # Convert the output string to a dictionary
-                    log_message(f"output: {output}")
+                    # log_message(f"output: {output}")
                     recorded_files_dict = output.get('Recorded Files', {})
                     group_directories = output.get('Group Directories', [])
 
-                    log_message(f"Raw Recorded Files JSON: {recorded_files_dict}")
-                    log_message(f"Raw group_directories_str: {group_directories}")
+                    # log_message(f"Raw Recorded Files JSON: {recorded_files_dict}")
+                    # log_message(f"Raw group_directories_str: {group_directories}")
 
                     complete_data = {
                         "files_by_subdirectory": [
@@ -5058,7 +5063,7 @@ def record_files_in_directory_launcher(request, **kwargs):
                         ],
                         "group_directories": group_directories
                     }
-                    log_message(f"complete_data: {complete_data}")
+                    # log_message(f"complete_data: {complete_data}")
                     return JsonResponse(complete_data)
         
                 else:
@@ -5076,11 +5081,11 @@ def record_files_in_directory_launcher(request, **kwargs):
 @render_response()
 def data_upload_popup(request, conn=None, **kwargs):
     """Data upload popup UI"""
-    log_message("data_upload_popup: Function start")
+    # log_message("data_upload_popup: Function start")
     try:
         # Get the active group ID
         active_group_id = conn.getEventContext().groupId
-        log_message(f"data_upload_popup: Retrieved active group ID: {active_group_id}")
+        # log_message(f"data_upload_popup: Retrieved active group ID: {active_group_id}")
         
         # Create a new request object with the active group ID in the POST data
         request_copy = request.POST.copy()
@@ -5089,10 +5094,10 @@ def data_upload_popup(request, conn=None, **kwargs):
 
 
         # Try running the launcher function
-        log_message("data_upload_popup: Calling record_files_in_directory_launcher")
+        # log_message("data_upload_popup: Calling record_files_in_directory_launcher")
         response = record_files_in_directory_launcher(request, **kwargs)
-        log_message(f"Raw response content: {response.content}")
-        log_message("data_upload_popup: record_files_in_directory_launcher call completed")
+        # log_message(f"Raw response content: {response.content}")
+        # log_message("data_upload_popup: record_files_in_directory_launcher call completed")
 
         # Initialize an empty list for files by subdirectory
         files_by_subdirectory = []
@@ -5101,7 +5106,7 @@ def data_upload_popup(request, conn=None, **kwargs):
         if isinstance(response, HttpResponse) and response.status_code == 200:
             try:
                 response_data = json.loads(response.content.decode('utf-8'))  # Decode if response.content is a byte string
-                log_message(f"data_upload_popup: Parsed response data: {response_data}")
+                # log_message(f"data_upload_popup: Parsed response data: {response_data}")
         
                 for subdir_dict in response_data['files_by_subdirectory']:
                     subdirectory = subdir_dict['subdirectory_name']
@@ -5111,15 +5116,15 @@ def data_upload_popup(request, conn=None, **kwargs):
                             file_path = file['path']
                             file_name = file['filename']
                             files_info.append({"file_name": file_name, "file_path": file_path})
-                        else:
-                            log_message(f"Unexpected file format: {file}")
+                        #else:
+                            # log_message(f"Unexpected file format: {file}")
         
                     files_by_subdirectory.append({
                         "subdirectory_name": subdirectory,
                         "files_in_subdirectory": files_info
                     })
             except (json.JSONDecodeError, TypeError, ValueError) as e:
-                log_message(f"data_upload_popup: Error processing response data: {e}")
+                # log_message(f"data_upload_popup: Error processing response data: {e}")
                 print(f"Error processing response data: {e}")
 
         # Extract selected objects from the URL
@@ -5148,7 +5153,7 @@ def data_upload_popup(request, conn=None, **kwargs):
         }
         # Instead of returning the rendered template, convert context to a string
         context_str = json.dumps(context, indent=4)  # Convert context to a pretty-printed JSON string
-        log_message(f"data_upload_popup: Prepared context: {context_str}")
+        # log_message(f"data_upload_popup: Prepared context: {context_str}")
         
         return render(request, "webclient/data_upload/data_upload_popup.html", context)
 

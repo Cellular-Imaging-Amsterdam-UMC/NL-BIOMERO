@@ -1,69 +1,69 @@
-function buildFileTree(dataString) {
-    console.log("Building file tree with data:", dataString);
+function buildFileTree(filesInSubdirectory) {
+    console.log("Data passed to buildFileTree:", filesInSubdirectory);
     const tree = {};
-    var dataString = dataString.replace(/'/g, "\"");
-    console.log("Building file tree with data replaced:", dataString);
-    // Format the data string into a valid JSON array string
-    dataString = '{ "results": [' + dataString.replace(/\}\s*\{/g, '},{') + ']}';
-    console.log("data:",dataString)
-    // Parse the string into an array of objects
-    var data = JSON.parse(dataString);
-    data = data.results;
 
-    data.forEach(item => {
-        const parts = item.path.split('/');
-        let currentLevel = tree;
+    filesInSubdirectory.forEach(fileObj => {
+        if(fileObj.file_path && typeof fileObj.file_path.path === 'string') {
+            // Split the path and remove the base 'data' directory and the already selected group
+            // Assuming the first part is always 'data' and the second part is the group
+            const parts = fileObj.file_path.path.split('/').slice(3); // Adjust the index as needed
+            
+            let currentLevel = tree;
 
-        for (let index = 0; index < parts.length; index++) {
-            const part = parts[index];
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
 
-            // Skip the base directory and the core subdirectories
-            if (index < 2) continue;
+                if (!currentLevel[part]) {
+                    currentLevel[part] = {};
+                }
 
-            if (!currentLevel[part]) {
-                currentLevel[part] = {};
+                if (i === parts.length - 1) {
+                    currentLevel[part] = fileObj; // Store the file object here
+                } else {
+                    currentLevel = currentLevel[part];
+                }
             }
-            if (index === parts.length - 1) {
-                currentLevel[part] = item;
-            } else {
-                currentLevel = currentLevel[part];
-            }
+        } else {
+            console.error('Invalid file path structure:', fileObj);
         }
     });
-
-    // Return the third part of the path as the root of the tree
-    return tree[Object.keys(tree)[0]];
+    console.log("Constructed file tree:", tree);
+    return tree;
 }
 
+
 function renderFileTree(node, parentElement) {
-    console.log("Rendering file tree with node:", node);
+    console.log("Node to be rendered:", node);
     const ul = document.createElement('ul');
 
     for (const key in node) {
         const li = document.createElement('li');
+        const currentNode = node[key];
 
-        // If the current node is a file, add a checkbox
-        if (node[key].filename) {
+        // If the node is a file, add a checkbox and label with the file name
+        if (currentNode.file_name && currentNode.file_path) {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
-            checkbox.id = 'checkbox-' + node[key].path; // Assign a unique ID to the checkbox
+            // The ID should use the path for uniqueness, assuming the path is a string
+            checkbox.id = 'checkbox-' + currentNode.file_path.path;
 
             const label = document.createElement('label');
-            label.htmlFor = checkbox.id; // Associate the label with the checkbox
+            label.htmlFor = checkbox.id;
             label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(node[key].filename));
+            // Make sure you are accessing the filename correctly
+            label.appendChild(document.createTextNode(currentNode.file_name.filename));
 
             li.appendChild(label);
         } else {
-            // If it's a directory, make the name bold
+            // If it's not a file, it must be a folder, so display its name in bold
             const boldText = document.createElement('strong');
             boldText.textContent = key;
             li.appendChild(boldText);
-        }
 
-        // If the current node is a directory, recursively render its contents
-        if (typeof node[key] === 'object' && !node[key].filename) {
-            renderFileTree(node[key], li);
+            // Recursively render any nested subdirectories or files
+            if (typeof currentNode === 'object' && currentNode !== null && !currentNode.file_name) {
+                renderFileTree(currentNode, li);
+            }
         }
 
         ul.appendChild(li);
@@ -72,50 +72,19 @@ function renderFileTree(node, parentElement) {
     parentElement.appendChild(ul);
 }
 
-function selectGroupDirectory(id) {
-    console.log("Selecting group directory with id:", id);
-    // Get the file data for the selected directory
-    var fileDataString = filesInGroupsDir[id];
+function selectGroupDirectory(index) {
+    console.log("Selecting group directory with index:", index);
+    var selectedSubdirectory = filesBySubdirectory[index];
 
-    // Check if fileDataString is a non-empty string
-    if (typeof fileDataString === 'string' && fileDataString.trim() !== '') {
-        // Split the string into lines
-        var lines = fileDataString.split('\n');
-        console.log("lines:", lines);
-        // Parse each line as JSON to get an array of file objects
-        var fileData = lines.map(line => {
-            try {
-                var parsed = JSON.parse(line.replace(/'/g, "\""));
-                // Ensure parsed is an array
-                if (!Array.isArray(parsed)) {
-                    parsed = [parsed];
-                }
-                return parsed;
-            } catch (e) {
-                console.error('Error parsing file data:', e);
-                return null;
-            }
-        }).filter(item => item); // Remove null items
-
-        // Flatten fileData into a single array
-        fileData = [].concat.apply([], fileData);
-
-        // Check if fileData is an array
-        if (Array.isArray(fileData) && fileData.length > 0) {
-            // Build and render the file tree for the file data
-            var fileTree = buildFileTree(fileData);
-            console.log("fileTree:", fileTree);
-            var fileTreeDiv = document.getElementById('fileTree');
-            fileTreeDiv.innerHTML = ""; // Clear the div
-            renderFileTree(fileTree, fileTreeDiv);
-        } else {
-            var fileTreeDiv = document.getElementById('fileTree');
-            console.error('Invalid file data:', fileData);
-            fileTreeDiv.innerHTML = "No files found in this folder";
-        }
+    if (selectedSubdirectory) {
+        var fileTree = buildFileTree(selectedSubdirectory.files_in_subdirectory);
+        console.log("fileTree:", fileTree);
+        var fileTreeDiv = document.getElementById('fileTree');
+        fileTreeDiv.innerHTML = ""; // Clear the div
+        renderFileTree(fileTree, fileTreeDiv);
     } else {
         var fileTreeDiv = document.getElementById('fileTree');
-        console.error('Invalid file data:', fileDataString);
+        console.error('Subdirectory data not found for index:', index);
         fileTreeDiv.innerHTML = "No files found in this folder";
     }
 }

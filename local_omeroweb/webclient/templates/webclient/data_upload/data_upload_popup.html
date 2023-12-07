@@ -13,24 +13,55 @@
     {{ block.super }}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript">
-        // Use jQuery's no-conflict mode
         var $j = jQuery.noConflict();
-        //var baseDataDirectory = '{{ base_data_directory }}'; If we actually needed this, I will need to pass it from the record_files_in_directory script
-    
-        $j(document).ready(function() {
-    
-            // Show an error message
-            function showError(message) {
-                var errorMessageElement = $j('#errorMessage');
-                errorMessageElement.text(message);
-                errorMessageElement.show();
+        var filesBySubdirectory; // Declare it without assigning []
+
+        function selectGroupDirectory(index) {
+            console.log("Selecting group directory with index:", index);
+            // Find the selected subdirectory data by index
+            var selectedSubdirectory = filesBySubdirectory[index];
+            console.log("Selected subdirectory data:", selectedSubdirectory);
+
+            if (selectedSubdirectory) {
+                // Build and render the file tree
+                var fileTree = buildFileTree(selectedSubdirectory.files_in_subdirectory);
+                console.log("fileTree:", fileTree);
+                var fileTreeDiv = document.getElementById('fileTree');
+                fileTreeDiv.innerHTML = ""; // Clear the div
+                renderFileTree(fileTree, fileTreeDiv);
+            } else {
+                console.error('Subdirectory data not found for index:', index);
+                var fileTreeDiv = document.getElementById('fileTree');
+                fileTreeDiv.innerHTML = "No files found in this folder";
             }
-    
+        }
+
+        function showError(message) {
+            var errorMessageElement = $j('#errorMessage');
+            errorMessageElement.text(message);
+            errorMessageElement.show();
+        }
+
+        $j(document).ready(function() {
+            filesBySubdirectory = JSON.parse('{{ files_by_subdirectory|escapejs }}'.replace(/'/g, '"'));
+            console.log('Files by Subdirectory:', filesBySubdirectory);
+
+            var buttonsContainer = document.getElementById('directoryButtonsContainer');
+            filesBySubdirectory.forEach((subdirectory, index) => {
+                var button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-default';
+                // Use the index as the ID
+                button.id = index;
+                button.innerText = subdirectory.subdirectory_name;
+                button.onclick = function() { selectGroupDirectory(this.id); };
+                buttonsContainer.appendChild(button);
+            });
+
             $j('#data_files').change(function() {
                 var selectedFiles = $j(this).val();
-                $j('#fileList').empty(); // Clear the list
-    
-                // Add table header
+                $j('#fileList').empty();
+
                 var tableHeader = '<table><thead><tr><th>File Name</th><th>Metadata File</th></tr></thead><tbody>';
                 $j('#fileList').append(tableHeader);
                 
@@ -42,9 +73,9 @@
             
                 $j('#fileList').append('</tbody></table>');
             });
-    
-            // Set the data_paths input field's value when the form is submitted
-            $j('#data_uploader_script_launcher').submit(function() {
+
+            $j('#data_uploader_script_launcher').submit(function(event) {
+                // Process the selected files and prepare them for the upload
                 var selectedFiles = [];
                 $j('#fileTree input[type="checkbox"]:checked').each(function() {
                     selectedFiles.push(this.id.replace('checkbox-', ''));
@@ -54,137 +85,79 @@
         });
     </script>
 {% endblock %}
+
 {% block body %}
     {% if selected_dataset %}
-    <script src="{% static 'webclient/javascript/cute_file_selector.js' %}"></script>
-    <form id='data_uploader_script_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_script_launcher' %}">{% csrf_token %}
-        
-        <div style="padding:10px; margin-bottom:10px">
-            <h3 id="dataUploadName">Upload Data</h3>
-            
-            <!-- Add these hidden input fields -->
-            <input type="hidden" id="data_paths" name="data_paths">
-            <input type="hidden" id="dataset_id" name="dataset_id" value="{{ selected_dataset.id }}">
-            <input type="hidden" id="active_group_id" name="active_group_id" value="{{ activeGroup.id }}">
-
-            <!-- Description Div -->
-            <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 0px; margin-bottom: 0px;">
-                <!-- Description Text -->
-                <p style="font-size: 0.8em;">
-                    This script uses the selected Dataset and the files chosen by the user, 
-                    along with the metadata specified through XML files, to upload well-annotated 
-                    data to the selected Dataset folder. Please ensure that you have selected 
-                    the correct Dataset and files before proceeding with the upload.
-                </p>
-                <p style="font-size: 0.8em;"><strong>Author:</strong> Rodrigo Rosas-Bertolini</p>
-                <p style="font-size: 0.8em;"><strong>Contact:</strong> r.rosas@amsterdamumc.nl</p>
-                <p style="font-size: 0.8em;"><strong>Version:</strong> 0.0.0</p>
+        <script src="{% static 'webclient/javascript/cute_file_selector.js' %}"></script>
+        <form id='data_uploader_script_launcher' method="post" enctype="multipart/form-data" action="{% url 'data_uploader_script_launcher' %}">{% csrf_token %}
+            <div style="padding:10px; margin-bottom:10px">
+                <h3 id="dataUploadName">Upload Data</h3>
+                <input type="hidden" id="data_paths" name="data_paths">
+                <input type="hidden" id="dataset_id" name="dataset_id" value="{{ selected_dataset.id }}">
+                <input type="hidden" id="active_group_id" name="active_group_id" value="{{ activeGroup.id }}">
+                <div id="descriptionDiv" style="background-color: #f0f0f0; padding: 0px; margin-bottom: 0px;">
+                    <p style="font-size: 0.8em;">
+                        This script uses the selected Dataset and the files chosen by the user, 
+                        along with the metadata specified through XML files, to upload well-annotated 
+                        data to the selected Dataset folder. Please ensure that you have selected 
+                        the correct Dataset and files before proceeding with the upload.
+                    </p>
+                    <p style="font-size: 0.8em;"><strong>Author:</strong> Rodrigo Rosas-Bertolini</p>
+                    <p style="font-size: 0.8em;"><strong>Contact:</strong> r.rosas@amsterdamumc.nl</p>
+                    <p style="font-size: 0.8em;"><strong>Version:</strong> 0.0.0</p>
+                </div>
+                <p class="section_title"><strong>Data Destination:</strong></p>
+                <div class="row">
+                    <div class="column left">
+                        <p class="data_destination_fields"><strong>Selected Group:</strong></p>
+                    </div>
+                    <div class="column right">
+                        <p class="data_destination_fields"><strong>{{ activeGroup.name }}</strong></p>
+                    </div>
+                    <div class="column id">
+                        <p class="data_destination_fields">ID: {{ activeGroup.id }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column left">
+                        <p class="data_destination_fields"><strong>Selected Dataset:</strong></p>
+                    </div>
+                    <div class="column right">
+                        {% if selected_dataset %}
+                            <p class="data_destination_fields"><strong>{{ selected_dataset.name }}</strong></p>
+                        {% else %}
+                            <p class="data_destination_fields">No Dataset Selected</p>
+                        {% endif %}
+                    </div>
+                    <div class="column id">
+                        {% if selected_dataset %}
+                            <p class="data_destination_fields">ID: {{ selected_dataset.id }}</p>
+                        {% else %}
+                            <p class="data_destination_fields">No ID</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <p class="section_title"><strong>Data Source:</strong></p>
+                <div style="background-color: #b0c4de; padding: 10px;">
+                    <p class="section_title"><strong>Select Files:</strong></p>
+                    <div id="directoryButtonsContainer" style="margin-bottom: 20px;">
+                        <!-- Buttons will be appended here -->
+                    </div>
+                    <div id="fileTree"></div>
+                    <p id="targetInfo" style="display:none">
+                        <span id="targetMessage"></span>
+                        <pre><code id="targetPath"></code></pre>
+                    </p>
+                </div>
+            <div class="footer">
+                <div style="float:right">
+                    <a href="#" tabIndex="3" onClick="self.close()">Close</a>
+                    <input id="submit" tabIndex="2" type="submit" value="Upload Data" />
+                    <img id="spinner" src ="{% static "webgateway/img/spinner.gif" %}"/>
+                </div>
             </div>
-
-            <p class="section_title"><strong>Data Destination:</strong></p>
-
-            <!-- Active Group Display -->
-            <div class="row">
-                <div class="column left">
-                    <p class="data_destination_fields"><strong>Selected Group:</strong></p>
-                </div>
-                <div class="column right">
-                    <p class="data_destination_fields"><strong>{{ activeGroup.name }}</strong></p>
-                </div>
-                <div class="column id">
-                    <p class="data_destination_fields">ID: {{ activeGroup.id }}</p>
-                </div>
-            </div>
-            
-            <!-- Dataset Selection Dropdown -->
-            <div class="row">
-                <div class="column left">
-                    <p class="data_destination_fields"><strong>Selected Dataset:</strong></p>
-                </div>
-                <div class="column right">
-                    {% if selected_dataset %}
-                        <p class="data_destination_fields"><strong>{{ selected_dataset.name }}</strong></p>
-                    {% else %}
-                        <p class="data_destination_fields">No Dataset Selected</p>
-                    {% endif %}
-                </div>
-                <div class="column id">
-                    {% if selected_dataset %}
-                        <p class="data_destination_fields">ID: {{ selected_dataset.id }}</p>
-                    {% else %}
-                        <p class="data_destination_fields">No ID</p>
-                    {% endif %}
-                </div>
-            </div>
-            
-            <p class="section_title"><strong>Data Source:</strong></p>
-            <div style="background-color: #b0c4de; padding: 10px;">
-                {% for directory in group_directories %}
-                    <button type="button" class="btn btn-default" id="{{ directory }}" onclick="selectGroupDirectory(this.id)">{{ directory }}</button>
-                {% endfor %}
-
-                <script type="text/javascript">
-                    var filesBySubdirectory = JSON.parse('{{ files_by_subdirectory|escapejs }}'.replace(/'/g, '"'));
-                </script>
-                <script>
-                    try {
-                        console.log('Files by Subdirectory:', filesBySubdirectory);
-
-                        // Iterate over each subdirectory object
-                        filesBySubdirectory.forEach(subdirectory => {
-                            console.log('Subdirectory:', subdirectory.subdirectory_name);
-
-                            // Iterate over the files in each subdirectory
-                            subdirectory.files_in_subdirectory.forEach(file => {
-                                console.log('File Path:', file.file_path, 'File Name:', file.file_name);
-                            });
-                        });
-                    } catch (e) {
-                        console.error("Error parsing JSON: ", e);
-                    }
-
-                    function selectGroupDirectory(id) {
-                        // Reset the color of the previously selected button, if any
-                        if (window.selectedButtonId) {
-                            var previousButton = document.getElementById(window.selectedButtonId);
-                            previousButton.style.backgroundColor = ""; // Change this to the original color
-                            previousButton.style.color = "";
-                        }
-                
-                        // Change the color of the selected button
-                        var selectedButton = document.getElementById(id);
-                        selectedButton.style.backgroundColor = "gray";
-                        selectedButton.style.color = "white";
-                
-                        // Store the id of the selected button
-                        window.selectedButtonId = id;
-                
-                        // Build and render the file tree for the selected directory
-                        var fileData = filesInGroupsDir[id];
-                        var fileTree = buildFileTree(fileData);
-                        var fileTreeDiv = document.getElementById('fileTree');
-                        fileTreeDiv.innerHTML = ""; // Clear the div
-                        renderFileTree(fileTree, fileTreeDiv);
-                    }
-                </script>
-                <p class="section_title"><strong>Select Files:</strong></p>
-                <div id="fileTree"></div>
-                <p id="targetInfo" style="display:none">
-                    <span id="targetMessage"></span>
-                    <pre><code id="targetPath"></code></pre>
-                </p>
-            </div>
-
-        <div class="footer">
-            <div style="float:right">
-                <a href="#" tabIndex="3" onClick="self.close()">Close</a>
-                <input id="submit" tabIndex="2" type="submit" value="Upload Data" />
-                <img id="spinner" src ="{% static "webgateway/img/spinner.gif" %}"/>
-            </div>
-        </div>
-    </form>
+        </form>
     {% else %}
-        <!-- Warning message -->
         <div style="padding:10px; margin-bottom:40px">
             <h3 id="dataUploadName">Upload Data</h3>
             <p style="color: red;">Select a single Dataset in the left-side 'Explore' menu before running 'Upload Data'. If the Dataset where you want to upload data does not yet exist, create it by clicking on the green folder icon of the same menu.</p>
