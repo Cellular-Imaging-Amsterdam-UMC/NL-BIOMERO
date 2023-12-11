@@ -4998,7 +4998,7 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 @login_required(setGroupContext=True)
 def record_files_in_directory_launcher(request, **kwargs):
     conn = kwargs.get('conn')
-    # log_message("record_files_in_directory_launcher: Function start")
+
     try:
         # Get the script service
         script_service = conn.getScriptService()
@@ -5044,12 +5044,20 @@ def record_files_in_directory_launcher(request, **kwargs):
                 results = proc.getResults(0, conn.SERVICE_OPTS)
                 # log_message(f"Complete raw results: {results}")
                 proc.close(False)
-        
+
                 # Process and return the results if present
                 if 'Output' in results:
                     output_str = results['Output'].val  # Get the output string
-                    output = json.loads(output_str)  # Convert the output string to a dictionary
-                    # log_message(f"output: {output}")
+                    if output_str:  # Check if the output string is not None or empty
+                        output = json.loads(output_str)  # Convert the output string to a dictionary
+                        # log_message(f"output: {output}")
+                    # Check for 'error' key in output
+                            # Check for 'error' key in output
+                    if 'error' in output:
+                        error_message = output['error']
+                        # Modification: Return error as JSON response
+                        return HttpResponse(json.dumps({'error': error_message}), content_type='application/json')
+                    
                     recorded_files_dict = output.get('Recorded Files', {})
                     group_directories = output.get('Group Directories', [])
 
@@ -5065,68 +5073,73 @@ def record_files_in_directory_launcher(request, **kwargs):
                     }
                     # log_message(f"complete_data: {complete_data}")
                     return JsonResponse(complete_data)
-        
-                else:
-                    return HttpResponse("Error: Failed to retrieve recorded files or no files recorded")
-        
+
             sleep(1)  # Wait before checking again
 
         return HttpResponse("Error: Script execution did not complete within the allowed time")
 
     except Exception as e:
-        return HttpResponse(f"Unexpected error: {str(e)}")
+        # Return the exception as a JSON response
+        return HttpResponse(json.dumps({'error': str(e)}), content_type='application/json')
 
 
 @login_required()
 @render_response()
 def data_upload_popup(request, conn=None, **kwargs):
     """Data upload popup UI"""
-    # log_message("data_upload_popup: Function start")
     try:
         # Get the active group ID
         active_group_id = conn.getEventContext().groupId
-        # log_message(f"data_upload_popup: Retrieved active group ID: {active_group_id}")
         
         # Create a new request object with the active group ID in the POST data
         request_copy = request.POST.copy()
         request_copy.update({'active_group_id': active_group_id})
         request.POST = request_copy
 
-
         # Try running the launcher function
-        # log_message("data_upload_popup: Calling record_files_in_directory_launcher")
         response = record_files_in_directory_launcher(request, **kwargs)
-        # log_message(f"Raw response content: {response.content}")
-        # log_message("data_upload_popup: record_files_in_directory_launcher call completed")
 
         # Initialize an empty list for files by subdirectory
         files_by_subdirectory = []
 
         # Check if the response is an HttpResponse and has status code 200
-        if isinstance(response, HttpResponse) and response.status_code == 200:
-            try:
-                response_data = json.loads(response.content.decode('utf-8'))  # Decode if response.content is a byte string
-                # log_message(f"data_upload_popup: Parsed response data: {response_data}")
-        
-                for subdir_dict in response_data['files_by_subdirectory']:
-                    subdirectory = subdir_dict['subdirectory_name']
-                    files_info = []
-                    for file in subdir_dict['files_in_subdirectory']:
-                        if isinstance(file, dict) and 'path' in file and 'filename' in file:
-                            file_path = file['path']
-                            file_name = file['filename']
-                            files_info.append({"file_name": file_name, "file_path": file_path})
-                        #else:
-                            # log_message(f"Unexpected file format: {file}")
-        
-                    files_by_subdirectory.append({
-                        "subdirectory_name": subdirectory,
-                        "files_in_subdirectory": files_info
-                    })
-            except (json.JSONDecodeError, TypeError, ValueError) as e:
-                # log_message(f"data_upload_popup: Error processing response data: {e}")
-                print(f"Error processing response data: {e}")
+        if isinstance(response, HttpResponse):
+            if response.status_code == 200:
+                try:
+                    response_data = json.loads(response.content.decode('utf-8'))  # Decode if response.content is a byte string
 
+                    # Check for 'error' key in response data
+                    if 'error' in response_data:
+                        error_message = response_data['error']
+                        return HttpResponse(f"<html><body><h1>Error</h1><p>{error_message}</p></body></html>", content_type='text/html')
+
+                    for subdir_dict in response_data['files_by_subdirectory']:
+                        subdirectory = subdir_dict['subdirectory_name']
+                        files_info = []
+                        for file in subdir_dict['files_in_subdirectory']:
+                            if isinstance(file, dict) and 'path' in file and 'filename' in file:
+                                file_path = file['path']
+                                file_name = file['filename']
+                                files_info.append({"file_name": file_name, "file_path": file_path})
+        
+                        files_by_subdirectory.append({
+                            "subdirectory_name": subdirectory,
+                            "files_in_subdirectory": files_info
+                        })
+                except (json.JSONDecodeError, TypeError, ValueError) as e:
+                    error_message = f"Error processing response data: {e}"
+                    return HttpResponse(f"<html><body><h1>Error</h1><p>{error_message}</p></body></html>", content_type='text/html')
+            else:
+                # Handling error response
+                error_message = response.content.decode('utf-8')  # Decode response content
+                try:
+                    error_data = json.loads(error_message)
+                    if 'error' in error_data:
+                        # Render error message in HTML
+                        return HttpResponse(f"<html><body><h1>Error</h1><p>{error_data['error']}</p></body></html>", content_type='text/html')
+                except json.JSONDecodeError:
+                    # If the response is not JSON, handle as plain text
+                    return HttpResponse(f"<html><body><h1>Error</h1><p>{error_message}</p></body></html>", content_type='text/html')
         # Extract selected objects from the URL
         selected_objects = request.GET
 
@@ -5151,9 +5164,6 @@ def data_upload_popup(request, conn=None, **kwargs):
             "selected_dataset": selected_dataset,
             "files_by_subdirectory": files_by_subdirectory,
         }
-        # Instead of returning the rendered template, convert context to a string
-        context_str = json.dumps(context, indent=4)  # Convert context to a pretty-printed JSON string
-        # log_message(f"data_upload_popup: Prepared context: {context_str}")
         
         return render(request, "webclient/data_upload/data_upload_popup.html", context)
 
@@ -5172,10 +5182,8 @@ def data_upload_popup(request, conn=None, **kwargs):
         }
 
         # Use a template that is designed to show errors
-        html_content = f"<html><body><h1>Error</h1><p>{error_context['error_message']}</p></body></html>"
-        return HttpResponse(html_content)
-
-
+        html_content = f"<html><body><h1>Error</h1><pre>{error_context['error_message']}</pre></body></html>"
+        return HttpResponse(html_content, content_type='text/html')
 ### New Ends  
 
 @require_POST
