@@ -14,7 +14,7 @@ groups_dir_prefir = 'core'
 #Gets the data files to make the file selector
 def record_files_in_directory(directory):
     """Uses glob to record files in a directory and its subdirectories."""
-    pattern = os.path.join(directory, '**', '*')  # Pattern to match all files in all subdirectories
+    pattern = os.path.join(directory, '**[!.zarr]','*')  # Pattern to match all files in all subdirectories
     recorded_files = []
     for file_path in glob.iglob(pattern, recursive=True):
         if os.path.isfile(file_path):
