@@ -4961,7 +4961,7 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
 
     # Prepare the input map
     input_map = {key: rstring(value) for key, value in request.POST.items()}
-    log_message(f"input_map: {input_map}")
+    # log_message(f"input_map: {input_map}")
     
     # Get the active group ID from the request
     active_group_id = request.POST.get("active_group_id")
@@ -4989,9 +4989,9 @@ def data_uploader_script_launcher(request, conn=None, **kwargs):
         return HttpResponse(str(e))
 
 #TMP only for development delete later
-def  log_message(message):
-    with open('local_omeroweb\\webclient\\tmp_mini_log.txt', 'a') as log_file:
-        log_file.write(f"{datetime.datetime.now()}: {message}\n")
+# def  # log_message(message):
+#     with open('local_omeroweb\\webclient\\tmp_mini_log.txt', 'a') as log_file:
+#         log_file.write(f"{datetime.datetime.now()}: {message}\n")
 
 #TMP ends
 
@@ -5006,7 +5006,7 @@ def record_files_in_directory_launcher(request, **kwargs):
 
         # Get the script ID
         scripts = script_service.getScripts()
-        log_message("record_files_in_directory_launcher: Got script service")
+        # log_message("record_files_in_directory_launcher: Got script service")
         script_ids = [s.id.val for s in scripts if s.getName().val == script_name]
         if not script_ids:
             return HttpResponse(f"Error: Script '{script_name}' not found")
@@ -5042,7 +5042,7 @@ def record_files_in_directory_launcher(request, **kwargs):
             if cb.block(0):
                 cb.close()
                 results = proc.getResults(0, conn.SERVICE_OPTS)
-                log_message(f"Complete raw results: {results}")
+                # log_message(f"Complete raw results: {results}")
                 proc.close(False)
 
                 # Process and return the results if present
@@ -5050,7 +5050,7 @@ def record_files_in_directory_launcher(request, **kwargs):
                     output_str = results['Output'].val  # Get the output string
                     if output_str:  # Check if the output string is not None or empty
                         output = json.loads(output_str)  # Convert the output string to a dictionary
-                        log_message(f"output: {output}")
+                        # log_message(f"output: {output}")
                     # Check for 'error' key in output
                             # Check for 'error' key in output
                     if 'error' in output:
@@ -5061,8 +5061,8 @@ def record_files_in_directory_launcher(request, **kwargs):
                     recorded_files_dict = output.get('Recorded Files', {})
                     group_directories = output.get('Group Directories', [])
 
-                    log_message(f"Raw Recorded Files JSON: {recorded_files_dict}")
-                    log_message(f"Raw group_directories_str: {group_directories}")
+                    # log_message(f"Raw Recorded Files JSON: {recorded_files_dict}")
+                    # log_message(f"Raw group_directories_str: {group_directories}")
 
                     complete_data = {
                         "files_by_subdirectory": [
@@ -5071,7 +5071,7 @@ def record_files_in_directory_launcher(request, **kwargs):
                         ],
                         "group_directories": group_directories
                     }
-                    log_message(f"complete_data: {complete_data}")
+                    # log_message(f"complete_data: {complete_data}")
                     return JsonResponse(complete_data)
 
             sleep(1)  # Wait before checking again
