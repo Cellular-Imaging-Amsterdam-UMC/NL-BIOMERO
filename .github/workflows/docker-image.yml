@@ -26,7 +26,8 @@ jobs:
       id: vars
       run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
     - name: Build and tag WEB
-      run: docker build . --file ./web/Dockerfile --tag  ${{ env.USER_NAME }}/omeroweb:${{ steps.vars.outputs.tag }}
+      run: docker build . --file Dockerfile --tag  ${{ env.USER_NAME }}/omeroweb:${{ steps.vars.outputs.tag }}
+      working-directory: ./web
     - name: Push the tagged WEB Docker image
       run: docker push ${{ env.USER_NAME }}/omeroweb:${{ steps.vars.outputs.tag }}
     - name: Build and tag SERVER
@@ -38,7 +39,8 @@ jobs:
     - name: Push the tagged PROCESSOR Docker image
       run: docker push ${{ env.USER_NAME }}/omeroworker-processor:${{ steps.vars.outputs.tag }}
     - name: Build and tag BASIC WORKER
-      run: docker build . --file ./worker/Dockerfile --tag  ${{ env.USER_NAME }}/omeroworker:${{ steps.vars.outputs.tag }}
+      run: docker build . --file Dockerfile --tag  ${{ env.USER_NAME }}/omeroworker:${{ steps.vars.outputs.tag }}
+      working-directory: ./worker
     - name: Push the tagged BASIC WORKER Docker image
       run: docker push ${{ env.USER_NAME }}/omeroworker:${{ steps.vars.outputs.tag }}
 
