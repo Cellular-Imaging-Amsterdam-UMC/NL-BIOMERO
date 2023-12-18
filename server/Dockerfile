@@ -1,4 +1,4 @@
-FROM openmicroscopy/omero-server:5.6.8
+FROM openmicroscopy/omero-server:5.6.10
 
 # Upload scripts for omero-server user
 # COPY --chown=omero-server:omero-server scripts/slurm/* /opt/omero/server/OMERO.server/lib/scripts/slurm/

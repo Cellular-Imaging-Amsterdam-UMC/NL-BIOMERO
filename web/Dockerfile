@@ -1,4 +1,4 @@
-ARG PARENT_IMAGE=openmicroscopy/omero-web-standalone:5.22.1
+ARG PARENT_IMAGE=openmicroscopy/omero-web-standalone:5.23.0
 FROM ${PARENT_IMAGE}
 
 USER root
