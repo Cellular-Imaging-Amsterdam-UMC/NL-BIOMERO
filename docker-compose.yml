@@ -106,6 +106,7 @@ services:
     environment:
       OMEROHOST: omeroserver
       CONFIG_omero_web_login__logo:
+      ENV: TEST
     # Named network to communicate with other containers
     networks:
       - omero
