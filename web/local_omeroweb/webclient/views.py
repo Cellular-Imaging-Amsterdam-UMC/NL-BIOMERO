@@ -306,7 +306,10 @@ class WebclientLoginView(LoginView):
         url = request.GET.get("url")
         if url is not None and len(url) != 0:
             context["url"] = urlencode({"url": url})
-
+        # Add an environment identifier to the web
+        env = os.environ.get("ENV")
+        if env is not None:
+            context["env"] = env
         if hasattr(settings, "LOGIN_LOGO"):
             context["LOGIN_LOGO"] = settings.LOGIN_LOGO
 
