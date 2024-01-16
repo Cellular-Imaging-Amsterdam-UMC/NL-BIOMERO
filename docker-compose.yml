@@ -105,14 +105,17 @@ services:
     # login__logo supplies a logo on the starting page of web UI
     environment:
       OMEROHOST: omeroserver
-      CONFIG_omero_web_login__logo: "https://cembo.eu/wp-content/uploads/2021/04/Amsterdam-UMC.png"
+      CONFIG_omero_web_login__logo:
     # Named network to communicate with other containers
     networks:
       - omero
     # Map ports to ports on the host machine, to allow opening of webpage
     ports:
       - "4080:4080"
-
+    volumes: # Added this line for local development
+      - ./web/local_omeroweb:/opt/omero/web/venv3/lib/python3.6/site-packages/omeroweb/
+      - ./web/local_omeroweb_config:/opt/omero/web/config/
+      
 # Define the network(s) to communicate between containers
 networks:
   omero:

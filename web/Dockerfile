@@ -18,4 +18,8 @@ RUN /opt/omero/web/venv3/bin/pip install \
 ADD 01-default-webapps.omero /opt/omero/web/config/
 # ADD custom_login.html /opt/omero/web/config/
 
+ADD local_omeroweb /opt/omero/web/venv3/lib/python3.6/site-packages/omeroweb
+ADD local_omeroweb_config /opt/omero/web/config
+
+
 USER omero-web

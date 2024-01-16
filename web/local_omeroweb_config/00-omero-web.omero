@@ -1,0 +1,9 @@
+# Ansible managed
+
+config drop default
+
+# Additional custom options
+config set -- omero.web.application_server.host 0.0.0.0
+config set -- omero.web.check_version false
+config set -- omero.web.secure true
+config set -- omero.web.server_list '[["omero", 4064, "omero"]]'
