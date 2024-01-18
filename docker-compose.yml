@@ -114,8 +114,8 @@ services:
     ports:
       - "4080:4080"
     volumes: # Added this line for local development
-      - ./local_omeroweb:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/
-      - ./local_omeroweb_config:/opt/omero/web/config/
+      - ./web/local_omeroweb:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/
+      - ./web/local_omeroweb_config:/opt/omero/web/config/
       
 # Define the network(s) to communicate between containers
 networks:
