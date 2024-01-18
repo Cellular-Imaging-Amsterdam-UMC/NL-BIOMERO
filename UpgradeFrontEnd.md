@@ -136,6 +136,92 @@ Redesigned script button for clarity and aesthetic preference.
  config set -- omero.web.ui.top_links '[["Data", "webindex", {"title": "Browse Data via Projects, Tags etc"}],["Upload History", "history", {"title": "Upload History"}], ["Figure", "figure_index", {"title": "Open Figure in new tab", "target": "_blank"}], ["Help", "https://help.openmicroscopy.org/", {"title":"Open OMERO user guide in a new tab", "target":"new"}]]'
 
 
+**local_omeroweb\webgateway\static\webgateway\css\ome.header.css**
+```css
+	.header_toolbar > li:first-child{
+		border-left:none;
+	}
+	
+	.header_toolbar > li:last-child{
+		border-right:none;		
+	}
+
+	/* NEW: Clearer Scripts and Activity button */
+		#scriptButton::before {
+			content: attr(title);
+			background: url(../img/script-text-play.svg) no-repeat left center;
+			background-size: contain; /* or 'cover' depending on your needs */
+			padding-left: 27px; /* Adjust as needed */
+			padding-top: 0.5em;
+			padding-bottom: 0.5em;
+			padding-right: 0.5em;
+			filter: drop-shadow(0 1px 0px rgba(0,0,0,.4));
+		}
+
+
+		#scriptButton::before {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end; /* Align text to the right */
+			color: hsl(210,20%,90%); /* Lighter color */
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Font family from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			font-weight: 500; /* Font weight from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			text-shadow: 0 1px 0px rgba(0,0,0,.4); /* Text shadow from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			font-size: 1.2em; /* Font size from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			height: calc(100% - 1em); /* Adjust for padding */
+		}
+
+		#launch_activities::before, #dataUploadButton::before {
+		    display: flex;
+		    align-items: center;
+		    justify-content: flex-start; /* Align text to the left */
+		    color: hsl(210,20%,90%); /* Lighter color */
+		    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Font family from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    font-weight: 500; /* Font weight from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    text-shadow: 0 1px 0px rgba(0,0,0,.4); /* Text shadow from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    font-size: 1.2em; /* Font size from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    padding: 0.5em; /* Add padding */
+		    height: calc(100% - 1em); /* Adjust for padding */
+		}
+
+		#scriptButton:hover::before, #launch_activities:hover::before, #dataUploadButton:hover::before {
+			color: white; /* Color when hovered */
+		}
+		
+		#launch_activities::before{
+		    content: "Activities Log";
+		}
+
+       #dataUploadButton::before{
+           content: "Upload Data";
+       }
+		/* NEW: Ends */
+		
+		#script_notifications li:first-child {
+			 -webkit-border-top-left-radius:3px; /* Saf3+, Chrome */
+				  -moz-border-radius-topleft:3px; /* FF1+ */
+				      border-top-left-radius:3px; /* Opera 10.5, IE 9 */ 
+					   -webkit-border-bottom-left-radius:3px;
+					       -moz-border-radius-bottomleft:3px;
+					           border-bottom-left-radius:3px;  
+		}
+		
+		#script_notifications li:last-child {
+			 -webkit-border-top-right-radius:3px; /* Saf3+, Chrome */
+				  -moz-border-radius-topright:3px; /* FF1+ */
+				      border-top-right-radius:3px; /* Opera 10.5, IE 9 */ 
+					   -webkit-border-bottom-right-radius:3px;
+					       -moz-border-radius-bottomright:3px;
+					           border-bottom-right-radius:3px;  
+		}
+```
+**local_omeroweb\webgateway\static\webgateway\img\script-text-play.svg**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path fill="hsl(210, 20%, 90%)" d="M13.8 22H5C3.3 22 2 20.7 2 19V18H13.1C13 18.3 13 18.7 13 19C13 20.1 13.3 21.1 13.8 22M13.8 16H5V5C5 3.3 6.3 2 8 2H19C20.7 2 22 3.3 22 5V6H20V5C20 4.4 19.6 4 19 4S18 4.4 18 5V13.1C16.2 13.4 14.7 14.5 13.8 16M8 8H15V6H8V8M8 12H14V10H8V12M17 16V22L22 19L17 16Z" />
+</svg>
+```
 
 
     

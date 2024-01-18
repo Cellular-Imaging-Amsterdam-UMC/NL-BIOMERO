@@ -214,17 +214,56 @@
 		border-right:none;		
 	}
 
-		#figScriptButton{
-			background: url(../img/icon_figure_scripts.png) center center no-repeat;
+	/* NEW: Clearer Scripts and Activity button */
+		#scriptButton::before {
+			content: attr(title);
+			background: url(../img/script-text-play.svg) no-repeat left center;
+			background-size: contain; /* or 'cover' depending on your needs */
+			padding-left: 27px; /* Adjust as needed */
+			padding-top: 0.5em;
+			padding-bottom: 0.5em;
+			padding-right: 0.5em;
+			filter: drop-shadow(0 1px 0px rgba(0,0,0,.4));
 		}
 
-		#scriptButton{
-			background: url(../img/icon_script.png) center center no-repeat;
+
+		#scriptButton::before {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end; /* Align text to the right */
+			color: hsl(210,20%,90%); /* Lighter color */
+			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Font family from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			font-weight: 500; /* Font weight from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			text-shadow: 0 1px 0px rgba(0,0,0,.4); /* Text shadow from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			font-size: 1.2em; /* Font size from #middle_header_left a, #show_user_dropdown, #public_login_button */
+			height: calc(100% - 1em); /* Adjust for padding */
 		}
-	
-		#launch_activities{
-			background:url(../img/activity_light_24.png) center center no-repeat;
+
+		#launch_activities::before, #dataUploadButton::before {
+		    display: flex;
+		    align-items: center;
+		    justify-content: flex-start; /* Align text to the left */
+		    color: hsl(210,20%,90%); /* Lighter color */
+		    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; /* Font family from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    font-weight: 500; /* Font weight from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    text-shadow: 0 1px 0px rgba(0,0,0,.4); /* Text shadow from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    font-size: 1.2em; /* Font size from #middle_header_left a, #show_user_dropdown, #public_login_button */
+		    padding: 0.5em; /* Add padding */
+		    height: calc(100% - 1em); /* Adjust for padding */
 		}
+
+		#scriptButton:hover::before, #launch_activities:hover::before, #dataUploadButton:hover::before {
+			color: white; /* Color when hovered */
+		}
+		
+		#launch_activities::before{
+		    content: "Activities Log";
+		}
+
+       #dataUploadButton::before{
+           content: "Upload Data";
+       }
+		/* NEW: Ends */
 		
 		#script_notifications li:first-child {
 			 -webkit-border-top-left-radius:3px; /* Saf3+, Chrome */
