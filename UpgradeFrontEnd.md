@@ -6,9 +6,21 @@ Torec Luik & Rodrigo Rosas-Bertolini
 ## Non-hosted login logo
 OMERO web expects the login page logo of the institution to be hosted (in other words, it wants a URl)
 
-We use a PNG and so can you. To do so, place the file in the following location.
+We use a PNG and so can you. To do so, place the file in the following location. Then edit the style to your liking.
 
-    # Path to custom login page logo
+****
+
+```html
+<div style="margin: 5% auto 0; height: 100px"></div>
+<div class="login-logos">
+    <div class="custom_logo">
+        <div class="custom_logo">
+            <img src="{% static "webclient/image/Amsterdam-UMC.png" %}" style="max-width: 600px; height: auto;" />
+        </div>
+    <img src="{% static "webclient/image/logo_login_web.png" %}" />
+</div>
+
+```
 
 ## Double-Click for better file browsing 
 Upgrading file browsing by enabling double click to navigate groups. Double clicking on a group now takes you to the group with the 'All Members' selected, meaning that you will see the data of all users by default and only if you choose so you can delve into the data of individual users. Additionally, "Group Select" title added to the group button for clarity.
