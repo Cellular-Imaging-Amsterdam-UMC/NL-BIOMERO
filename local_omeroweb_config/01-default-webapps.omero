@@ -1,0 +1,54 @@
+# OMERO.web configuration
+
+# whitenoise
+config append -- omero.web.middleware '{"index": 0, "class": "whitenoise.middleware.WhiteNoiseMiddleware"}'
+
+# omero-figure
+config append -- omero.web.apps '"omero_figure"'
+config append -- omero.web.open_with '["omero_figure", "new_figure", {"supported_objects": ["images"], "target": "_blank", "label": "OMERO.figure"}]'
+
+# omero-iviewer
+config append -- omero.web.apps '"omero_iviewer"'
+config set -- omero.web.viewer.view omero_iviewer.views.index
+config append -- omero.web.open_with '["omero_iviewer", "omero_iviewer_index", {"supported_objects":["images", "dataset", "well"], "script_url": "omero_iviewer/openwith.js", "label": "OMERO.iviewer"}]'
+
+# omero-mapr
+config append -- omero.web.apps '"omero_mapr"'
+config append -- omero.web.mapr.config '{"menu": "anyvalue", "config":{"default":["Any Value"], "all":[], "ns":["openmicroscopy.org/omero/client/mapAnnotation"], "label":"Any"}}'
+
+# omero-parade
+config append -- omero.web.apps '"omero_parade"'
+config append -- omero.web.ui.center_plugins '["Parade", "omero_parade/init.js.html", "omero_parade"]'
+
+# omero-fpbioimage
+config append -- omero.web.apps '"omero_fpbioimage"'
+config append -- omero.web.open_with '["omero_fpbioimage", "fpbioimage_index", {"script_url": "fpbioimage/openwith.js", "supported_objects": ["image"], "label": "FPBioimage"}]'
+
+## set up omero web login index page
+#config set omero.web.index_template "custom_login.html"
+#config append omero.web.template_dirs '"/opt/omero/web/config"'
+#config set omero.web.login_view "webindex_custom"
+
+# Top links
+config set -- omero.web.ui.top_links '[["Data", "webindex", {"title": "Browse Data via Projects, Tags etc"}],["Upload History", "history", {"title": "Upload History"}], ["Figure", "figure_index", {"title": "Open Figure in new tab", "target": "_blank"}], ["Help", "https://help.openmicroscopy.org/", {"title":"Open OMERO user guide in a new tab", "target":"new"}]]'
+
+
+### APP
+# By default, we enable 'minimal_webapp' only
+# config append -- omero.web.apps '"minimal_webapp"'
+
+# Add a link to the app from webclient toolbar
+# config append -- omero.web.ui.top_links '["Minimal-Webapp", "minimal_webapp_index", {"title": "Open app in new tab", "target": "_blank"}]'
+
+# React
+# config append -- omero.web.apps '"react_webapp"'
+# config append -- omero.web.ui.top_links '["React-Webapp", "react_webapp_index", {"title": "Open react app in new tab", "target": "_blank"}]'
+# 
+# config set omero.web.debug True
+
+# enable CORS so e.g. react-webapp can connect to OMERO.web on different origin
+# See https://docs.openmicroscopy.org/latest/omero/sysadmins/unix/install-web.html
+config append -- omero.web.apps '"corsheaders"'
+config append -- omero.web.middleware '{"index": 0.5, "class": "corsheaders.middleware.CorsMiddleware"}'
+config append -- omero.web.middleware '{"index": 10, "class": "corsheaders.middleware.CorsPostCsrfMiddleware"}'
+config set -- omero.web.cors_origin_allow_all True
