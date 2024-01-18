@@ -3,7 +3,7 @@ omero-serevr v. 5.6.10 ~~~~~~ omero-web v. 5.24.0
 
 Torec Luik & Rodrigo Rosas-Bertolini
 
-## Non-hosted login logo
+## Non-hosted logo in login page
 OMERO web expects the login page logo of the institution to be hosted (in other words, it wants a URl)
 
 We use a PNG and so can you. To do so, place the file in the following location. Then edit the styles to your liking. Stay classy by choose a logo with no background.
@@ -23,6 +23,36 @@ We use a PNG and so can you. To do so, place the file in the following location.
     <img src="{% static "webclient/image/logo_login_web.png" %}" />
 </div>
 ```
+
+## No server selector in login page
+We removed the server selector to remove clutter for users. Instead, we use different domains for different servere.
+
+**local_omeroweb\webclient\templates\webclient\login.html**
+```html
+<div id="login">
+    {% block login %}
+    <form class="standard_form inlined" action="{% url 'weblogin' %}{% if url %}?{{url}}{% endif %}" method="post">{% csrf_token %}
+            {% if error %}
+				<span class="error">{% trans "Error:" %} {{ error | urlize }}</span>
+			{% endif %}
+			
+            <!--NEW: removed server option-->
+			<input type="hidden" name="{{ form.server.name }}" value="1" />
+
+			<div>
+				{% trans form.username.label_tag %}
+				<!--{% if form.username.field.required %}*{% endif %} -->
+				{{ form.username }}
+				<!-- Form Error -->
+				{% if form.username.errors %}
+                  {% for error in form.username.errors %}
+                      <span class="form_error">{{ error|escape }}</span>
+                  {% endfor %}
+				{% endif %}
+			</div>
+
+```
+
 
 
 ## Double-Click for better file browsing 
