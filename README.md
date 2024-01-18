@@ -1,9 +1,11 @@
-# OMERO server with OMERO-Slurm-Client
+# Containerized OMERO with BIOMERO
 
+These scripts spin up the entire OMERO environment required for [BIOMERO](https://github.com/NL-BioImaging/omero-slurm-client), and other improvements by the Core Facility Cellular Imaging.
 
-This is an adaptation of [OMERO.server grid and OMERO.web (docker-compose)](https://github.com/ome/docker-example-omero-grid)
+It uses Docker Compose to setup an OMERO grid on one computer with a server, web, processor and a BIOMERO processor.
+If you also want to spin up a local HPC cluster with Docker Compose, to connect BIOMERO to, we host an example [here](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm).
 
-This is an example of running [OMERO.server components on multiple nodes using OMERO.grid](http://www.openmicroscopy.org/site/support/omero5/sysadmins/grid.html#nodes-on-multiple-hosts) in Docker, but with a connection to OMERO Slurm Client.
+This is an adaptation of OME's [OMERO.server grid and OMERO.web (docker-compose)](https://github.com/ome/docker-example-omero-grid) / [OMERO.server components on multiple nodes using OMERO.grid](http://www.openmicroscopy.org/site/support/omero5/sysadmins/grid.html#nodes-on-multiple-hosts).
 
 OMERO.server is listening on the standard OMERO ports `4063` and `4064`.
 OMERO.web is listening on port `4080` (http://localhost:4080/).
@@ -12,11 +14,11 @@ OMERO.web is listening on port `4080` (http://localhost:4080/).
 ## Quickstart
 Clone this repository locally (from the commandline)
 
-    git clone https://github.com/TorecLuik/docker-example-omero-grid-amc.git
+    git clone https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO.git
 
 Change into the new directory
 
-    cd docker-example-omero-grid-amc
+    cd NL-BIOMERO
 
 Setup the connection with Slurm:
 
@@ -26,7 +28,7 @@ First, setup a configuration file, e.g. take the local slurm:
 
 Next, actually setup a local Slurm that matches this config.
 
-Follow the README on https://github.com/TorecLuik/slurm-docker-cluster
+Follow the README on [here](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm)
 
 Or in short: 
 
@@ -38,7 +40,7 @@ Or in short:
 
 Then let's go back to our omero setup:
 
-    cd docker-example-omero-grid-amc
+    cd NL-BIOMERO
 
 
 
@@ -60,13 +62,13 @@ Enjoy!
 
 To actually enjoy, you'll need some data. 
 
-For now you need [OMERO.insight app](https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf).
+For now you need [OMERO.insight app](https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf), but we are working on a web-importer.
 
 Connect to `localhost`, login as `root`/`omero` again and upload some nice images.
 
-## OMERO Slurm Client
+## BIOMERO - OMERO Slurm Client
 
-Checkout the [OMERO Slurm Client documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for details on how to use the library and example scripts.
+Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for details on how to use the library and example scripts.
 
 In short:
 1. Run script `slurm/init/SLURM Init environment...`
@@ -110,7 +112,7 @@ Exit back to your commandline by typing `exit`.
 
 ## Slurm specifics
 
-Checkout the [OMERO Slurm Client documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for more details on how to setup your Slurm connection with OMERO. 
+Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for more details on how to setup your Slurm connection with OMERO. 
 
 In short, you always need:
 - (headless) SSH setup to Slurm server from your host computer. See for example `ssh.config.example`.

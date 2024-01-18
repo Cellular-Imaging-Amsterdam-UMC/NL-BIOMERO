@@ -4,43 +4,104 @@ on:
     types: [published]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        # Setting up Docker Buildx with docker-container driver is required
+        # at the moment to be able to use a subdirectory with Git context
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: get the user or organization name
-      run: echo "USER_NAME=$(echo '${{ github.repository }}' | awk '{print tolower($0)}' | cut -d/ -f 1  | tr -d -)" >> $GITHUB_ENV
-      shell: bash
-    - name: get the repository name
-      run: echo "REPOSITORY_NAME=$(echo '${{ github.repository }}' | awk '{print tolower($0)}' | cut -d/ -f 2)" >> $GITHUB_ENV
-      shell: bash  
-    - name: Get the version
-      id: vars
-      run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
-    - name: Build and tag WEB
-      run: docker build . --file Dockerfile --tag  ${{ env.USER_NAME }}/omeroweb:${{ steps.vars.outputs.tag }}
-      working-directory: ./web
-    - name: Push the tagged WEB Docker image
-      run: docker push ${{ env.USER_NAME }}/omeroweb:${{ steps.vars.outputs.tag }}
-    - name: Build and tag SERVER
-      run: docker build . --file ./server/Dockerfile --tag  ${{ env.USER_NAME }}/omeroserver:${{ steps.vars.outputs.tag }}
-    - name: Push the tagged SERVER Docker image
-      run: docker push ${{ env.USER_NAME }}/omeroserver:${{ steps.vars.outputs.tag }}
-    - name: Build and tag PROCESSOR
-      run: docker build . --file ./worker-processor/Dockerfile --tag  ${{ env.USER_NAME }}/omeroworker-processor:${{ steps.vars.outputs.tag }}
-    - name: Push the tagged PROCESSOR Docker image
-      run: docker push ${{ env.USER_NAME }}/omeroworker-processor:${{ steps.vars.outputs.tag }}
-    - name: Build and tag BASIC WORKER
-      run: docker build . --file Dockerfile --tag  ${{ env.USER_NAME }}/omeroworker:${{ steps.vars.outputs.tag }}
-      working-directory: ./worker
-    - name: Push the tagged BASIC WORKER Docker image
-      run: docker push ${{ env.USER_NAME }}/omeroworker:${{ steps.vars.outputs.tag }}
+      -
+        name: Docker meta WEB
+        id: meta-web
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/omeroweb
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      -
+        name: Build and push WEB
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:web"
+          push: true
+          tags: ${{ steps.meta-web.outputs.tags }}
+          labels: ${{ steps.meta-web.outputs.labels }}
+      -
+        name: Docker meta SERVER
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/omeroserver
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      -
+        name: Build and push SERVER
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}"
+          push: true
+          file: ./server/Dockerfile
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+      -
+        name: Docker meta BIOMERO
+        id: meta-biomero
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/biomero
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      -
+        name: Build and push BIOMERO PROCESSOR
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}"
+          push: true
+          file: ./worker-processor/Dockerfile
+          tags: ${{ steps.meta-biomero.outputs.tags }}
+          labels: ${{ steps.meta-biomero.outputs.labels }}
+      -
+        name: Docker meta WORKER
+        id: meta-worker
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/omeroworker
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+      -
+        name: Build and push WORKER
+        uses: docker/build-push-action@v5
+        with:
+          context: "{{defaultContext}}:worker"
+          push: true
+          tags: ${{ steps.meta-worker.outputs.tags }}
+          labels: ${{ steps.meta-worker.outputs.labels }}
 
