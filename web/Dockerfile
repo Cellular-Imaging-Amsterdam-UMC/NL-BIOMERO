@@ -24,7 +24,9 @@ ARG CONFIG_omero_web_login_logo
 RUN if [ -z "$CONFIG_omero_web_login_logo" ]; then echo "CONFIG_omero_web_login_logo is not set"; exit 1; fi
 
 # Delete the existing custom_login_logo.png file
-RUN rm /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/custom_login_logo.png
+ARG CACHEBUST=1
+RUN echo "Cache bust: $CACHEBUST" && \
+    rm /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/custom_login_logo.png
 
 # Add the new custom_login_logo.png file
 ADD local_omeroweb_edits/Logos/${CONFIG_omero_web_login_logo} /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/custom_login_logo.png
