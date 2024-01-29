@@ -15,22 +15,16 @@ RUN /opt/omero/web/venv3/bin/pip install \
         whitenoise
         # # omero-fpbioimage 
 
-# ADD 01-default-webapps.omero /opt/omero/web/config/
-# ADD custom_login.html /opt/omero/web/config/
-
-# ADD local_omeroweb /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb
-# ADD local_omeroweb_config /opt/omero/web/config
 
 # Configureation file
-        # TODO: Config file is used in different features... Is there a neatest way?
 ADD local_omeroweb_edits/01-default-webapps.omero /opt/omero/web/config
 
-# Custom login page logo
-        # TODO: Edit out hard code its embarassing
+# Replaces the default logo with the custom logo and removes the server selection
+ARG CONFIG_omero_web_login__logo
+RUN if [ -z "$CONFIG_omero_web_login__logo" ]; then echo "CONFIG_omero_web_login__logo is not set"; exit 1; fi
+ADD local_omeroweb_edits/Logos/${CONFIG_omero_web_login__logo} /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/custom_login_logo.png
 ADD local_omeroweb_edits/login.html /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/templates/webclient/login.html
 
-# No server selector in login page
-ADD local_omeroweb_edits/Amsterdam-UMC.png /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/Amsterdam-UMC.png
 
 # Double-Click for better file browsing
 ADD local_omeroweb_edits/group_user_dropdown2.html /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/templates/webclient/base/includes/group_user_dropdown2.html

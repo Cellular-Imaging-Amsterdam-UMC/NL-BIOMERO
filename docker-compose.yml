@@ -100,12 +100,16 @@ services:
   omeroweb:
     #image: "openmicroscopy/omero-web-standalone:5"
     # We build this also locally in './web' folder, to add some extensions
-    build: ./web
-    # Environment variables for in the container
-    # login__logo supplies a logo on the starting page of web UI
+    build:
+      context: ./web
+      args:
+        # Environment variables for in the container
+        # login__logo sets the custom logo image on the web UI's start page.
+        # The image file should be placed in the '/web/local_omeroweb_edits/logos' directory before running docker-compose up.
+        - CONFIG_omero_web_login__logo=TUDelft_Logo.png
+
     environment:
       OMEROHOST: omeroserver
-      CONFIG_omero_web_login__logo:
       ENV: TEST
     # Named network to communicate with other containers
     networks:
@@ -113,9 +117,9 @@ services:
     # Map ports to ports on the host machine, to allow opening of webpage
     ports:
       - "4080:4080"
-    # volumes: # Added this line for local development
-      # - ./web/local_omeroweb:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/
-      # - ./web/local_omeroweb_config:/opt/omero/web/config/
+    # volumes: 
+      # In case of further development, add volumes for local_omeroweb_edits here
+      # Once volumes are added, only omeroweb container reload necessary, not the whole docker-compose.
       
 # Define the network(s) to communicate between containers
 networks:
