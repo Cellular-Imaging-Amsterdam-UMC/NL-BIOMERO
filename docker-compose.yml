@@ -100,14 +100,14 @@ services:
   omeroweb:
     #image: "openmicroscopy/omero-web-standalone:5"
     # We build this also locally in './web' folder, to add some extensions
+    # Environment variables for in the container
+    # login__logo sets the custom logo image on the web UI's start page.
+    # The image file should be placed in the '/web/local_omeroweb_edits/logos' directory before running docker-compose up.
     build:
       context: ./web
       args:
-        # Environment variables for in the container
-        # login__logo sets the custom logo image on the web UI's start page.
-        # The image file should be placed in the '/web/local_omeroweb_edits/logos' directory before running docker-compose up.
-        - CONFIG_omero_web_login__logo=TUDelft_Logo.png
-
+        - CONFIG_omero_web_login_logo=NKI.png
+        - CACHEBUST=2s
     environment:
       OMEROHOST: omeroserver
       ENV: TEST

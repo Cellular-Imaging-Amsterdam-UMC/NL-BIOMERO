@@ -82,10 +82,12 @@
 <div style="margin: 15% auto 0; height: 350px"></div>
 <div class="login-logos">
     <div class="custom_logo">
-        <div class="custom_logo">
-            <!-- Load the placeholder logo image -->
-            <img src="{% static 'webclient/image/custom_login_logo.png' %}" style="max-width: 600px; height: auto;" />
-        </div>
+        {% if LOGIN_LOGO %}
+            <img src="{{ LOGIN_LOGO }}" />
+        {% else %}
+            <img src="{% static "webclient/image/custom_login_logo.png" %}" />
+        {% endif %}
+    </div>
     <img src="{% static "webclient/image/logo_login_web.png" %}" />
 </div>
 
