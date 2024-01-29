@@ -30,7 +30,7 @@ config append -- omero.web.open_with '["omero_fpbioimage", "fpbioimage_index", {
 #config set omero.web.login_view "webindex_custom"
 
 # Top links
-config set -- omero.web.ui.top_links '[["Data", "webindex", {"title": "Browse Data via Projects, Tags etc"}],["Upload History", "history", {"title": "Upload History"}], ["Figure", "figure_index", {"title": "Open Figure in new tab", "target": "_blank"}], ["Help", "https://help.openmicroscopy.org/", {"title":"Open OMERO user guide in a new tab", "target":"new"}]]'
+config set -- omero.web.ui.top_links '[["Data", "webindex", {"title": "Browse Data via Projects, Tags etc"}],["Upload History", "history", {"title": "Upload History"}], ["Annotation Search", {"viewname": "maprindex_anyvalue"}, {"title": "Annotation Search"}], ["Figure", "figure_index", {"title": "Open Figure in new tab", "target": "_blank"}], ["Help", "https://help.openmicroscopy.org/", {"title":"Open OMERO user guide in a new tab", "target":"new"}]]'
 
 
 ### APP
