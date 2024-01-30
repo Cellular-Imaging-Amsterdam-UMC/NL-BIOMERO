@@ -22,7 +22,7 @@ ADD local_omeroweb_edits/01-default-webapps.omero /opt/omero/web/config
 
 # Add the new login images to the login page image directory
 # All images here must be named by {number}.png reflecting the desiered display order
-ADD local_omeroweb_edits/Display_Images ./webclient/static/webclient/image/login_page_images/
+# ADD local_omeroweb_edits/Display_Images ./webclient/static/webclient/image/login_page_images/
 
 ADD local_omeroweb_edits/login.html ./webclient/templates/webclient/login.html
 

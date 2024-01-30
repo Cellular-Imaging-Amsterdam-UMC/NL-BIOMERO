@@ -112,9 +112,11 @@ services:
     # Map ports to ports on the host machine, to allow opening of webpage
     ports:
       - "4080:4080"
-    # volumes: 
+    volumes: 
+      - "./web/local_omeroweb_edits/Display_Images:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/"
       # In case of further development, add volumes for local_omeroweb_edits here
       # Once volumes are added, only omeroweb container reload necessary, not the whole docker-compose.
+      
 
     # Custom login logo system:
       # Images placed in the '/web/local_omeroweb_edits/Display_Images/' directory will be displayed on the web login page.
