@@ -101,13 +101,8 @@ services:
     #image: "openmicroscopy/omero-web-standalone:5"
     # We build this also locally in './web' folder, to add some extensions
     # Environment variables for in the container
-    # login__logo sets the custom logo image on the web UI's start page.
-    # The image file should be placed in the '/web/local_omeroweb_edits/logos' directory before running docker-compose up.
     build:
       context: ./web
-      args:
-        - CONFIG_omero_web_login_logo=NKI.png
-        - CACHEBUST=2s
     environment:
       OMEROHOST: omeroserver
       ENV: TEST
@@ -120,6 +115,12 @@ services:
     # volumes: 
       # In case of further development, add volumes for local_omeroweb_edits here
       # Once volumes are added, only omeroweb container reload necessary, not the whole docker-compose.
+
+    # Custom login logo system:
+      # Images placed in the '/web/local_omeroweb_edits/Display_Images/' directory will be displayed on the web login page.
+      # If the images are numbered, they will be displayed in their number order for 5 seconds each.
+      # This allows for a rotating display of images on the login page including but not limited to: platform announcements and local CORE facility news
+      # In the '/web/local_omeroweb_edits/Logos/' you will find some images of institution logos.
       
 # Define the network(s) to communicate between containers
 networks:
