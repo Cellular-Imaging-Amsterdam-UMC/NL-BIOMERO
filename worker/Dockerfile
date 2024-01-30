@@ -12,4 +12,5 @@ RUN python -m pip install scikit-image scipy
 # Replace the default startup scripts
 RUN rm /startup/60-database.sh
 COPY 99-run.sh /startup/99-run.sh
+RUN chmod +x /startup/99-run.sh
 USER omero-server

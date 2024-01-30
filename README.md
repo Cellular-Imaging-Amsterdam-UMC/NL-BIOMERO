@@ -1,6 +1,6 @@
 # Containerized OMERO with BIOMERO
 
-These scripts spin up the entire OMERO environment required for [BIOMERO](https://github.com/NL-BioImaging/omero-slurm-client), and other improvements by the Core Facility Cellular Imaging.
+These scripts spin up the entire OMERO environment required for [BIOMERO](https://github.com/NL-BioImaging/biomero), and other improvements by the Core Facility Cellular Imaging.
 
 It uses Docker Compose to setup an OMERO grid on one computer with a server, web, processor and a BIOMERO processor.
 If you also want to spin up a local HPC cluster with Docker Compose, to connect BIOMERO to, we host an example [here](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm).
@@ -66,9 +66,9 @@ For now you need [OMERO.insight app](https://downloads.openmicroscopy.org/help/p
 
 Connect to `localhost`, login as `root`/`omero` again and upload some nice images.
 
-## BIOMERO - OMERO Slurm Client
+## BIOMERO - BioImage analysis in OMERO
 
-Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for details on how to use the library and example scripts.
+Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for details on how to use the library and example scripts.
 
 In short:
 1. Run script `slurm/init/SLURM Init environment...`
@@ -112,7 +112,7 @@ Exit back to your commandline by typing `exit`.
 
 ## Slurm specifics
 
-Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/omero-slurm-client/) for more details on how to setup your Slurm connection with OMERO. 
+Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for more details on how to setup your Slurm connection with OMERO. 
 
 In short, you always need:
 - (headless) SSH setup to Slurm server from your host computer. See for example `ssh.config.example`.

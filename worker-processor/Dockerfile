@@ -8,8 +8,7 @@ USER root
 ## Default Python environment
 ENV VIRTUAL_ENV=/opt/omero/server/venv3
 ENV PATH=/opt/ice-3.6.5-0.3.0/bin:$VIRTUAL_ENV/bin/:$PATH
-RUN yum -y update \
-    && yum -y install git 
+RUN yum -y install git 
 
 ## Replace the default configuration files
 COPY worker-processor/ice.config worker-processor/worker.cfg /opt/omero/server/OMERO.server/etc/templates/
@@ -39,19 +38,22 @@ RUN wget https://github.com/glencoesoftware/bioformats2raw/releases/download/v0.
     && rm bioformats2raw-0.7.0.zip
 ENV PATH="$PATH:/opt/bioformats2raw-0.7.0/bin"
 
-## Add Omero Slurm Client
+## Add BIOMERO Omero Slurm Client
+# For development: 
 # Invalidate cache for development builds
-ADD "https://api.github.com/repos/NL-BioImaging/omero-slurm-client/commits?per_page=1" latest_commit
+# ADD "https://api.github.com/repos/NL-BioImaging/biomero/commits?per_page=1" latest_commit
+# and install from git intead of pypi 
+# && python3 -m pip install 'git+https://github.com/NL-BioImaging/biomero' \
 RUN python3 -m venv $VIRTUAL_ENV \
     && python3 -m pip install --upgrade pip \ 
-    # TODO: add version to slurm client after release, for development: run latest
-    && python3 -m pip install 'git+https://github.com/NL-BioImaging/omero-slurm-client' \
+    && python3 -m pip install biomero==1.2.0 \
     && python3 -m pip install ezomero==1.1.1 tifffile==2020.9.3
 
-## Setup slurm-config for omero-slurm-client
+## Setup slurm-config for biomero
 COPY worker-processor/slurm-config.ini /etc/slurm-config.ini
 
 ## OMERO: Replace the default startup scripts
 RUN rm /startup/60-database.sh
 COPY worker-processor/99-run.sh /startup/99-run.sh
+RUN chmod +x /startup/99-run.sh
 USER omero-server
