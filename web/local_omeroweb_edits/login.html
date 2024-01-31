@@ -88,6 +88,19 @@
 </div>
 
 <script>
+    /*
+    TLDR: do not remove the 'Image Array Placeholder'
+    This placeholder is used by the get_images_for_login_page.py script to insert an array of image paths.
+    The script scans a specified directory for image files, generates a JavaScript array of paths to these images,
+    and replaces this placeholder with that array.
+
+    The array is used by the JavaScript code below to dynamically change the source of the image with the id 'dynamic-image'.
+    The image source is changed every 5 seconds to the next image path in the array, creating a slideshow effect.
+
+    To use the script, run it with the image directory and the path to this HTML file as command line arguments.
+    For example: python get_images_for_login_page.py /path/to/images /path/to/this/file.html
+    */
+
     // Image Array Placeholder
 
     var currentImageIndex = 0;

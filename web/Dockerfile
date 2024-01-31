@@ -1,4 +1,8 @@
 # First stage: Python environment to run the script
+# This section of the code will use the get_iamges_for_login_page to stage an edited verion of the login.html script
+# The edited version of the login.html script will have the images in the Display_Images directory coded in
+# Restart the container if you change images contained in the Display_Images directory
+
 FROM python:3.9 as builder
 
 # Copy the script and images into the builder stage
