@@ -124,3 +124,19 @@ In short, you always need:
 - Configuration of `slurm-config.ini`. 
     - Alias used in your config, e.g. `localslurm` 
     - Setup storage paths on Slurm server, e.g. `slurm_data_path`, `slurm_images_path` and `slurm_script_path`.
+
+
+## Edited Front-end
+The omero-web container adds the following features to OMERO.web:
+- Imporved customization to the login page allowing multiple images to be added
+- Improved clarity of the login page by removing the server list (not useful if omero server are separated by domain)
+- Better group browsing by enabling double-click navigation and improved clarity of the Groups button
+- Better legibility of toolbar menu buttons by renaming titles, adding titles, and/or changing icons
+
+The edited files are stored in [web/local_omeroweb_edits/](web/local_omeroweb_edits/) and are copied over the original files of OMERO.web.
+
+### Customizing your institutions login page 
+The custom login logo is no longer determined in the configuration file. Rather, the server administrator can copy their institution's logo in the following directory: [web/local_omeroweb_edits/Display_Images/](web/local_omeroweb_edits/Display_Images/) 
+
+Multiple images (jpg or png) can be added to the same directory, and these will be rotated each 5 seconds to show all the images in order.
+This feature allows display of server announcements and local news. 
