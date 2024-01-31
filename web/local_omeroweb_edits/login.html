@@ -80,30 +80,21 @@
 <div style="margin: auto">
     <div style="margin: 15% auto 0; height: 350px"></div>
     <div class="login-logos">
-        <!-- Container for dynamic images inserted by the Python script -->
-        <div id="dynamic-image">
-            <!-- Dynamic Images START -->
-            <!-- Dynamic Images END -->
-        </div>
-
         <div class="custom_logo">
-            <img src="{% static 'webclient/image/logo_login_web.png' %}" />
+            <img id="dynamic-image" src="" />
         </div>
+        <img src="{% static "webclient/image/logo_login_web.png" %}" />
     </div>
 </div>
 
 <script>
+    // Image Array Placeholder
+
     var currentImageIndex = 0;
-    var images = document.getElementById('dynamic-image').getElementsByTagName('img');
 
     function changeImage() {
-        // Hide all images
-        for (var i = 0; i < images.length; i++) {
-            images[i].style.display = 'none';
-        }
-
-        // Show the current image
-        images[currentImageIndex].style.display = 'block';
+        // Change the image source
+        document.getElementById('dynamic-image').src = images[currentImageIndex];
 
         // Update the index to point to the next image
         currentImageIndex = (currentImageIndex + 1) % images.length;
@@ -195,3 +186,4 @@
     </p>
 </div>
 {% endblock %}
+
