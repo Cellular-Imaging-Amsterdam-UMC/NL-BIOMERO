@@ -1,22 +1,18 @@
-# First stage: Python environment to run the script
+FROM openmicroscopy/omero-web-standalone:5.24.0
+
+USER root
+
 # This section of the code will use the get_iamges_for_login_page to stage an edited verion of the login.html script
 # The edited version of the login.html script will have the images in the Display_Images directory coded in
 # Restart the container if you change images contained in the Display_Images directory
-
-FROM python:3.9 as builder
-
-# Copy the script and images into the builder stage
+# Copy the script and images
 COPY local_omeroweb_edits/get_images_for_login_page.py /script/
 COPY local_omeroweb_edits/login.html /script/
 COPY local_omeroweb_edits/Display_Images /images/
 
 # Run the script to update the login.html file
-RUN python /script/get_images_for_login_page.py /images/ /script/login.html
-
-# Second stage: Build the actual OMERO.web image
-FROM openmicroscopy/omero-web-standalone:5.24.0
-
-USER root
+RUN python3.9 /script/get_images_for_login_page.py /images/ /script/login.html
+RUN cp /script/login.html ./webclient/templates/webclient/login.html
 
 RUN /opt/omero/web/venv3/bin/pip install \
         'django-cors-headers' \
@@ -38,8 +34,8 @@ ADD local_omeroweb_edits/01-default-webapps.omero /opt/omero/web/config
 # Add the new login images to the login page image directory
 ADD local_omeroweb_edits/Display_Images ./webclient/static/webclient/image/login_page_images/
 
-# Copy the modified login.html from the builder stage
-COPY --from=builder /script/login.html ./webclient/templates/webclient/login.html
+# # Copy the modified login.html
+# RUN cp /script/login.html ./webclient/templates/webclient/login.html
 
 # Double-Click for better file browsing
 ADD local_omeroweb_edits/group_user_dropdown2.html ./webclient/templates/webclient/base/includes/group_user_dropdown2.html
