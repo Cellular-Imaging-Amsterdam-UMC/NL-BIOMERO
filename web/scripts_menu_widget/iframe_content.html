@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scripts Menu Widget</title>
+    <style>
+        body {
+            background-color: white;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            /* No direct effect on iframe size */
+        }
+    </style>
+</head>
+<body>
+    <p>scripts_menu_widget</p>
+    <script>
+        // Send a postMessage to the parent window suggesting the IFrame size
+        window.parent.postMessage({ iframeId: 'myCustomIFrame', width: '200px', height: '200px' }, '*');
+    </script>
+</body>
+</html>

@@ -17,6 +17,7 @@ RUN /opt/omero/web/venv3/bin/pip install \
         omero-fpbioimage \
         omero-mapr \
         omero-parade \
+        #githbu://my-repo/build/v1.23.4 \
         omero-webtagging-autotag \
         omero-webtagging-tagsearch \
         whitenoise
@@ -41,6 +42,16 @@ ADD local_omeroweb_edits/layout.css ./webclient/static/webclient/css/layout.css
 # Improved top menu button clarity
 ADD local_omeroweb_edits/ome.header.css ./webgateway/static/webgateway/css/ome.header.css
 ADD local_omeroweb_edits/script-text-play.svg ./webgateway/static/webgateway/img/script-text-play.svg
+
+# Edited for scripts_menu_widget
+ADD scripts_menu_widget/base_container.html ./webclient/templates/webclient/base/base_container.html
+ADD scripts_menu_widget/views.py ./webclient/views.py
+ADD scripts_menu_widget/urls.py ./webclient/urls.py
+
+# Widget files
+ADD scripts_menu_widget/iframe_content.html ./webclient/templates/webclient/base/includes/iframe_content.html
+ADD scripts_menu_widget/iframe_script.js ./webclient/static/webclient/javascript/iframe_script.js
+ADD scripts_menu_widget/iframe_style.css ./webclient/static/webclient/css/iframe_style.css
 
 USER omero-web
 
