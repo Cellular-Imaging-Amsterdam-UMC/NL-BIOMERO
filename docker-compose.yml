@@ -111,6 +111,8 @@ services:
     # Environment variables for in the container
     build:
       context: ./web
+      args:
+        CACHEBUSTER: ${CACHEBUSTER}
     environment:
       OMEROHOST: omeroserver
       CONFIG_omero_scripts_timeout: 604800000
