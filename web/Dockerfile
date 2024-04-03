@@ -10,17 +10,33 @@ COPY local_omeroweb_edits/get_images_for_login_page.py /script/
 COPY local_omeroweb_edits/login.html /script/
 COPY local_omeroweb_edits/Display_Images /images/
 
+# Invalidate cache for development
+# ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/scripts_menu_widget_app/commits?per_page=1" latest_commit
+# ADD "https://api.github.com/repos/rodrigolearns/omero-parade-spoon/commits?per_page=1" latest_commit
+
+# Install Node.js and npm
+RUN yum update -y && yum install -y nodejs npm
+
 RUN /opt/omero/web/venv3/bin/pip install \
         'django-cors-headers' \
         omero-figure \
         omero-iviewer \
         omero-fpbioimage \
         omero-mapr \
-        omero-parade \
-        #githbu://my-repo/build/v1.23.4 \
         omero-webtagging-autotag \
         omero-webtagging-tagsearch \
-        whitenoise
+        whitenoise 
+
+# RUN /opt/omero/web/venv3/bin/pip install \
+        # 'git+https://github.com/rodrigolearns/omero-parade-spoon@master'
+
+# Add a build argument for cache invalidation
+ARG CACHEBUSTER=unknown
+
+# Assuming the local repo is placed in the "web/local_omeroweb_edits/omero-parade-spoon" directory
+COPY /omero-parade-spoon /opt/omero-parade-spoon
+RUN /opt/omero/web/venv3/bin/pip install /opt/omero-parade-spoon
+
 
 # Set the working directory
 WORKDIR /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb

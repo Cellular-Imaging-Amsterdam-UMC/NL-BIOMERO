@@ -30,6 +30,8 @@ services:
     build: 
       context: ./
       dockerfile: ./server/Dockerfile
+      args:
+        BIOMERO_VERSION: ${BIOMERO_VERSION}
     # Define environment variables for use in the container.
     # 'nodedescriptors' assigns roles to all the containers
     # 'omero_db_*' are same as in 'database' description. 
@@ -83,6 +85,8 @@ services:
     build: 
       context: ./
       dockerfile: ./worker-processor/Dockerfile
+      args:
+        BIOMERO_VERSION: ${BIOMERO_VERSION}
     # Define variables for use in the container.
     # WORKER_NAME is used in the omero/ice node description
     # logging_level doesn't work, but should increase logging
@@ -107,6 +111,8 @@ services:
     # Environment variables for in the container
     build:
       context: ./web
+      args:
+        CACHEBUSTER: ${CACHEBUSTER}
     environment:
       OMEROHOST: omeroserver
       CONFIG_omero_scripts_timeout: 604800000
