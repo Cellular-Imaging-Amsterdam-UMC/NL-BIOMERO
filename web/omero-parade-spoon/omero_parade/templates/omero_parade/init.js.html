@@ -1,0 +1,22 @@
+{% load common_filters %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'omero_parade/css/parade.css' %}"></link>
+
+<script type="module">
+  import omero_parade from '{% static 'omero_parade/js/bundle.js' %}';
+
+$(function() {
+  var dataTree = $.jstree.reference('#dataTree'); // Adjust based on actual availability
+
+  // Initialize omero_parade immediately
+  omero_parade.omero_parade(dataTree, {
+    dataprovidersUrl: "{% url 'parade_dataproviders' %}",
+    filtersUrl: "{% url 'parade_filters' %}",
+    indexUrl: "{% url 'parade_index' %}",
+    staticPrefix: "{% get_static_prefix %}",
+    thumbnailsBatch: {{ thumbnails_batch|default:50|json_dumps|safe }},
+    webgatewayBaseUrl: "{% url 'webgateway' %}",
+  });
+});
+</script>

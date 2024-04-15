@@ -1,0 +1,26 @@
+{% load common_filters %}
+{% load static %}
+
+<html>
+    <head>
+        {% include "webgateway/base/includes/script_src_jquery.html" %}
+        {% include "webgateway/base/includes/jquery-ui.html" %}
+        <link rel="stylesheet" href="{% static 'omero_parade/css/parade.css' %}"></link>
+        <script src="{% static 'omero_parade/js/bundle.js' %}"></script>
+    </head>
+
+    <body>
+        <div id="full_page_app"></div>
+    </body>
+
+    <script>
+        omero_parade.full_page_app("full_page_app", {
+            dataprovidersUrl: "{% url 'parade_dataproviders' %}",
+            filtersUrl: "{% url 'parade_filters' %}",
+            indexUrl: "{% url 'parade_index' %}",
+            staticPrefix: "{% get_static_prefix %}",
+            thumbnailsBatch: {{ thumbnails_batch|default:50|json_dumps|safe }},
+            webgatewayBaseUrl: "{% url 'webgateway' %}",
+        });
+    </script>
+</html>
