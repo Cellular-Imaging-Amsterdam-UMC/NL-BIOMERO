@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scripts Menu Widget</title>
+    <style>
+        body {
+            background-color: white;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- React App Mount Point -->
+    <div id="omero_parade_mount_point"></div>
+
+    <!-- Variables Display Area -->
+    <div id="variablesDisplay"></div>
+
+    <script>
+        // Function to parse URL parameters
+        function getUrlParams() {
+            var params = {};
+            location.search.substr(1).split("&").forEach(function(item) {
+                var s = item.split("="),
+                    k = s[0],
+                    v = s[1] && decodeURIComponent(s[1]); // Ensure proper decoding
+                params[k] = v;
+            });
+            return params;
+        }
+
+        // Display the variables and send styles to parent
+        window.onload = function() {
+            var params = getUrlParams();
+            var displayArea = document.getElementById('variablesDisplay');
+            
+            // Displaying parsed URL parameters
+            displayArea.innerHTML = 'Scripts URL: ' + params.scriptsUrl + '<br>' +
+                                    'User ID: ' + params.userId;
+
+            // Send a postMessage to the parent window with the IFrame size, position, and styles
+            window.parent.postMessage({
+                iframeId: 'myCustomIFrame',
+                styles: {
+                    width: '200px',
+                    height: '400px',
+                    border: '20px solid #ccc',
+                    borderRadius: '4px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,.5)',
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    zIndex: '9999'
+                }
+            }, '*');
+        };
+    </script>
+</body>
+</html>
