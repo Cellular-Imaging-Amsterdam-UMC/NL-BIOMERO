@@ -121,9 +121,8 @@ services:
     # Map ports to ports on the host machine, to allow opening of webpage
     ports:
       - "4080:4080"
-    # volumes: 
-      # In case of further development, add volumes for local_omeroweb_edits here
-      # Once volumes are added, only omeroweb container reload necessary, not the whole docker-compose.
+    volumes: 
+      - "./web/omero-parade-spoon/omero_parade/static/omero_parade:/opt/omero/web/OMERO.web/var/static/omero_parade"
       
 # Define the network(s) to communicate between containers
 networks:
