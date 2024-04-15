@@ -10,16 +10,33 @@ COPY local_omeroweb_edits/get_images_for_login_page.py /script/
 COPY local_omeroweb_edits/login.html /script/
 COPY local_omeroweb_edits/Display_Images /images/
 
+# Invalidate cache for development
+# ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/scripts_menu_widget_app/commits?per_page=1" latest_commit
+# ADD "https://api.github.com/repos/rodrigolearns/omero-parade-spoon/commits?per_page=1" latest_commit
+
+# Install Node.js and npm
+RUN yum update -y && yum install -y nodejs npm
+RUN npm install --global yarn
 RUN /opt/omero/web/venv3/bin/pip install \
         'django-cors-headers' \
-        omero-figure \
         omero-iviewer \
         omero-fpbioimage \
         omero-mapr \
-        omero-parade \
         omero-webtagging-autotag \
         omero-webtagging-tagsearch \
-        whitenoise
+        whitenoise 
+
+# omero-figure \
+# RUN /opt/omero/web/venv3/bin/pip install \
+# 'git+https://github.com/rodrigolearns/omero-parade-spoon@master'
+
+# Add a build argument for cache invalidation
+ARG CACHEBUSTER=unknown
+
+# Assuming the local repo is placed in the "web/local_omeroweb_edits/omero-parade-spoon" directory
+COPY /omero-parade-spoon /opt/omero-parade-spoon
+RUN /opt/omero/web/venv3/bin/pip install /opt/omero-parade-spoon
+
 
 # Set the working directory
 WORKDIR /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb
@@ -42,5 +59,14 @@ ADD local_omeroweb_edits/layout.css ./webclient/static/webclient/css/layout.css
 ADD local_omeroweb_edits/ome.header.css ./webgateway/static/webgateway/css/ome.header.css
 ADD local_omeroweb_edits/script-text-play.svg ./webgateway/static/webgateway/img/script-text-play.svg
 
-USER omero-web
+# # Edited for scripts_menu_widget
+ADD scripts_menu_widget/base_container.html ./webclient/templates/webclient/base/base_container.html
+ADD scripts_menu_widget/views.py ./webclient/views.py
+ADD scripts_menu_widget/urls.py ./webclient/urls.py
 
+# # Widget files
+ADD scripts_menu_widget/iframe_content.html ./webclient/templates/webclient/base/includes/iframe_content.html
+ADD scripts_menu_widget/iframe_script.js ./webclient/static/webclient/javascript/iframe_script.js
+ADD scripts_menu_widget/iframe_style.css ./webclient/static/webclient/css/iframe_style.cs
+
+USER omero-web
