@@ -30,6 +30,10 @@ config set -- omero.web.ui.top_links '[["Data", "webindex", {"title": "Browse Da
 # enable CORS so e.g. react-webapp can connect to OMERO.web on different origin
 # See https://docs.openmicroscopy.org/latest/omero/sysadmins/unix/install-web.html
 config append -- omero.web.apps '"corsheaders"'
+config append -- omero.web.apps '"omero_webtest"'
+config append -- omero.web.ui.right_plugins '["ROIs", "webtest/webclient_plugins/right_plugin.rois.js.html", "image_roi_tab"]'
+config append -- omero.web.ui.right_plugins '["Scripts", "webtest/webclient_plugins/right_plugin.scripts.js.html", "scripts_tab"]'
+config append -- omero.web.ui.center_plugins '["Split View", "webtest/webclient_plugins/center_plugin.splitview.js.html", "split_view_panel"]'
 config append -- omero.web.middleware '{"index": 0.5, "class": "corsheaders.middleware.CorsMiddleware"}'
 config append -- omero.web.middleware '{"index": 10, "class": "corsheaders.middleware.CorsPostCsrfMiddleware"}'
 config set -- omero.web.cors_origin_allow_all True

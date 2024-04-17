@@ -10,6 +10,8 @@ COPY local_omeroweb_edits/get_images_for_login_page.py /script/
 COPY local_omeroweb_edits/login.html /script/
 COPY local_omeroweb_edits/Display_Images /images/
 
+# Invalidate cache for development builds
+ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/omero-amc-webtest/commits?per_page=1" latest_commit
 RUN /opt/omero/web/venv3/bin/pip install \
         'django-cors-headers' \
         omero-figure \
@@ -19,6 +21,7 @@ RUN /opt/omero/web/venv3/bin/pip install \
         omero-parade \
         omero-webtagging-autotag \
         omero-webtagging-tagsearch \
+        git+https://github.com/Cellular-Imaging-Amsterdam-UMC/omero-amc-webtest.git \
         whitenoise
 
 # Set the working directory
