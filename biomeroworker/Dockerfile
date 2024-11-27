@@ -23,7 +23,7 @@ RUN yum install -y blosc-devel
 
 # Sadly can't do this in Dockerfile:
 # ENV JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.20.0.8-1.el7_9.x86_64
+ENV JAVA_HOME=/usr/lib/jvm/jre-11-openjdk-11.0.24.0.8-2.el9.x86_64
 RUN export JAVA_HOME
 
 RUN wget https://github.com/glencoesoftware/bioformats2raw/releases/download/v0.7.0/bioformats2raw-0.7.0.zip \
