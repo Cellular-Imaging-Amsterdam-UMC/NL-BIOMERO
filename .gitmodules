@@ -1,0 +1,3 @@
+[submodule "omeroadi"]
+  path = omeroadi
+  url = https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git
