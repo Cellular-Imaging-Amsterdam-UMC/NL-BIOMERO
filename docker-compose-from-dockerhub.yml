@@ -11,9 +11,9 @@ services:
     image: "postgres:11"
     # Define environment variables (user/pass here)
     environment:
-      POSTGRES_USER: omero
-      POSTGRES_DB: omero
-      POSTGRES_PASSWORD: omero
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     # Define named network to communicate with other containers
     networks:
       - omero
@@ -24,9 +24,9 @@ services:
   database-biomero:
     image: "postgres:16"
     environment:
-      POSTGRES_USER: biomero
-      POSTGRES_DB: biomero
-      POSTGRES_PASSWORD: biomero
+      POSTGRES_USER: ${BIOMERO_POSTGRES_USER}
+      POSTGRES_DB: ${BIOMERO_POSTGRES_DB}
+      POSTGRES_PASSWORD: ${BIOMERO_POSTGRES_PASSWORD}
     networks:
       - omero
     volumes:
@@ -37,19 +37,14 @@ services:
     # This container uses the tag for the latest server release of OMERO 5
     # To upgrade to the next major release, increment the major version number
     image: "cellularimagingcf/omeroserver:${NL_BIOMERO_VERSION:-latest}"
-    # We build this container locally from the Dockerfile in the ./server folder
-    # build: 
-    #   context: ./
-    #   dockerfile: ./server/Dockerfile
     # Define environment variables for use in the container.
     # 'nodedescriptors' assigns roles to all the containers
     # 'omero_db_*' are same as in 'database' description. 
-    # TODO: Should probably extract those to the .env file
     environment:
       CONFIG_omero_db_host: database
-      CONFIG_omero_db_user: omero
-      CONFIG_omero_db_pass: omero
-      CONFIG_omero_db_name: omero
+      CONFIG_omero_db_user: ${POSTGRES_USER}
+      CONFIG_omero_db_pass: ${POSTGRES_PASSWORD}
+      CONFIG_omero_db_name: ${POSTGRES_DB}
       CONFIG_omero_server_nodedescriptors: >-
         master:Blitz-0
         omeroworker-1:Tables-0,Indexer-0,PixelData-0,DropBox,MonitorServer,FileServer,Storm
@@ -57,7 +52,7 @@ services:
       CONFIG_omero_master_host: omeroserver
       CONFIG_omero_scripts_timeout: 604800000
       CONFIG_omero_logging_level: 10
-      ROOTPASS: omero
+      ROOTPASS: ${OMERO_ROOT_PASSWORD}
     # Define named network to communicate with other containers
     networks:
       - omero
@@ -72,8 +67,6 @@ services:
 
   # Name of our worker node, can be anything 
   omeroworker-1:
-    # We build this image locally in the ./worker folder
-    # build: ./worker
     image: "cellularimagingcf/omeroworker:${NL_BIOMERO_VERSION:-latest}"
     # Define variables for use in the container.
     # WORKER_NAME is used in the omero/ice node description
@@ -91,12 +84,6 @@ services:
 
   # Define our processor worker
   biomeroworker:
-    # Build this image locally from current map './'
-    # This way we can share file access from Dockerfile in './worker-gpu'
-    # Uses args to provide variables from '.env' file to the Dockerfile
-    # build: 
-    #   context: ./
-    #   dockerfile: ./biomeroworker/Dockerfile
     image: "cellularimagingcf/biomero:${NL_BIOMERO_VERSION:-latest}"
     # Define variables for use in the container.
     # WORKER_NAME is used in the omero/ice node description
@@ -107,7 +94,7 @@ services:
       CONFIG_omero_logging_level: 10
       CONFIG_omero_scripts_timeout: 604800000
       PERSISTENCE_MODULE: eventsourcing_sqlalchemy
-      SQLALCHEMY_URL: postgresql+psycopg2://biomero:biomero@database-biomero:5432/biomero
+      SQLALCHEMY_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
     # Named network to communicate with other containers
     networks:
       - omero
@@ -116,20 +103,17 @@ services:
     volumes:
       - "omero:/OMERO"
       - "~/.ssh:/tmp/.ssh:ro"
-      - "./biomeroworker/slurm-config.ini:/etc/slurm-config.ini"
+      - "./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
       - "./web/L-Drive:/data"
 
   # Service for the omero.web UI
   omeroweb:
-    #image: "openmicroscopy/omero-web-standalone:5"
-    # We build this also locally in './web' folder, to add some extensions
-    # build: ./web
     image: "cellularimagingcf/omeroweb:${NL_BIOMERO_VERSION:-latest}"
     # Environment variables for in the container
     # login__logo supplies a logo on the starting page of web UI
     environment:
       OMEROHOST: omeroserver
-      ROOTPASS: omero
+      ROOTPASS: ${OMERO_ROOT_PASSWORD}
       CONFIG_omero_web_login__logo: "https://cembo.eu/wp-content/uploads/2021/04/Amsterdam-UMC.png"
       CONFIG_omero_scripts_timeout: 604800000
       ENV: TEST
@@ -137,7 +121,7 @@ services:
       METABASE_SECRET_KEY: ${METABASE_SECRET_KEY}
       METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID: ${METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID}
       METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID: ${METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID}
-      INGEST_TRACKING_DB_URL: postgresql+psycopg2://biomero:biomero@database-biomero:5432/biomero
+      INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
       IMPORT_MOUNT_PATH: /data
       FORMS_MASTER_USER: ${FORMS_MASTER_USER}
       FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
@@ -149,6 +133,7 @@ services:
       - "4080:4080"
     volumes:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "./web/local_omeroweb_edits/pretty_login/login_page_images/bioimaging.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/AmsterdamUMC-logo.png:ro"
       - "./web/L-Drive:/data:rw"
 
   metabase:
@@ -157,8 +142,8 @@ services:
     hostname: metabase
     environment:
       MB_DB_FILE: /metabase-data/metabase.db
-      MB_USER: admin@biomero.com
-      MB_PASSWORD: b1omero
+      MB_USER: ${METABASE_USER}
+      MB_PASSWORD: ${METABASE_PASSWORD}
     networks:
       - omero
     ports:
@@ -176,9 +161,9 @@ services:
     environment:
       OMERO_HOST: omeroserver
       OMERO_USER: root
-      OMERO_PASSWORD: omero
+      OMERO_PASSWORD: ${OMERO_ROOT_PASSWORD}
       OMERO_PORT: 4064
-      INGEST_TRACKING_DB_URL: postgresql+psycopg2://biomero:biomero@database-biomero:5432/biomero
+      INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
     networks:
       - omero
     volumes:

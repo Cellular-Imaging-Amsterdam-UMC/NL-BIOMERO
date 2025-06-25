@@ -1,0 +1,49 @@
+#------------------------------------------------#
+# Main ADI settings
+#------------------------------------------------#
+# Paths settings
+log_file_path: logs/app.logs
+group_list: config/groups_list.json
+base_dir: /data
+data_dir_name: .omerodata
+# ingest_tracking_db: sqlite:///OMERO/ingest_tracking.db
+ingest_tracking_db: postgresql+psycopg2://biomero:biomero@database-biomero:5432/biomero
+
+#------------------------------------------------#
+# ADI Worker settings
+#------------------------------------------------#
+# Number of import orders that get processed in parallel
+max_workers: 4
+# Number of file upload threads to run at the same time, per worker/order
+# @see: https://docs.openmicroscopy.org/omero/5.6.2/users/cli/import.html#cmdoption-omero-import-parallel-upload 
+parallel_upload_per_worker: 6
+# Number of fileset candidates to import at the same time, per worker/order
+# @see: https://docs.openmicroscopy.org/omero/5.6.2/users/cli/import.html#cmdoption-omero-import-parallel-fileset
+parallel_filesets_per_worker: 6
+# Specify optional step to skip during import (only works for screens)
+# @see: https://docs.openmicroscopy.org/omero/5.6.2/users/cli/import.html#cmdoption-omero-import-skip 
+skip_all: true
+skip_checksum: true
+skip_minmax: true
+skip_thumbnails: true
+skip_upgrade: true
+# Connection timeout in milliseconds
+ttl_for_user_conn: 60000
+
+#------------------------------------------------#
+# Test settings
+#------------------------------------------------#
+# These settings are used by the T_main integration test from ADI container.
+# This test is run by default on startup or can be triggered manually.
+# sample_image: /data/coreReits/4) Pancreatic Islet Cells of the Mouse.tif # dataset
+# sample_parent_id: 2401 # dataset to upload into
+# sample_parent_type: Dataset
+sample_image: /data/coreReits/Screens/CellsSmall/experiment.db # screen
+sample_parent_id: 451 # screen to upload into
+sample_parent_type: Screen
+preprocessing: 1 # run preprocessing in the test (for screens conversion)
+sample_pre_container: cellularimagingcf/cimagexpresstoometiff:v0.7
+sample_pre_input: "{Files}"
+sample_pre_out: "/data"
+sample_pre_outalt: "/out"
+sample_pre_save: "single"

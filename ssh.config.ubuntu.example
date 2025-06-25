@@ -1,0 +1,6 @@
+Host localslurm
+        HostName 172.17.0.1
+        User slurm
+        Port 2222
+        IdentityFile ~/.ssh/id_rsa
+        StrictHostKeyChecking no

@@ -58,27 +58,15 @@ RUN /opt/omero/web/venv3/bin/python3.9 -m pip install --upgrade pip && \
     /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/omero-boost && \
     /opt/omero/web/venv3/bin/omero-boost-setup
 
+# Set permissions for omero-boost directory so omero-web user can write files
+RUN chown -R omero-web:omero-web /opt/omero/web/omero-boost && \
+    chmod -R 755 /opt/omero/web/omero-boost && \
+    chmod -R 775 /opt/omero/web/omero-boost/omero_boost
+
 ### Install OMERO.forms ###
-# Install Node.js first
-RUN curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - && \
-    yum install -y --nogpgcheck nodejs && \
-    npm install -g npm@latest
 
-# Forms installation - using biomero_forms branch
-ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO.forms/commits/biomero_forms" /latest_commit_forms
-RUN git clone -b biomero_forms https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO.forms.git /opt/omero/web/omero-forms
-
-
-# Build and install Forms
-WORKDIR /opt/omero/web/omero-forms
-RUN npm install --force && \
-    node_modules/.bin/webpack --mode production && \
-    /opt/omero/web/venv3/bin/python3.9 -m pip install -e .
-
-# Clean up Node.js
-RUN yum remove -y nodejs && \
-    yum clean all && \
-    rm -rf /var/cache/yum
+# Install OMERO.forms from PyPI
+RUN /opt/omero/web/venv3/bin/pip install omero-forms==2.1.0
 
 # Set the working directory
 WORKDIR /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb
