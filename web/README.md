@@ -1,3 +1,5 @@
+⚠️ **Note**: this README is not up to date
+
 # NL-BIOMERO Web Container  
 Welcome to the NL-BIOMERO Web Container, a specialized deployment of OMERO tailored for the [Cellular Imaging lab at Amsterdam University Medical Center](https://github.com/Cellular-Imaging-Amsterdam-UMC). This deployment includes several customizations to enhance the user experience and functionality of the OMERO web interface.
 

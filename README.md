@@ -10,161 +10,244 @@ This is an adaptation of OME's [OMERO.server grid and OMERO.web (docker-compose)
 OMERO.server is listening on the standard OMERO ports `4063` and `4064`.
 OMERO.web is listening on port `4080` (http://localhost:4080/).
 
-## Quickstart
+---
 
-!Note: this quickstart is based on Windows docker desktop and uses `host.docker.internal` to communicate between local clusters. This might require different settings on Linux (commandline)
+## 🚀 Platform-Specific Deployment
 
-Clone this repository locally (from the commandline)
+### Windows (Docker Desktop)
+Follow the **Quickstart** section below for Windows deployment with Docker Desktop.
 
-    git clone https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO.git
+### Ubuntu/Linux
+For Ubuntu/Linux deployments (with SSL support), see our dedicated guide:
+📖 **[Ubuntu/Linux Deployment Guide](README.linux.md)**
 
-Change into the new directory
+---
 
-    cd NL-BIOMERO
+## Quickstart (Windows)
 
-Setup the connection with Slurm:
+**Note**: This quickstart is based on Windows Docker Desktop and uses `host.docker.internal` to communicate between local clusters. Linux users should refer to the [Ubuntu/Linux guide](README.linux.md).
 
-First, setup a configuration file, e.g. take the local slurm:
+### 1. Clone and Setup
+Clone this repository locally:
 
-    cp biomeroworker/slurm-config.localslurm.ini biomeroworker/slurm-config.ini
-
-Next, actually setup a local Slurm that matches this config.
-
-Follow the README on [here](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm)
-
-Or in short:
-
-    cd ..
-    git clone https://github.com/TorecLuik/slurm-docker-cluster
-    cd slurm-docker-cluster
-    cp ~/.ssh/id_rsa.pub .
-    docker-compose up -d --build
-
-Then let's go back to our omero setup:
-
-    cd NL-BIOMERO
-
-First, ensure that you can reach the slurm cluster from your host machine:
-
-    ssh -i ~/.ssh/id_rsa -p 2222 -o StrictHostKeyChecking=no slurm@host.docker.internal
-
-If that works, (exit and) create a nice alias 'localslurm' for this setup instead by creating `~/.ssh/config`
-
-    cp ssh.config.example ~/.ssh/config
-
-The contents should be like this (to match the SSH command you performed above):
-
-```
-Host localslurm
-        HostName host.docker.internal
-        User slurm
-        Port 2222
-        IdentityFile ~/.ssh/id_rsa
-        StrictHostKeyChecking no
+```bash
+git clone https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO.git
+cd NL-BIOMERO
 ```
 
-Now test the new config:
+### 2. Configure Environment
+First, customize your environment file `.env`:
 
-    ssh localslurm
+```bash
+# Edit .env with your secure passwords and configuration
+# Edit biomeroworker/slurm-config.ini if you need different BIOMERO settings
+```
 
-Note that this configured alias has to be the same as the one configured in your slurm-config.ini
+### 3. Setup Slurm Connection (Optional)
+For local testing with a containerized Slurm cluster:
 
-Finally, when that works, build and start the biomero containers:
+```bash
+# Setup local Slurm cluster
+cd ..
+git clone https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm
+cd NL-BIOMERO-Local-Slurm
+cp ~/.ssh/id_rsa.pub .
+docker-compose up -d --build
+cd ../NL-BIOMERO
+```
 
-    docker-compose up -d --build
+### 4. Configure SSH Access
+Test Slurm connectivity:
 
-If you want, follow along with the logs on your commandline:
+```bash
+# from your host machine:
+ssh -i ~/.ssh/id_rsa -p 2222 -o StrictHostKeyChecking=no slurm@localhost
+# or from inside your biomeroworker container:
+ssh -i ~/.ssh/id_rsa -p 2222 -o StrictHostKeyChecking=no slurm@host.docker.internal
+exit
+```
 
-    docker-compose logs -f
+If successful, create an SSH alias:
 
-You can exit the logs with CTRL+C (your OMERO will keep running, because we ran them with `-d` = `detached`)
+```bash
+cp ssh.config.example ~/.ssh/config
+```
 
-Log in on web (`localhost:4080`) as user `root` password `omero`. This might take a bit to get ready as the servers start up.
 
-Enjoy!
+### 5. Deploy NL-BIOMERO
+Launch the full stack:
 
-### Note on Linux commandline Docker issues with .ssh
+```bash
+# For development (with local builds)
+docker-compose up -d --build
 
-I have noticed on Linux, the container will not have access to your .ssh folder with default permissions. So just change the .ssh folder to something open like 777 `chmod -R 777 ~/.ssh` when you are building the container / mounting your SSH into BIOMERO.
+# For production (using pre-built images)
+docker-compose -f docker-compose-from-dockerhub.yml up -d
+```
 
-Afterward, you can just change it back again, with `chmod -R 700 ~/.ssh`, so you can use it locally to SSH again.
+Monitor the deployment:
 
-## Data
+```bash
+docker-compose logs -f
+```
+Exit w/ CTRL + C
 
-To actually enjoy, you'll need some data.
+Verify the alias works:
 
-For now you need [OMERO.insight app](https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf), but we are working on a web-importer.
+```bash
+# go inside your biomeroworker container:
+docker-compose exec biomeroworker bash
+# from inside your biomeroworker container:
+ssh localslurm
+exit
+exit
+```
 
-Connect to `localhost`, login as `root`/`omero` again and upload some nice images.
+### 6. Access the Interfaces
+- **OMERO.web**: http://localhost:4080
+  - **Login**: `root` / `omero` (change default password)
+- **Metabase**: http://localhost:3000  
+  - **Login**: `admin@biomero.com` / `b1omero` (change default password)
 
-## BIOMERO - BioImage analysis in OMERO
 
-Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for details on how to use the library and example scripts.
+---
 
-In short:
+## 📊 Data Import
 
-1. Run script `slurm/init/SLURM Init environment...`
-2. Get a coffee or something. This will take at least 10 min to download all the workflow images. Maybe write a nice review on `image.sc` of this software.
-3. Select your image / dataset and run script `slurm/workflows/SLURM Run Workflow...`
-   - Select at least one of the `Select how to import your results`, e.g. change `Import into NEW Dataset` text to `hello world`
-   - Select a fun workflow, e.g. `cellpose`.
-     - Change the `nuc channel` to the channel to segment
-     - Uncheck the `use gpu` unless you setup a nice Slurm w/ GPU
-   - Refresh your OMERO `Explore` tab to see your `hello world` dataset with a mask image when the workflow is done.
+To get started with data:
 
-## Docker specifics
+1. **Web Import**: Use our built-in web importer at http://localhost:4080/omero_boost/canvas/
+2. **OMERO.insight**: Download the [desktop client](https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf)
+   - Connect to `localhost:4063`
+   - Login as `root` / `omero`
 
-To stop the cluster:
+---
 
-    docker-compose down
+## 🧬 BIOMERO - BioImage Analysis
 
-N.B. Data is stored on Docker volumes, which are not automatically deleted when you down the setup. Convenient.
+Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for detailed usage instructions.
 
-To remove volumes as well:
+### Quick Workflow Example:
 
-    docker-compose down --volumes
+1. **Initialize Environment**:
+   - Run script: `slurm/init/SLURM Init environment...`
+   - ☕ Grab coffee (10+ min download time for a few workflow containers)
 
-To rebuild a single container (while running your cluster):
+2. **Run Analysis**:
+   - Select your image/dataset
+   - Run script: `slurm/workflows/SLURM Run Workflow...`
+   - Configure import: Change `Import into NEW Dataset` → `hello_world`
+   - Select workflow: e.g., `cellpose`
+   - Set parameters: nucleus channel, GPU settings, etc.
 
-    docker-compose up -d --build <name>
+OR
 
-To attach to a running container:
+2. **"CANVAS" UI**:
+   - Use our new interface at http://localhost:4080/omero_boost/canvas/?tab=biomero
+   - Select your workflow: e.g., `Cellpose`
+   - Add Dataset, select the image(s) you want to segment
+   - Fill in the workflow parameters in tab 2, e.g. nuclei channel 3
+   - Select desired output target, e.g. Select Dataset `hello_world` again; and Run!
+   - Track your workflow status at the `Status` tab
 
-    docker-compose exec <name> /bin/bash
 
-Where `<name>` is e.g. `biomeroworker`
+3. **View Results**:
+   - Refresh OMERO `Explore` tab (in the Data tab; http://localhost:4080/webclient/)
+   - Find your `hello_world` dataset with generated masks
 
-Exit back to your commandline by typing `exit`.
+---
 
-## Slurm specifics
+## 🛠️ Container Management
 
-Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for more details on how to setup your Slurm connection with OMERO.
+### Basic Operations
+```bash
+# Stop the cluster
+docker-compose down
 
-In short, you always need:
+# Remove with volumes (⚠️ deletes data)
+docker-compose down --volumes
 
-- (headless) SSH setup to Slurm server from your host computer. See for example `ssh.config.example`.
-  - Slurm IP
-  - Slurm SSH port (probably `22`)
-  - Slurm username
-  - SSH keys (public key exchanged with Slurm server)
-  - SSH alias config file stored as `~/.ssh/config`
-- Configuration of `slurm-config.ini`.
-  - Alias used in your config, e.g. `localslurm`
-  - Setup storage paths on Slurm server, e.g. `slurm_data_path`, `slurm_images_path` and `slurm_script_path`.
+# Rebuild single container
+docker-compose up -d --build --force-recreate <container-name>
 
-## Edited Front-end
+# Access container shell
+docker-compose exec <container-name> bash
+```
 
-The omero-web container adds the following features to OMERO.web:
-<br>**omero-database-pages** - Adds additional pages to the OMERO web interface for better database interaction and visualization.
-<br>**omero-script-menu-widget** - Replacs the script-dropdown functionality with a beautiful and stylishly understated widget.
-<br>**better_buttons** - Enhances the user interface by providing more intuitive and accessible buttons for common actions.
-<br>**pretty_login** - Improves the login page aesthetics for a more welcoming and user-friendly experience.
+### Useful Container Names
+- `omeroserver` - OMERO server
+- `omeroweb` - Web interface  
+- `biomeroworker` - BIOMERO processor
+- `metabase` - Analytics dashboard
 
-The edited files are stored in [web/local_omeroweb_edits/](web/local_omeroweb_edits/) and more information in the [web/README.md](web/README.md).
+---
 
-### Customizing your institutions login page
+## 🔧 Configuration
 
-The custom login logo is no longer determined in the configuration file. Rather, the server administrator can copy their institution's logo in the following directory: [web/local_omeroweb_edits/Display_Images/](web/local_omeroweb_edits/Display_Images/)
+### Slurm Connection Requirements
+See [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for comprehensive setup details.
 
-Multiple images (jpg or png) can be added to the same directory, and these will be rotated each 5 seconds to show all the images in order.
-This feature allows display of server announcements and local news.
+**Essential Components**:
+- **SSH Configuration**: Headless SSH to Slurm server
+  - Server IP/hostname
+  - SSH port (usually `22`)
+  - Username and SSH keys
+  - Alias configuration in `~/.ssh/config`
+- **Slurm Configuration**: Edit `biomeroworker/slurm-config.ini`
+  - SSH alias (e.g., `localslurm`)
+  - Storage paths: `slurm_data_path`, `slurm_images_path`, `slurm_script_path`
+
+### Linux Considerations
+- SSH permissions: `chmod -R 777 ~/.ssh` before deployment
+- Use `postgres:16-alpine` for better compatibility
+- See [Ubuntu/Linux guide](README.linux.md) for detailed instructions
+
+---
+
+## 🎨 Frontend Customizations
+This deployment includes several UI enhancements:
+
+- **🎨 OMERO CANVAS***: Modern UI for ADI web importer and BIOMERO workflows
+- **📝 OMERO.forms**: Create custom metadata forms for users to fill in
+- **🔘 Better Buttons**: Improved some button design and accessibility
+- **🎭 Pretty Login**: Minor enhanced login page aesthetics
+
+
+\* (codename!)
+
+
+
+### Custom Institution Branding
+Add your institution's logo to the login page:
+
+1. Place logo files in: `web/local_omeroweb_edits/pretty_login/login_page_images/`
+2. And just mount the file over the current image, e.g. 
+
+```yml
+volumes:
+      - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "./web/local_omeroweb_edits/pretty_login/login_page_images/bioimaging.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/AmsterdamUMC-logo.png:ro"
+      - "./web/L-Drive:/data:rw"
+
+``` 
+
+More details in [web/README.md](web/README.md).
+
+---
+
+## 📚 Additional Resources
+
+- 📖 **[Ubuntu/Linux Deployment](README.linux.md)** - Production deployment guide
+- 🧬 **[BIOMERO Documentation](https://nl-bioimaging.github.io/biomero/)** - Analysis workflows
+- 🏗️ **[Local Slurm Cluster](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm)** - Testing environment
+- 🔬 **[OMERO Documentation](https://omero.readthedocs.io/)** - Core platform docs
+
+---
+
+## 🤝 Support
+
+- **Issues**: [GitHub Issues](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO/issues)
+- **Discussions**: [image.sc](https://forum.image.sc/) (tag #biomero)
+- **Contact**: cellularimaging /at/ amsterdamumc.nl
+
+Happy imaging! 🔬✨

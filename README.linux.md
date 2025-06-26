@@ -227,4 +227,6 @@ docker-compose -f /opt/omero/docker-compose-for-ubuntu-with-SSL.yml up -d --buil
 - [OMERO Documentation](https://omero.readthedocs.io/)
 - [NL-BIOMERO GitHub](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO)
 
+If you run into any issues anyway, feel free to make an image.sc post or a GitHub issue for it; you will probably help other people with the same issues!
+
 Happy imaging! 🔬✨
