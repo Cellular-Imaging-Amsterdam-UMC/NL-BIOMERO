@@ -24,6 +24,10 @@ RUN cd /opt/omero/server/OMERO.server/lib/scripts/ && \
 RUN curl -o /opt/omero/server/OMERO.server/lib/scripts/omero/figure_scripts/Figure_To_Pdf.py \
     https://raw.githubusercontent.com/ome/omero-figure/refs/heads/master/omero_figure/scripts/omero/figure_scripts/Figure_To_Pdf.py
 
+# Install Labels2Rois script
+RUN curl -o /opt/omero/server/OMERO.server/lib/scripts/omero/util_scripts/Labels2Rois.py \
+    https://raw.githubusercontent.com/Cellular-Imaging-Amsterdam-UMC/label2rois/main/Labels2Rois.py
+
 # Overwrite ICE configuration
 # COPY ice.config /opt/omero/server/OMERO.server/etc/templates/
 # Overwrite startup run
