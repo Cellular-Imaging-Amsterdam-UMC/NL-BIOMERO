@@ -1,4 +1,4 @@
-FROM openmicroscopy/omero-server:5.6.14
+FROM openmicroscopy/omero-server:5.6.16
 
 ARG BIOMERO_VERSION
 
@@ -17,8 +17,12 @@ RUN yum install -y openssh-clients
 COPY biomeroworker/10-mount-ssh.sh /startup/10-mount-ssh.sh
 RUN chmod +x /startup/10-mount-ssh.sh
 
+## Install psycopg2 system prerequisites for postgres interaction
+RUN yum install -y python3-devel postgresql-devel gcc
+# Update PATH manually based on known locations
+ENV PATH="/usr/pgsql-12/bin:/usr/pgsql-13/bin:/usr/pgsql-14/bin:/usr/pgsql-15/bin:/usr/pgsql-16/bin:/usr/bin:${PATH}"
+
 ## Setup OME ZARR & TIFF modules for data export
-RUN python3 -m pip install omero-cli-zarr==0.5.5
 RUN yum install -y blosc-devel
 
 # Sadly can't do this in Dockerfile:
@@ -32,21 +36,17 @@ RUN wget https://github.com/glencoesoftware/bioformats2raw/releases/download/v0.
 ENV PATH="$PATH:/opt/bioformats2raw-0.7.0/bin"
 
 ## Add BIOMERO Omero Slurm Client
-# For development: 
-# Invalidate cache for development builds
-# ADD "https://api.github.com/repos/NL-BioImaging/biomero/commits?per_page=1" latest_commit
-# ADD "https://api.github.com/repos/NL-BioImaging/biomero/commits?sha=database&per_page=1" latest_commit
-# and install from git intead of pypi 
 RUN yum -y install ack
-# Install psycopg2 system prerequisites for postgres interaction
-RUN yum install -y python3-devel postgresql-devel gcc
-# Update PATH manually based on known locations
-ENV PATH="/usr/pgsql-12/bin:/usr/pgsql-14/bin:${PATH}"
+
+# Create virtual environment and install ALL packages in it
 RUN python3 -m venv $VIRTUAL_ENV \
-    && python3 -m pip install --upgrade pip \
-    && python3 -m pip install biomero==${BIOMERO_VERSION} \
-    # && python3 -m pip install 'git+https://github.com/NL-BioImaging/biomero.git@database' \
-    && python3 -m pip install ezomero==1.1.1 tifffile==2020.9.3 omero-metadata==0.12.0
+    && $VIRTUAL_ENV/bin/python -m pip install --upgrade pip \
+    && wget https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp39-cp39-manylinux_2_28_x86_64.whl \
+    && $VIRTUAL_ENV/bin/python -m pip install zeroc_ice-3.6.5-cp39-cp39-manylinux_2_28_x86_64.whl \
+    && rm zeroc_ice-3.6.5-cp39-cp39-manylinux_2_28_x86_64.whl \
+    && $VIRTUAL_ENV/bin/python -m pip install omero-cli-zarr==0.5.5 \
+    && $VIRTUAL_ENV/bin/python -m pip install biomero==${BIOMERO_VERSION} \
+    && $VIRTUAL_ENV/bin/python -m pip install ezomero==1.1.1 tifffile==2020.9.3 omero-metadata==0.12.0
 
 ## Adjust processor code with AMC Processor
 # This version forwards HTTP(S) PROXY environment variables to the subprocesses (scripts)
