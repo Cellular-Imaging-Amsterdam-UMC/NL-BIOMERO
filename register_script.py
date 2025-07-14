@@ -556,16 +556,6 @@ def link_to_target(parameter_map, conn, obj):
         print("Linked to Dataset", target.getId())
 
 
-def register(conn, parameter_map):
-
-    filename = parameter_map["Filename"]
-
-
-
-    message = "ok"
-    return message
-
-
 def run_script():
     """
     The main entry point of the script, as called by the client via the
@@ -627,7 +617,6 @@ def run_script():
         if parameter_map.get("target") or parameter_map.get("target_by_name"):
             link_to_target(parameter_map, conn, obj)
 
-        #message = register(conn, parameter_map)
         #client.setOutput("Message", rstring(message))
         if obj is not None:
             client.setOutput("Result", robject(obj))
