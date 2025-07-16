@@ -131,7 +131,10 @@ def load_attrs(uri, transport_params=None, extension=None):
                 with open(path) as f:
                     zattrs = json.load(f)
             if "attributes" in zattrs:
-                zattrs = zattrs["attributes"]["ome"]
+                zattrs_ome = zattrs["attributes"].get("ome")
+                if zattrs_ome is None:
+                    return zattrs
+                zattrs = zattrs_ome
             return zattrs
         except Exception as e:
             pass
@@ -156,7 +159,8 @@ def parse_image_metadata(uri, img_attrs, transport_params=None):
     Parse the image metadata
     """
     multiscale_attrs = img_attrs['multiscales'][0]
-    array_path = multiscale_attrs["datasets"][0]["path"]
+    dataset0 = multiscale_attrs["datasets"][0]
+    array_path = dataset0["path"]
     # load .zarray from path to know the dimension
     array_data = load_attrs(f"{uri}{array_path}/", transport_params=transport_params,
                             extension=".zarray")
@@ -176,7 +180,11 @@ def parse_image_metadata(uri, img_attrs, transport_params=None):
     else:
         data_type_key = "dtype"
     pixels_type = dtype(array_data[data_type_key]).name
-    return sizes, pixels_type
+
+    scale = dataset0.get('coordinateTransformations', [])[0].get('scale', [])
+    pixel_size = {axis['name']: (size, axis.get('unit')) for axis, size in zip(axes, scale)}
+
+    return sizes, pixels_type, pixel_size
 
 
 def create_image(conn, image_attrs, image_uri, object_name, families, models, transport_params=None, endpoint=None,
@@ -186,7 +194,7 @@ def create_image(conn, image_attrs, image_uri, object_name, families, models, tr
     '''
     query_service = conn.getQueryService()
     pixels_service = conn.getPixelsService()
-    sizes, pixels_type = parse_image_metadata(image_uri, image_attrs, transport_params)
+    sizes, pixels_type, pixel_size = parse_image_metadata(image_uri, image_attrs, transport_params)
     size_t = sizes.get("t", 1)
     size_z = sizes.get("z", 1)
     size_x = sizes.get("x", 1)
@@ -200,11 +208,15 @@ def create_image(conn, image_attrs, image_uri, object_name, families, models, tr
                                      conn.SERVICE_OPTS)
     iid = iid.getValue()
 
+    image = conn.getObject("Image", iid)
+    img_obj = image._obj
+
+    # TODO: set the pixel size
+    #set_pixel_size(conn, image.getPixelsId(), pixel_size)
+
     omero_attrs = image_attrs.get('omero', None)
     set_channel_names(conn, iid, omero_attrs)
 
-    image = conn.getObject("Image", iid)
-    img_obj = image._obj
     set_external_info(image_uri, img_obj, endpoint=endpoint, uri_parameters=uri_parameters)
     # Check rendering settings
     rnd_def = set_rendering_settings(omero_attrs, pixels_type, image.getPixelsId(), families, models)
@@ -240,6 +252,18 @@ def set_channel_names(conn, iid, omero_attrs):
     channel_names = get_channels(omero_attrs)
     nameDict = dict((i + 1, name) for i, name in enumerate(channel_names))
     conn.setChannelNames("Image", [iid], nameDict)
+
+
+def set_pixel_size(conn, pixels_id, sizes):
+    pixels = omero.model.PixelsI(pixels_id, False)
+    sizex = sizes.get('x')
+    sizey = sizes.get('y')
+    sizez = sizes.get('z')
+    pixels.physicalSizeX = rlength(sizex)
+    pixels.physicalSizeY = rlength(sizey)
+    pixels.physicalSizeZ = rlength(sizez)
+
+    # or use:? image._obj.getPrimaryPixels().setPhysicalSizeX()
 
 
 def set_rendering_settings(omero_info, pixels_type, pixels_id, families, models):

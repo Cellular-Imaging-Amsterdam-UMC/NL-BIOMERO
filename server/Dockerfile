@@ -35,3 +35,5 @@ RUN curl -o /opt/omero/server/OMERO.server/lib/scripts/omero/util_scripts/Labels
 
 # entrypoint from omero-server dockerfile: 
 # run all /startup/* scripts in alphabetic/numerical order.
+
+COPY server/omero-zarr-pixel-buffer.jar /lib/server/omero-zarr-pixel-buffer.jar
