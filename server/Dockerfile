@@ -18,7 +18,8 @@ ADD server/01-ldap-config.omero /opt/omero/server/config/
 
 # Clone specific release version
 RUN cd /opt/omero/server/OMERO.server/lib/scripts/ && \
-    git clone --depth 1 --branch ${BIOMERO_VERSION} --single-branch https://github.com/NL-BioImaging/biomero-scripts.git biomero
+    git clone --depth 1 --branch ${BIOMERO_VERSION} --single-branch https://github.com/NL-BioImaging/biomero-scripts.git biomero && \
+    rm -f biomero/admin/Example_Minimal_Slurm_Script.py
 
 # Install the Figure-to-PDF script for OMERO.figure plugin
 RUN curl -o /opt/omero/server/OMERO.server/lib/scripts/omero/figure_scripts/Figure_To_Pdf.py \
