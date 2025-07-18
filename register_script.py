@@ -591,7 +591,7 @@ def run_script():
         """ome-zarr register test script.
 """,
 
-        scripts.String("uri", optional=False, description="The URI to the S3 store", grouping="1", default='/data/6001240.zarr/'),
+        scripts.String("uri", optional=False, description="The URI to the S3 store", grouping="1", default='/data/5025553.zarr/'),
         scripts.String("endpoint", optional=True, description="Enter the URL endpoint if applicable", grouping="2"),
         scripts.String("name", optional=True, description="The name of the image/plate", grouping="3"),
         scripts.Bool("nosignrequest", optional=True, description="Indicate to sign anonymously", grouping="4"),
