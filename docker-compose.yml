@@ -8,7 +8,8 @@ services:
   # Name of our database, referenced in omero_db_host
   database:
     # Define a prebuilt Postgres image with a version
-    image: "postgres:11"
+    image: "postgres:16"
+    # image: "postgres:11" # Back to 11 temporarily
     # Define environment variables (user/pass here)
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -147,6 +148,7 @@ services:
       IMPORT_MOUNT_PATH: /data
       FORMS_MASTER_USER: ${FORMS_MASTER_USER}
       FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
+      ADI_ENABLED: ${ADI_ENABLED}
     # Named network to communicate with other containers
     networks:
       - omero
@@ -180,6 +182,8 @@ services:
     build:
       context: https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git#main
     privileged: true
+    profiles:
+      - "adi_enabled"
     devices:
       - "/dev/fuse:/dev/fuse"
     security_opt:
@@ -206,11 +210,10 @@ networks:
 # Define the named volume(s) to persist data to the host computer
 volumes:
   database:
+    external: true
+    # name: nl-biomero_database
+    name: omero-2025-07-24-14-06-06-pg16 # Test the restored data
   database-biomero:
+    external: true
+    name: biomero-2025-07-24-14-06-06-pg16 # Test the restored data
   omero:
-  l-drive:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/web/L-Drive
