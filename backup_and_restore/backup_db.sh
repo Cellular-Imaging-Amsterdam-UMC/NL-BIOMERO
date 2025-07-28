@@ -1,23 +1,44 @@
 #!/bin/bash
 
-# Default parameters
+# Parameters with defaults
 ENV_FILE="./.env"
 CONTAINER_NAME=""
 DB_NAME=""
 USER=""
 OUTPUT_DIRECTORY=""
 DB_TYPE="both"
+CONTAINER_ENGINE=""
+HELP=false
+
+# Function to detect container engine
+detect_container_engine() {
+    if [[ -n "$CONTAINER_ENGINE" ]]; then
+        echo "$CONTAINER_ENGINE"
+        return
+    fi
+    
+    # Check for podman first (often preferred on RHEL/Fedora)
+    if command -v podman >/dev/null 2>&1; then
+        echo "podman"
+    elif command -v docker >/dev/null 2>&1; then
+        echo "docker"
+    else
+        echo "Error: Neither podman nor docker found in PATH" >&2
+        exit 1
+    fi
+}
 
 # Function to show help
 show_help() {
     cat << 'EOF'
-DATABASE BACKUP SCRIPT - Bash
+DATABASE BACKUP SCRIPT - Bash (Docker/Podman)
 
 USAGE:
   ./backup_and_restore/backup_db.sh [OPTIONS]
 
 DESCRIPTION:
   Backup NL-BIOMERO PostgreSQL databases (OMERO and/or BIOMERO) with error handling and validation.
+  Supports both Docker and Podman container engines.
 
 PARAMETERS:
   --envFile <path>         Path to .env file (default: ./.env)
@@ -26,14 +47,18 @@ PARAMETERS:
   --user <username>       Override database user (from .env)
   --outputDirectory <dir> Output directory (default: ./backup_and_restore/backups)
   --dbType <type>         Database to backup: omero|biomero|both (default: both)
+  --containerEngine <eng> Force container engine: docker|podman (auto-detected)
   --help                  Show this help message
 
 EXAMPLES:
-  # Backup both databases (default)
+  # Backup both databases (default, auto-detect container engine)
   ./backup_and_restore/backup_db.sh
 
-  # Backup only OMERO database
-  ./backup_and_restore/backup_db.sh --dbType omero
+  # Force using podman
+  ./backup_and_restore/backup_db.sh --containerEngine podman
+
+  # Backup only OMERO database with docker
+  ./backup_and_restore/backup_db.sh --dbType omero --containerEngine docker
 
   # Backup to custom directory
   ./backup_and_restore/backup_db.sh --outputDirectory "/backup/daily"
@@ -48,12 +73,15 @@ OUTPUT FILES:
   {database}.{timestamp}.pg_dump
   Example: omero.2025-07-24_14-30-15-UTC.pg_dump
 
+CONTAINER ENGINES:
+  Auto-detects podman or docker. Prefers podman if both are available.
+
 For more information, see: backup_and_restore/README.md
 EOF
     exit 0
 }
 
-# Add this case to your parameter parsing while loop:
+# Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
         --help)
@@ -83,17 +111,31 @@ while [[ $# -gt 0 ]]; do
             if [[ "$2" == "omero" || "$2" == "biomero" || "$2" == "both" ]]; then
                 DB_TYPE="$2"
             else
-                echo "Error: dbType must be 'omero', 'biomero', or 'both'"
+                echo "Error: dbType must be 'omero', 'biomero', or 'both'" >&2
+                exit 1
+            fi
+            shift 2
+            ;;
+        --containerEngine)
+            if [[ "$2" == "docker" || "$2" == "podman" ]]; then
+                CONTAINER_ENGINE="$2"
+            else
+                echo "Error: containerEngine must be 'docker' or 'podman'" >&2
                 exit 1
             fi
             shift 2
             ;;
         *)
-            echo "Unknown parameter: $1"
+            echo "Unknown parameter: $1" >&2
+            echo "Use --help for usage information"
             exit 1
             ;;
     esac
 done
+
+# Detect container engine
+ENGINE=$(detect_container_engine)
+echo "Using container engine: $ENGINE"
 
 # Simple .env reader
 declare -A env_hash
@@ -107,6 +149,8 @@ if [[ -f "$ENV_FILE" ]]; then
             env_hash["$key"]="$value"
         fi
     done < "$ENV_FILE"
+else
+    echo "Warning: .env file not found: $ENV_FILE" >&2
 fi
 
 # Single timestamp for all backups
@@ -145,23 +189,24 @@ backup_single() {
     echo "Backing up: ${final_user}@${final_db_name} from ${final_container_name} (${db_type} database)"
     echo "Output: ${final_output}"
 
-    # Backup with error checking
-    if ! docker exec "$final_container_name" pg_dump -Fc -f "/tmp/$filename" "$final_db_name" -U "$final_user"; then
+    # Backup with error checking (using detected container engine)
+    if ! $ENGINE exec "$final_container_name" pg_dump -Fc -f "/tmp/$filename" "$final_db_name" -U "$final_user"; then
         echo "Error: pg_dump failed! Check container name and credentials." >&2
         echo "Container: $final_container_name"
         echo "Database: $final_db_name"
         echo "User: $final_user"
+        echo "Engine: $ENGINE"
         return 1
     fi
 
-    # Copy the backup file
-    if ! docker cp "${final_container_name}:/tmp/${filename}" "$final_output"; then
+    # Copy the backup file (using detected container engine)
+    if ! $ENGINE cp "${final_container_name}:/tmp/${filename}" "$final_output"; then
         echo "Error: Failed to copy backup file!" >&2
         return 1
     fi
 
-    # Cleanup temp file
-    docker exec "$final_container_name" rm "/tmp/$filename"
+    # Cleanup temp file (using detected container engine)
+    $ENGINE exec "$final_container_name" rm "/tmp/$filename"
 
     # Verify the backup size
     if [[ ! -f "$final_output" ]]; then
@@ -169,14 +214,34 @@ backup_single() {
         return 1
     fi
     
-    backup_size=$(stat -f%z "$final_output" 2>/dev/null || stat -c%s "$final_output" 2>/dev/null)
+    # Get file size (cross-platform)
+    if command -v stat >/dev/null 2>&1; then
+        if stat -f%z "$final_output" >/dev/null 2>&1; then
+            # macOS/BSD stat
+            backup_size=$(stat -f%z "$final_output")
+        else
+            # GNU/Linux stat
+            backup_size=$(stat -c%s "$final_output")
+        fi
+    else
+        # Fallback using ls
+        backup_size=$(ls -l "$final_output" | awk '{print $5}')
+    fi
+    
     if [[ $backup_size -lt 10240 ]]; then
         echo "Warning: Backup file is suspiciously small ($backup_size bytes). Check for errors!" >&2
         echo "Content preview:"
         head -10 "$final_output"
         return 1
     else
-        backup_size_mb=$(echo "scale=2; $backup_size / 1048576" | bc -l 2>/dev/null || python3 -c "print(round($backup_size/1048576, 2))")
+        # Calculate size in MB
+        if command -v bc >/dev/null 2>&1; then
+            backup_size_mb=$(echo "scale=2; $backup_size / 1048576" | bc)
+        elif command -v python3 >/dev/null 2>&1; then
+            backup_size_mb=$(python3 -c "print(round($backup_size/1048576, 2))")
+        else
+            backup_size_mb=$(awk "BEGIN {printf \"%.2f\", $backup_size/1048576}")
+        fi
         echo "Backup successful: ${final_output} (${backup_size_mb} MB)"
         return 0
     fi

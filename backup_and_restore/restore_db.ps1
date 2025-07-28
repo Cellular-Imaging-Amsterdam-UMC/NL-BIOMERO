@@ -2,6 +2,7 @@ param(
     [string]$envFile = ".\.env",
     [string]$dumpPath = "",
     [string]$volumeName = "",
+    [string]$localFolder = "",
     [string]$dbName = "",
     [string]$user = "",
     [string]$password = "",
@@ -21,12 +22,13 @@ USAGE:
   .\backup_and_restore\restore_db.ps1 [OPTIONS]
 
 DESCRIPTION:
-  Restore NL-BIOMERO PostgreSQL database dumps to new Docker volumes with optional Postgres version upgrade.
+  Restore NL-BIOMERO PostgreSQL database dumps to new Docker volumes or local folders.
 
 PARAMETERS:
   -envFile <path>           Path to .env file (default: .\.env)
   -dumpPath <path>          Specific dump file path (overrides auto-detection)
-  -volumeName <name>        Override volume name (auto-generated: database-restored, database-biomero-restored)
+  -volumeName <name>        Create Docker volume with this name (auto-generated if not specified)
+  -localFolder <path>       Create local folder instead of Docker volume (mutually exclusive with volumeName)
   -dbName <name>           Override database name (from .env)
   -user <username>         Override database user (from .env)
   -password <password>     Override database password (from .env)
@@ -36,24 +38,39 @@ PARAMETERS:
   -help                   Show this help message
 
 EXAMPLES:
-  # Restore both databases from latest dumps to Postgres 16 (default)
+  # Restore to Docker volumes (default)
   .\backup_and_restore\restore_db.ps1
 
-  # Restore specific dump file
-  .\backup_and_restore\restore_db.ps1 -dumpPath ".\backup.pg_dump" -dbType omero
+  # Restore to local folders
+  .\backup_and_restore\restore_db.ps1 -localFolder "C:\postgres-data"
 
-  # Restore to Postgres 13
-  .\backup_and_restore\restore_db.ps1 -postgresVersion 13
+  # Restore specific dump to local folder
+  .\backup_and_restore\restore_db.ps1 -dumpPath ".\backup.pg_dump" -dbType omero -localFolder ".\restored-db"
 
-  # Custom configuration
-  .\backup_and_restore\restore_db.ps1 -volumeName "my-restored-db" -user "admin" -password "secret"
+OUTPUT:
+  Docker volumes: {dbtype}-{timestamp}-pg{version}
+  Local folders: {path}\{dbtype}-{timestamp}-pg{version}
 
-OUTPUT VOLUMES:
-  Default volume names: database-restored, database-biomero-restored
+USAGE IN DOCKER-COMPOSE:
+  # For Docker volumes
+  database:
+    volumes:
+      - omero-2025-07-24-14-06-06-pg16:/var/lib/postgresql/data
+
+  # For local folders  
+  database:
+    volumes:
+      - ./restored-db/omero-2025-07-24-14-06-06-pg16:/var/lib/postgresql/data
 
 For more information, see: backup_and_restore/README.md
 "@
     exit 0
+}
+
+# Validate mutually exclusive parameters
+if ($volumeName -and $localFolder) {
+    Write-Error "Error: -volumeName and -localFolder are mutually exclusive. Choose one."
+    exit 1
 }
 
 # Simple .env reader
@@ -105,17 +122,15 @@ function Get-DescriptiveVolumeName {
 
 # Function to restore one database
 function Restore-Single {
-    param($dbType, $dumpPath, $volumeName, $dbName, $user, $password, $postgresVersion)
+    param($dbType, $dumpPath, $volumeName, $localFolder, $dbName, $user, $password, $postgresVersion)
     
     # Auto-configure based on database type
     if ($dbType -eq "biomero") {
-        $finalVolumeName = if ($volumeName) { $volumeName } else { Get-DescriptiveVolumeName $dumpPath $dbType $postgresVersion }
         $finalDbName = if ($dbName) { $dbName } else { $envHash['BIOMERO_POSTGRES_DB'] }
         $finalUser = if ($user) { $user } else { $envHash['BIOMERO_POSTGRES_USER'] }
         $finalPassword = if ($password) { $password } else { $envHash['BIOMERO_POSTGRES_PASSWORD'] }
     } else {
         # Default to OMERO
-        $finalVolumeName = if ($volumeName) { $volumeName } else { Get-DescriptiveVolumeName $dumpPath $dbType $postgresVersion }
         $finalDbName = if ($dbName) { $dbName } else { $envHash['POSTGRES_DB'] }
         $finalUser = if ($user) { $user } else { $envHash['POSTGRES_USER'] }
         $finalPassword = if ($password) { $password } else { $envHash['POSTGRES_PASSWORD'] }
@@ -128,17 +143,55 @@ function Restore-Single {
             Write-Error "Could not find dump file for $dbType"
             return $false
         }
-        # Update volume name now that we have the dump path
-        if (-not $volumeName) {
-            $finalVolumeName = Get-DescriptiveVolumeName $dumpPath $dbType $postgresVersion
-        }
     }
 
-    # CHECK IF VOLUME ALREADY EXISTS - QUIT IF IT DOES
-    $existingVolume = docker volume ls -q --filter "name=^${finalVolumeName}$" 2>$null
-    if ($existingVolume) {
-        Write-Error "Volume '$finalVolumeName' already exists! Please remove it first with: docker volume rm $finalVolumeName"
-        return $false
+    # Generate target name/path
+    if ($localFolder) {
+        # LOCAL FOLDER MODE
+        $descriptiveName = Get-DescriptiveVolumeName $dumpPath $dbType $postgresVersion
+        $finalTargetPath = Join-Path $localFolder $descriptiveName
+        $targetType = "local folder"
+        
+        # Check if folder already exists
+        if (Test-Path $finalTargetPath) {
+            Write-Error "Local folder '$finalTargetPath' already exists! Please remove it first or choose a different path."
+            return $false
+        }
+        
+        # Create parent directory
+        $parentDir = Split-Path $finalTargetPath -Parent
+        if (-not (Test-Path $parentDir)) {
+            New-Item -ItemType Directory -Path $parentDir -Force | Out-Null
+        }
+        
+        # Create the target directory
+        New-Item -ItemType Directory -Path $finalTargetPath -Force | Out-Null
+        
+        # Convert to absolute path for Docker
+        $finalTargetPath = (Resolve-Path $finalTargetPath).Path
+        $mountString = "${finalTargetPath}:/var/lib/postgresql/data"
+        
+    } else {
+        # DOCKER VOLUME MODE
+        if ($volumeName) {
+            $finalVolumeName = $volumeName
+        } else {
+            $finalVolumeName = Get-DescriptiveVolumeName $dumpPath $dbType $postgresVersion
+        }
+        $targetType = "Docker volume"
+        
+        # Check if volume already exists
+        $existingVolume = docker volume ls -q --filter "name=^${finalVolumeName}$" 2>$null
+        if ($existingVolume) {
+            Write-Error "Volume '$finalVolumeName' already exists! Please remove it first with: docker volume rm $finalVolumeName"
+            return $false
+        }
+        
+        # Create volume
+        Write-Host "Creating volume: $finalVolumeName"
+        docker volume create $finalVolumeName | Out-Null
+        $mountString = "${finalVolumeName}:/var/lib/postgresql/data"
+        $finalTargetPath = $finalVolumeName  # For display purposes
     }
 
     # Verify dump file exists
@@ -149,7 +202,7 @@ function Restore-Single {
     
     Write-Host "Restoring $dbType database:"
     Write-Host "  From: $dumpPath"
-    Write-Host "  To volume: $finalVolumeName"
+    Write-Host "  To $targetType`: $finalTargetPath"
     Write-Host "  Database: $finalDbName"
     Write-Host "  User: $finalUser"
     Write-Host "  Postgres: $postgresVersion"
@@ -162,14 +215,11 @@ function Restore-Single {
         return $false
     }
     
-    Write-Host "Creating volume: $finalVolumeName"
-    docker volume create $finalVolumeName | Out-Null
-    
     # Start postgres container in background
     Write-Host "Starting PostgreSQL container..."
     $containerId = docker run -d `
         -v "$absoluteDumpPath`:/dump.pg_dump" `
-        -v "$finalVolumeName`:/var/lib/postgresql/data" `
+        -v "$mountString" `
         -e "POSTGRES_PASSWORD=$finalPassword" `
         "postgres:$postgresVersion" 2>$null
 
@@ -215,11 +265,9 @@ function Restore-Single {
         
         Write-Host "Verifying restored data..."
         if ($dbType -eq "biomero") {
-            # Check workflowtracker_events which should have records
             $jobCountOutput = docker exec $containerId psql -U $finalUser -d $finalDbName -t -c "SELECT COUNT(*) FROM workflowtracker_events;" 2>$null
             $tableName = "workflowtracker_events"
         } else {
-            # OMERO uses job table
             $jobCountOutput = docker exec $containerId psql -U $finalUser -d $finalDbName -t -c "SELECT COUNT(*) FROM job;" 2>$null
             $tableName = "job"
         }
@@ -233,13 +281,20 @@ function Restore-Single {
             
             if ([int]$jobCount -gt 0) {
                 $dumpSize = (Get-Item $dumpPath).Length
-                Write-Host "$dbType restore successful: $finalVolumeName ($([math]::Round($dumpSize/1MB, 2)) MB, $jobCount $tableName records)"
-                return $true
+                Write-Host "✅ $dbType restore successful: $finalTargetPath ($([math]::Round($dumpSize/1MB, 2)) MB, $jobCount $tableName records)"
+                
+                # Return the final target for use in summary
+                return @{
+                    success = $true
+                    target = $finalTargetPath
+                    type = $targetType
+                    mount = if ($localFolder) { $mountString } else { $finalVolumeName }
+                }
             }
         }
 
         Write-Error "No data was restored! Could not verify $tableName count from: '$jobCountText'"
-        return $false
+        return @{ success = $false }
         
     } finally {
         # Always clean up the container
@@ -254,33 +309,49 @@ if ($dbType -eq "both") {
     Write-Output "Restoring both databases to Postgres $postgresVersion"
     Write-Output ""
     
-    # Handle single volumeName for both databases
+    # Handle single target for both databases
     if ($volumeName) {
-        $omeroVolume = "$volumeName-omero"
-        $biomeroVolume = "$volumeName-biomero"
+        $omeroTarget = "$volumeName-omero"
+        $biomeroTarget = "$volumeName-biomero"
+        $targetParam = "volumeName"
+    } elseif ($localFolder) {
+        $omeroTarget = $localFolder
+        $biomeroTarget = $localFolder  
+        $targetParam = "localFolder"
     } else {
-        $omeroVolume = ""  # Let function auto-generate
-        $biomeroVolume = "" # Let function auto-generate
+        $omeroTarget = ""
+        $biomeroTarget = ""
+        $targetParam = "volumeName"  # Default
     }
     
-    $omeroSuccess = Restore-Single "omero" $dumpPath $omeroVolume $dbName $user $password $postgresVersion
-    Write-Output ""
-    $biomeroSuccess = Restore-Single "biomero" "" $biomeroVolume "" "" "" $postgresVersion
+    if ($targetParam -eq "volumeName") {
+        $omeroResult = Restore-Single "omero" $dumpPath $omeroTarget "" $dbName $user $password $postgresVersion
+        $biomeroResult = Restore-Single "biomero" "" $biomeroTarget "" "" "" "" $postgresVersion
+    } else {
+        $omeroResult = Restore-Single "omero" $dumpPath "" $omeroTarget $dbName $user $password $postgresVersion  
+        $biomeroResult = Restore-Single "biomero" "" "" $biomeroTarget "" "" "" $postgresVersion
+    }
     
     Write-Output ""
-    if ($omeroSuccess -and $biomeroSuccess) {
+    if ($omeroResult.success -and $biomeroResult.success) {
         Write-Output "*** Both restores completed successfully! ***"
         Write-Output ""
-        Write-Output "Volumes created:"
-        # Show the actual volume names that were created
-        $actualOmeroVolume = if ($volumeName) { "$volumeName-omero" } else { Get-DescriptiveVolumeName (Find-LatestDump $backupDirectory "omero") "omero" $postgresVersion }
-        $actualBiomeroVolume = if ($volumeName) { "$volumeName-biomero" } else { Get-DescriptiveVolumeName (Find-LatestDump $backupDirectory "biomero") "biomero" $postgresVersion }
-        Write-Output "  $actualOmeroVolume"
-        Write-Output "  $actualBiomeroVolume"
+        Write-Output "Targets created:"
+        Write-Output "  OMERO: $($omeroResult.target) ($($omeroResult.type))"
+        Write-Output "  BIOMERO: $($biomeroResult.target) ($($biomeroResult.type))"
+        
+        if ($localFolder) {
+            Write-Output ""
+            Write-Output "To use in docker-compose.yml:"
+            Write-Output "  database:"
+            Write-Output "    volumes:"
+            Write-Output "      - $($omeroResult.mount)"
+            Write-Output "  biomero-database:"  
+            Write-Output "    volumes:"
+            Write-Output "      - $($biomeroResult.mount)"
+        }
     } else {
         Write-Error "*** One or more restores FAILED! ***"
-        Write-Error "OMERO success: $omeroSuccess"
-        Write-Error "BIOMERO success: $biomeroSuccess"
         exit 1
     }
 } else {
@@ -288,13 +359,25 @@ if ($dbType -eq "both") {
     Write-Output "Restoring single database ($dbType) to Postgres $postgresVersion"
     Write-Output ""
     
-    $success = Restore-Single $dbType $dumpPath $volumeName $dbName $user $password $postgresVersion
-    if (-not $success) {
+    if ($localFolder) {
+        $result = Restore-Single $dbType $dumpPath "" $localFolder $dbName $user $password $postgresVersion
+    } else {
+        $result = Restore-Single $dbType $dumpPath $volumeName "" $dbName $user $password $postgresVersion
+    }
+    
+    if (-not $result.success) {
         exit 1
     } else {
         Write-Output ""
         Write-Output "*** Restore completed successfully! ***"
-        $restoredVolume = if ($volumeName) { $volumeName } else { if ($dbType -eq "biomero") { "database-biomero-restored" } else { "database-restored" } }
-        Write-Output "Volume created: $restoredVolume"
+        Write-Output "Target created: $($result.target) ($($result.type))"
+        
+        if ($localFolder) {
+            Write-Output ""
+            Write-Output "To use in docker-compose.yml:"
+            Write-Output "  database:"
+            Write-Output "    volumes:"
+            Write-Output "      - $($result.mount)"
+        }
     }
 }

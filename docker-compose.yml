@@ -21,6 +21,8 @@ services:
     # Define named volumes to persist data on host after shutdown
     volumes:
       - "database:/var/lib/postgresql/data"
+      # - .\backup_and_restore\omero-2025-07-24-14-06-06-pg16:/var/lib/postgresql/data
+       
 
   database-biomero:
     # Define a prebuilt Postgres image with a version
