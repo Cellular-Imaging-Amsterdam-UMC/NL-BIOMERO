@@ -65,11 +65,11 @@ $envContent | ForEach-Object {
 # Single timestamp for all backups
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
 
-# Function to backup one database (your existing logic)
+# Function to backup one database 
 function Backup-Single {
     param($dbType, $containerName, $dbName, $user, $outputDirectory, $timestamp)
     
-    # Auto-configure based on database type (your existing logic)
+    # Auto-configure based on database type 
     if ($dbType -eq "biomero") {
         $finalContainerName = if ($containerName) { $containerName } else { "nl-biomero-database-biomero-1" }
         $finalDbName = if ($dbName) { $dbName } else { $envHash['BIOMERO_POSTGRES_DB'] }
@@ -93,7 +93,7 @@ function Backup-Single {
     Write-Output "Backing up: $finalUser@$finalDbName from $finalContainerName ($dbType database)"
     Write-Output "Output: $finalOutput"
 
-    # Backup with error checking (your existing logic)
+    # Backup with error checking 
     $dumpResult = docker exec $finalContainerName pg_dump -Fc -f "/tmp/$filename" $finalDbName -U $finalUser
     if ($LASTEXITCODE -ne 0) {
         Write-Error "pg_dump failed! Check container name and credentials."
@@ -113,7 +113,7 @@ function Backup-Single {
     # Cleanup temp file
     docker exec $finalContainerName rm "/tmp/$filename"
 
-    # Verify the backup size (your existing logic)
+    # Verify the backup size 
     $backupSize = (Get-Item $finalOutput).Length
     if ($backupSize -lt 10KB) {
         Write-Warning "Backup file is suspiciously small ($backupSize bytes). Check for errors!"

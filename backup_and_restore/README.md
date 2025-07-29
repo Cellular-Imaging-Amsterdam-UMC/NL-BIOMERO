@@ -1,10 +1,14 @@
-# Database Backup & Restore Scripts
+# Database & Server Backup & Restore Scripts
 
-**One-command backup and restore for NL-BIOMERO PostgreSQL databases with PostgreSQL version upgrades.**
+**One-command backup and restore for NL-BIOMERO PostgreSQL databases and OMERO server configuration with PostgreSQL version upgrades.**
+
+For information on OMERO.server backup and restore, please take a look at [OME recommendations](https://omero.readthedocs.io/en/stable/sysadmins/server-backup-and-restore.html) on this topic first. The scripts in our repo will help to combine such backup & restore strategies with the containerized environment promoted in NL-BIOMERO. 
+
+They can also be used to bridge from existing deployments to containerized deployments (and vice versa), by backing up in one and restoring into the other.
 
 ## 🚀 Core Value & Default Behavior
 
-### **Backup** (from running containers)
+### **Database Backup** (from running containers)
 ```powershell
 # Windows - Backs up BOTH databases from running containers
 .\backup_and_restore\backup_db.ps1
@@ -14,7 +18,17 @@
 ```
 **Creates:** `omero.2025-07-24_14-30-15-UTC.pg_dump` + `biomero.2025-07-24_14-30-15-UTC.pg_dump`
 
-### **Restore** (to fresh containers)
+### **Server Backup** (OMERO data store + configuration)
+```powershell
+# Windows - Backs up complete OMERO server (data + config)
+.\backup_and_restore\backup_server.ps1
+
+# Linux/macOS - Auto-detects Docker/Podman
+./backup_and_restore/backup_server.sh
+```
+**Creates:** `omero-server.2025-07-24_14-30-15-UTC.tar.gz` (includes data + config)
+
+### **Database Restore** (to fresh containers)
 ```powershell
 # Windows - Restores BOTH databases to PostgreSQL 16 (latest)
 .\backup_and_restore\restore_db.ps1
@@ -45,22 +59,131 @@
 ## 🎯 Key Features
 
 - ✅ **Zero configuration** - Reads from `.env`, auto-detects containers
-- ✅ **One command for both databases** - OMERO + BIOMERO together
+- ✅ **Complete system backup** - Databases + OMERO server + configuration
 - ✅ **PostgreSQL version upgrades** - Seamless 11→16 migrations
 - ✅ **Smart naming** - Timestamped volumes/folders you can identify
 - ✅ **Flexible targets** - Docker volumes OR local filesystem
 - ✅ **Cross-platform** - Windows PowerShell + Linux/macOS Bash
 - ✅ **Container engine agnostic** - Docker and Podman support (Linux)
 - ✅ **Production ready** - Error handling, validation, cleanup
+- ✅ **Configuration hierarchy** - Multiple ways to restore OMERO config
 
 ---
 
 ## Scripts Available
 
+### Database Scripts
 - **`backup_db.ps1`** - PowerShell (Windows) - Docker only
 - **`backup_db.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
 - **`restore_db.ps1`** - PowerShell (Windows) - Docker only
 - **`restore_db.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
+
+### Server Scripts
+- **`backup_server.ps1`** - PowerShell (Windows) - Docker only
+- **`backup_server.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
+- **`restore_server.ps1`** - PowerShell (Windows) - Docker only
+- **`restore_server.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
+
+---
+
+## OMERO Configuration Restoration 🔧
+
+OMERO configuration is restored using a **hierarchy system** where later options override earlier ones:
+
+### 1. **Backup Configuration** (Automatic) - **Priority: Lowest**
+```bash
+# Automatically loaded by 00-restore-config.sh during container startup
+/OMERO/backup/omero.config
+```
+- ✅ **Restored automatically** from server backups
+- ✅ **Zero configuration** required
+- ✅ **Version-controlled** with your data
+
+### 2. **Custom Config Files** - **Priority: Medium**
+```bash
+# Loaded by 50-config.py during container startup
+/opt/omero/server/config/*.omero
+```
+**Mount custom config files:**
+```yaml
+# docker-compose.yml
+services:
+  omeroserver:
+    volumes:
+      - "./config/custom-ldap.omero:/opt/omero/server/config/02-custom-ldap.omero:ro"
+      - "./config/production.omero:/opt/omero/server/config/03-production.omero:ro"
+```
+
+### 3. **Environment Variables** - **Priority: Highest**
+```yaml
+# docker-compose.yml - CONFIG_ variables override everything
+services:
+  omeroserver:
+    environment:
+      CONFIG_omero_db_host: database
+      CONFIG_omero_db_user: ${POSTGRES_USER}
+      CONFIG_omero_db_pass: ${POSTGRES_PASSWORD}
+      CONFIG_omero_db_name: ${POSTGRES_DB}
+      CONFIG_omero_scripts_timeout: 604800000
+      CONFIG_omero_ldap_config: true
+      CONFIG_omero_ldap_urls: "ldap://10.10.88.57:389"
+```
+
+**Environment Variable Format:**
+```bash
+# OMERO property: omero.ldap.config
+# Env variable:   CONFIG_omero_ldap_config
+
+# OMERO property: omero.db.host  
+# Env variable:   CONFIG_omero_db_host
+
+# OMERO property: omero.web.public.enabled
+# Env variable:   CONFIG_omero_web_public__enabled  # Note: double underscore for dots in property names
+```
+
+### Configuration Examples
+
+#### Development Override
+```yaml
+# Override database connection for development
+services:
+  omeroserver:
+    environment:
+      CONFIG_omero_db_host: dev-database
+      CONFIG_omero_logging_level: 20  # More verbose logging
+```
+
+#### Production Secrets
+```yaml
+# .env file
+LDAP_PASSWORD=MySecretPassword
+OMERO_ADMIN_EMAIL=admin@company.com
+
+# docker-compose.yml
+services:
+  omeroserver:
+    environment:
+      CONFIG_omero_ldap_password: ${LDAP_PASSWORD}
+      CONFIG_omero_mail_smtp_host: mail.company.com
+      CONFIG_omero_mail_from: ${OMERO_ADMIN_EMAIL}
+```
+
+#### Custom LDAP via Config File
+```omero
+# ./config/ldap.omero
+config set -- omero.ldap.config true
+config set -- omero.ldap.urls ldap://company-dc.local:389
+config set -- omero.ldap.base 'OU=Users,DC=company,DC=local'
+config set -- omero.ldap.username 'CN=omero_ldap,OU=Service Accounts,DC=company,DC=local'
+```
+
+```yaml
+# Mount the config file
+services:
+  omeroserver:
+    volumes:
+      - "./config/ldap.omero:/opt/omero/server/config/02-ldap.omero:ro"
+```
 
 ---
 
@@ -68,37 +191,95 @@
 
 ### 1. **Regular Backup** (Production)
 ```powershell
-# Backup running databases daily
+# Backup databases and server daily
 .\backup_and_restore\backup_db.ps1 -outputDirectory "\\backup-server\daily"
+.\backup_and_restore\backup_server.ps1 -outputDirectory "\\backup-server\daily"
 ```
 
-### 2. **Development Restore**
+### 2. **Complete System Restore**
 ```powershell
-# Quick restore for testing
+# 1. Restore databases
+.\backup_and_restore\restore_db.ps1 -postgresVersion 16
+
+# 2. Restore OMERO server
+.\backup_and_restore\restore_server.ps1
+
+# 3. Update docker-compose.yml volume names
+# 4. Start containers - configuration loads automatically
+```
+
+### 3. **Development Environment**
+```powershell
+# Quick restore for testing with custom config
 .\backup_and_restore\restore_db.ps1 -volumeName "dev-test"
+.\backup_and_restore\restore_server.ps1 -volumeName "dev-omero"
+
+# Override with development settings via ENV vars
 ```
 
-### 3. **PostgreSQL Upgrade** (11 → 16)
+### 4. **PostgreSQL Upgrade** (11 → 16)
 ```powershell
-# 1. Backup current database (PostgreSQL 11)
+# 1. Backup current system (PostgreSQL 11)
 .\backup_and_restore\backup_db.ps1
+.\backup_and_restore\backup_server.ps1
 
 # 2. Restore to PostgreSQL 16
 .\backup_and_restore\restore_db.ps1 -postgresVersion 16
+.\backup_and_restore\restore_server.ps1
 
-# 3. Update docker-compose.yml to use new volume names and update postgres container to v16
+# 3. Update docker-compose.yml postgres: "16" and volume names
 ```
 
-### 4. **Migrate to Local Filesystem**
+### 5. **Production Migration**
 ```powershell
-# Restore to local folders for easy file management
-.\backup_and_restore\restore_db.ps1 -localFolder "C:\postgres-data"
+# Restore with production overrides
+.\backup_and_restore\restore_server.ps1 -volumeName "production-omero"
+
+# Set production config via environment variables
+# CONFIG_omero_db_host, CONFIG_omero_ldap_*, etc.
 ```
 
-### 5. **Disaster Recovery**
+---
+
+## Server Backup & Restore Examples
+
+### Server Backup Commands
 ```powershell
+# Full server backup (data + fresh config export)
+.\backup_and_restore\backup_server.ps1
+
+# Export fresh config only (before making changes)  
+.\backup_and_restore\backup_server.ps1 -configOnly
+
+# Backup data without updating config
+.\backup_and_restore\backup_server.ps1 -dataOnly
+
+# Custom output directory
+.\backup_and_restore\backup_server.ps1 -outputDirectory "\\backup-server\omero\$(Get-Date -Format 'yyyy-MM-dd')"
+```
+
+### Server Restore Commands
+```powershell
+# Restore latest backup to Docker volume
+.\backup_and_restore\restore_server.ps1
+
 # Restore specific backup
-.\backup_and_restore\restore_db.ps1 -dumpPath "\\archive\omero.2025-01-15_10-00-00-UTC.pg_dump" -dbType omero
+.\backup_and_restore\restore_server.ps1 -backupPath ".\backups\omero-server.2025-07-24_14-30-00-UTC.tar.gz"
+
+# Restore to local filesystem
+.\backup_and_restore\restore_server.ps1 -targetPath "C:\omero-restored"
+
+# Custom volume name
+.\backup_and_restore\restore_server.ps1 -volumeName "production-omero-restored"
+
+# Restore with custom configuration override
+.\backup_and_restore\restore_server.ps1 -backupPath ".\backups\omero-server.2025-07-24_14-30-00-UTC.tar.gz" -configFile ".\config\production.omero.config"
+
+# Development environment with custom config
+.\backup_and_restore\restore_server.ps1 -configFile ".\config\dev.omero.config" -volumeName "dev-omero"
+
+# Restore old backup with updated LDAP settings
+.\backup_and_restore\restore_server.ps1 -backupPath "old-system.tar.gz" -configFile ".\config\new-ldap.omero.config"
 ```
 
 ---
@@ -112,7 +293,7 @@
 ```bash
 # Force specific engine on Linux
 ./backup_and_restore/backup_db.sh --containerEngine podman
-./backup_and_restore/restore_db.sh --containerEngine docker
+./backup_and_restore/backup_server.sh --containerEngine docker
 ```
 
 ---
@@ -122,23 +303,26 @@
 ### Backup Files
 ```
 backup_and_restore/backups/
-├── omero.2025-07-24_14-30-15-UTC.pg_dump     (10.5 MB)
-└── biomero.2025-07-24_14-30-15-UTC.pg_dump   (0.04 MB)
+├── omero.2025-07-24_14-30-15-UTC.pg_dump         (10.5 MB)
+├── biomero.2025-07-24_14-30-15-UTC.pg_dump       (0.04 MB)
+└── omero-server.2025-07-24_14-30-15-UTC.tar.gz   (2.1 GB)
 ```
 
 ### Restore Targets
 
 **Docker volumes** (default):
 ```
-omero-2025-07-24-14-30-15-pg16
-biomero-2025-07-24-14-30-15-pg16
+omero-2025-07-24-14-30-15-pg16      # Database
+biomero-2025-07-24-14-30-15-pg16    # Database  
+omero-server-2025-07-24-14-30-15    # OMERO data
 ```
 
-**Local folders** (with `-localFolder`):
+**Local folders** (with `-localFolder`/`-targetPath`):
 ```
-C:\postgres-data\
-├── omero-2025-07-24-14-30-15-pg16\
-└── biomero-2025-07-24-14-30-15-pg16\
+C:\restored-data\
+├── omero-2025-07-24-14-30-15-pg16\      # Database
+├── biomero-2025-07-24-14-30-15-pg16\    # Database
+└── omero-server-2025-07-24-14-30-15\    # OMERO data
 ```
 
 ---
@@ -157,11 +341,189 @@ POSTGRES_PASSWORD=omero
 BIOMERO_POSTGRES_DB=biomero
 BIOMERO_POSTGRES_USER=biomero
 BIOMERO_POSTGRES_PASSWORD=biomero
+
+# OMERO Configuration Overrides (optional)
+LDAP_PASSWORD=MySecretPassword
+OMERO_ADMIN_EMAIL=admin@company.com
 ```
 
 **Default container names:**
-- OMERO: `nl-biomero-database-1`
-- BIOMERO: `nl-biomero-database-biomero-1`
+- OMERO Database: `nl-biomero-database-1`
+- BIOMERO Database: `nl-biomero-database-biomero-1`
+- OMERO Server: `nl-biomero-omeroserver-1`
+
+---
+
+## Integration with docker-compose.yml
+
+### After Database Restore
+```yaml
+# Update volume names to use restored databases
+volumes:
+  database:
+    external: true
+    name: omero-2025-07-24-14-06-06-pg16  # Restored database
+  database-biomero:
+    external: true
+    name: biomero-2025-07-24-14-06-06-pg16  # Restored database
+```
+
+### After Server Restore
+```yaml
+# Update OMERO server volume
+volumes:
+  omero:
+    external: true
+    name: omero-server-2025-07-24-14-30-15  # Restored server data
+```
+
+### Configuration Hierarchy in Practice
+```yaml
+services:
+  omeroserver:
+    volumes:
+      # 1. Backup config loaded automatically from volume
+      - "omero:/OMERO"  # Contains /OMERO/backup/omero.config
+      
+      # 2. Custom config files (override backup config)
+      - "./config/ldap.omero:/opt/omero/server/config/02-ldap.omero:ro"
+      - "./config/production.omero:/opt/omero/server/config/03-production.omero:ro"
+    
+    environment:
+      # 3. Environment variables (override everything)
+      CONFIG_omero_db_host: database
+      CONFIG_omero_db_user: ${POSTGRES_USER}
+      CONFIG_omero_db_pass: ${POSTGRES_PASSWORD}
+      CONFIG_omero_ldap_password: ${LDAP_PASSWORD}  # From .env file
+      CONFIG_omero_logging_level: 10
+```
+
+## Configuration Override for Server Restore 🔧
+
+The server restore scripts support **configuration override** for flexible deployment scenarios:
+
+### Custom Configuration Files
+
+Create OMERO configuration files in standard format:
+
+```ini
+# filepath: ./config/production.omero.config
+# Production OMERO Configuration
+omero.db.host=prod-database.company.com
+omero.db.name=omero_prod
+omero.db.user=omero_prod
+omero.db.pass=SecureProductionPassword123
+omero.ldap.config=true
+omero.ldap.urls=ldaps://prod-ldap.company.com:636
+omero.ldap.base=OU=Users,OU=Production,DC=company,DC=com
+omero.ldap.username=CN=omero_ldap_prod,OU=Service Accounts,DC=company,DC=com
+omero.ldap.password=ProductionLdapPassword
+omero.mail.smtp.host=mail.company.com
+omero.mail.from=omero-prod@company.com
+omero.scripts.timeout=3600000
+```
+
+```ini
+# filepath: ./config/dev.omero.config
+# Development OMERO Configuration  
+omero.db.host=localhost
+omero.db.name=omero_dev
+omero.db.user=omero
+omero.db.pass=omero
+omero.ldap.config=false
+omero.logging.level=DEBUG
+omero.scripts.timeout=60000
+omero.web.debug=true
+```
+
+```ini
+# filepath: ./config/new-ldap.omero.config
+# Updated LDAP configuration for server migration
+omero.ldap.config=true
+omero.ldap.urls=ldap://new-ldap-server.company.com:389
+omero.ldap.base=OU=Users,OU=NewStructure,DC=company,DC=local
+omero.ldap.username=CN=omero_service,OU=ServiceAccounts,DC=company,DC=local
+omero.ldap.password=NewSecurePassword123
+omero.ldap.user_filter=(sAMAccountName=*)
+omero.ldap.user_mapping=omeName=sAMAccountName,firstName=givenName,lastName=sn,email=mail
+omero.ldap.group_filter=(objectClass=group)
+omero.ldap.group_mapping=name=cn
+```
+
+### Configuration Override Use Cases
+
+#### 1. **Production Migration**
+```powershell
+# Restore production data with updated production config
+.\backup_and_restore\restore_server.ps1 -backupPath "prod-backup.tar.gz" -configFile ".\config\production.omero.config"
+```
+
+#### 2. **Development Environment**
+```powershell
+# Create dev environment from production backup
+.\backup_and_restore\restore_server.ps1 -backupPath "prod-backup.tar.gz" -configFile ".\config\dev.omero.config" -volumeName "dev-omero"
+```
+
+#### 3. **Server Infrastructure Changes**
+```powershell
+# Restore after LDAP server migration
+.\backup_and_restore\restore_server.ps1 -backupPath "old-system.tar.gz" -configFile ".\config\new-ldap.omero.config"
+```
+
+#### 4. **Testing Configurations**
+```powershell
+# Test new LDAP settings with existing data
+.\backup_and_restore\restore_server.ps1 -configFile ".\config\test-ldap.omero.config" -volumeName "test-omero"
+```
+
+### Configuration Priority Order
+
+When using `-configFile`/`--configFile`, the **custom configuration completely replaces** the backup config:
+
+1. ❌ **Backup config** - Ignored when custom config provided
+2. ✅ **Custom config file** - Loaded from `/OMERO/backup/omero.config`
+3. ✅ **Mounted .omero files** - Still loaded from `/opt/omero/server/config/*.omero`
+4. ✅ **Environment variables** - Still override everything (`CONFIG_*`)
+
+### Configuration File Format
+
+The config files use the **standard OMERO config dump format** (same as `omero config get` output):
+
+```bash
+# Get current config to use as template
+docker exec nl-biomero-omeroserver-1 /opt/omero/server/venv3/bin/omero config get > current-config.omero.config
+
+# Edit and use as custom config
+.\backup_and_restore\restore_server.ps1 -configFile "current-config.omero.config"
+```
+
+### Configuration Validation
+
+The restore scripts perform basic validation:
+- ✅ **File exists** - Checks if config file is accessible
+- ✅ **Format check** - Looks for `omero.` properties or comments
+- ✅ **Interactive confirmation** - Asks to continue if format looks suspicious
+- ✅ **Installation verification** - Confirms config was written to `/OMERO/backup/omero.config`
+
+### Combining with Environment Variables
+
+You can still use environment variables to override specific settings:
+
+```yaml
+# docker-compose.yml - Override database settings while keeping LDAP from custom config
+services:
+  omeroserver:
+    environment:
+      # These override the custom config file
+      CONFIG_omero_db_host: new-database-server
+      CONFIG_omero_db_name: ${POSTGRES_DB}
+      CONFIG_omero_db_user: ${POSTGRES_USER}
+      CONFIG_omero_db_pass: ${POSTGRES_PASSWORD}
+    volumes:
+      - "omero:/OMERO"  # Contains custom config in /OMERO/backup/omero.config
+```
+
+This gives you **maximum flexibility** for different deployment scenarios while maintaining the automatic configuration loading! 🤖✅
 
 ---
 
@@ -171,10 +533,14 @@ BIOMERO_POSTGRES_PASSWORD=biomero
 # Windows - Built-in help
 .\backup_and_restore\backup_db.ps1 -help
 .\backup_and_restore\restore_db.ps1 -help
+.\backup_and_restore\backup_server.ps1 -help
+.\backup_and_restore\restore_server.ps1 -help
 
 # Linux/macOS - Built-in help
 ./backup_and_restore/backup_db.sh --help
 ./backup_and_restore/restore_db.sh --help
+./backup_and_restore/backup_server.sh --help
+./backup_and_restore/restore_server.sh --help
 ```
 
 ---
@@ -188,190 +554,15 @@ BIOMERO_POSTGRES_PASSWORD=biomero
 
 ---
 
-## Complete Parameter Reference
-
-### Backup Scripts
-
-#### PowerShell (`backup_db.ps1`)
-```powershell
-# All parameters with examples
-.\backup_and_restore\backup_db.ps1 `
-    -envFile ".\.env" `                          # Config file location
-    -containerName "custom-database-1" `        # Override OMERO container name
-    -dbName "custom_omero" `                     # Override database name
-    -user "admin" `                              # Override database user
-    -outputDirectory "C:\Backups\Daily" `       # Custom backup location
-    -dbType "omero"                              # omero|biomero|both (default: both)
-
-# Individual database backups
-.\backup_and_restore\backup_db.ps1 -dbType omero
-.\backup_and_restore\backup_db.ps1 -dbType biomero
-
-# Custom container configuration
-.\backup_and_restore\backup_db.ps1 -containerName "my-omero-db" -user "postgres"
-
-# Production backup with custom directory
-.\backup_and_restore\backup_db.ps1 -outputDirectory "\\backup-server\nl-biomero\$(Get-Date -Format 'yyyy-MM-dd')"
-```
-
-#### Bash (`backup_db.sh`)
-```bash
-# All parameters with examples
-./backup_and_restore/backup_db.sh \
-    --envFile "./.env" \                         # Config file location
-    --containerName "custom-database-1" \       # Override OMERO container name
-    --dbName "custom_omero" \                    # Override database name
-    --user "admin" \                             # Override database user
-    --outputDirectory "/backup/daily" \         # Custom backup location
-    --dbType "omero" \                           # omero|biomero|both (default: both)
-    --containerEngine "podman"                  # docker|podman (auto-detected)
-
-# Force container engine
-./backup_and_restore/backup_db.sh --containerEngine docker
-./backup_and_restore/backup_db.sh --containerEngine podman
-
-# Production backup
-./backup_and_restore/backup_db.sh --outputDirectory "/mnt/backup-server/$(date +%Y-%m-%d)"
-```
-
-### Restore Scripts
-
-#### PowerShell (`restore_db.ps1`)
-```powershell
-# All parameters with examples
-.\backup_and_restore\restore_db.ps1 `
-    -envFile ".\.env" `                          # Config file location
-    -dumpPath ".\custom-backup.pg_dump" `       # Specific dump file (overrides auto-detection)
-    -volumeName "my-restored-db" `               # Custom Docker volume name
-    -localFolder "C:\PostgresData" `            # Restore to local filesystem (mutually exclusive with volumeName)
-    -dbName "custom_omero" `                     # Override database name
-    -user "admin" `                              # Override database user
-    -password "secret123" `                      # Override database password
-    -dbType "omero" `                            # omero|biomero|both (default: both)
-    -postgresVersion "13" `                      # PostgreSQL version: 11,12,13,14,15,16 (default: 16)
-    -backupDirectory "C:\CustomBackups"         # Directory to search for dumps
-
-# PostgreSQL version upgrades
-.\backup_and_restore\restore_db.ps1 -postgresVersion 11  # Restore to PostgreSQL 11
-.\backup_and_restore\restore_db.ps1 -postgresVersion 13  # Restore to PostgreSQL 13
-.\backup_and_restore\restore_db.ps1 -postgresVersion 16  # Restore to PostgreSQL 16 (default)
-
-# Docker volume targets (default)
-.\backup_and_restore\restore_db.ps1 -volumeName "test-db"                    # Custom volume name
-.\backup_and_restore\restore_db.ps1                                          # Auto-generated: omero-2025-07-24-14-30-15-pg16
-
-# Local filesystem targets  
-.\backup_and_restore\restore_db.ps1 -localFolder "C:\MyDatabases"           # Creates subdirectories
-.\backup_and_restore\restore_db.ps1 -localFolder "\\server\databases"      # Network location
-
-# Specific dump files
-.\backup_and_restore\restore_db.ps1 -dumpPath ".\omero.2025-01-15_10-00-00-UTC.pg_dump" -dbType omero
-.\backup_and_restore\restore_db.ps1 -dumpPath "\\archive\old-backup.pg_dump" -dbType biomero -postgresVersion 11
-
-# Custom database configuration
-.\backup_and_restore\restore_db.ps1 -user "postgres" -password "admin123" -dbName "production_omero"
-
-# Production restore from archive
-.\backup_and_restore\restore_db.ps1 `
-    -dumpPath "\\backup-server\2025-01-15\omero.2025-01-15_10-00-00-UTC.pg_dump" `
-    -dbType omero `
-    -volumeName "production-restore-$(Get-Date -Format 'MMdd')" `
-    -postgresVersion 16
-```
-
-#### Bash (`restore_db.sh`)
-```bash
-# All parameters with examples
-./backup_and_restore/restore_db.sh \
-    --envFile "./.env" \                         # Config file location
-    --dumpPath "./custom-backup.pg_dump" \      # Specific dump file
-    --volumeName "my-restored-db" \              # Custom Docker volume name
-    --localFolder "/var/lib/postgres-data" \    # Restore to local filesystem
-    --dbName "custom_omero" \                    # Override database name
-    --user "admin" \                             # Override database user
-    --password "secret123" \                     # Override database password
-    --dbType "omero" \                           # omero|biomero|both (default: both)
-    --postgresVersion "13" \                     # PostgreSQL version (default: 16)
-    --backupDirectory "/backup/archive" \       # Directory to search for dumps
-    --containerEngine "podman"                  # docker|podman (auto-detected)
-
-# PostgreSQL version upgrades
-./backup_and_restore/restore_db.sh --postgresVersion 11
-./backup_and_restore/restore_db.sh --postgresVersion 16
-
-# Container engine selection
-./backup_and_restore/restore_db.sh --containerEngine docker
-./backup_and_restore/restore_db.sh --containerEngine podman
-
-# Local filesystem restore
-./backup_and_restore/restore_db.sh --localFolder "/mnt/databases"
-./backup_and_restore/restore_db.sh --localFolder "./restored-data"
-
-# Production scenarios
-./backup_and_restore/restore_db.sh \
-    --dumpPath "/backup/archive/omero.2025-01-15_10-00-00-UTC.pg_dump" \
-    --dbType omero \
-    --volumeName "production-restore-$(date +%m%d)" \
-    --postgresVersion 16 \
-    --containerEngine podman
-```
-
-### Parameter Combinations
-
-```powershell
-# INVALID - Mutually exclusive
-.\backup_and_restore\restore_db.ps1 -volumeName "test" -localFolder "C:\data"  # ❌ Error
-
-# VALID - Volume with custom name
-.\backup_and_restore\restore_db.ps1 -volumeName "my-test-db" -dbType omero    # ✅ Creates Docker volume
-
-# VALID - Local folder with auto-naming
-.\backup_and_restore\restore_db.ps1 -localFolder "C:\databases"              # ✅ Creates C:\databases\omero-2025-07-24-14-30-15-pg16\
-
-# VALID - Both databases to same base location
-.\backup_and_restore\restore_db.ps1 -localFolder "C:\databases"              # ✅ Creates separate subdirectories
-```
-
----
-
-## Integration with docker-compose.yml
-
-### Docker Volumes (Default)
-```yaml
-# After restore, update your docker-compose.yml named volumes
-# Define the named volume(s) to persist data to the host computer
-volumes:
-  database:
-    external: true
-    # name: nl-biomero_database
-    name: omero-2025-07-24-14-06-06-pg16 # Restored database
-  database-biomero:
-    external: true
-    name: biomero-2025-07-24-14-06-06-pg16 # Restored database
-```
-
-### Local Folders (with -localFolder)
-```yaml
-# Mount local folders directly at the services level
-services:
-  database:
-    volumes:
-      - ./restored-data/omero-2025-07-24-14-30-15-pg16:/var/lib/postgresql/data
-  
-  database-biomero:
-    volumes:
-      - ./restored-data/biomero-2025-07-24-14-30-15-pg16:/var/lib/postgresql/data
-```
-
----
-
 ## Troubleshooting
 
 **Container not found:** Check `docker ps` or `podman ps` for running containers  
 **Permission denied:** Ensure container engine has access to dump/target paths  
 **Small backup file:** Verify container names and database credentials in `.env`  
 **Volume exists:** Remove existing volume with `docker volume rm <name>`  
-**Restore failed:** Check PostgreSQL logs with `docker logs <container-id>`
+**Restore failed:** Check PostgreSQL logs with `docker logs <container-id>`  
+**Config not loading:** Check `/OMERO/backup/omero.config` exists in restored volume  
 
 **Check volumes:** `docker volume ls` or `podman volume ls`  
-**Check local folders:** Ensure parent directory exists and has write permissions
+**Check local folders:** Ensure parent directory exists and has write permissions  
+**Debug config:** `docker exec <omero-container> /opt/omero/server/venv3/bin/omero config get`
