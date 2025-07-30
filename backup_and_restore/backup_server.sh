@@ -5,6 +5,7 @@ ENV_FILE="./.env"
 CONTAINER_NAME=""
 OUTPUT_DIRECTORY=""
 VOLUME_NAME=""
+TIMESTAMP=""
 CONFIG_ONLY=false
 DATA_ONLY=false
 CONTAINER_ENGINE=""
@@ -110,6 +111,10 @@ while [[ $# -gt 0 ]]; do
             DATA_ONLY=true
             shift
             ;;
+        --timestamp)
+            TIMESTAMP="$2"
+            shift 2
+            ;;
         --containerEngine)
             if [[ "$2" == "docker" || "$2" == "podman" ]]; then
                 CONTAINER_ENGINE="$2"
@@ -148,7 +153,14 @@ FINAL_CONTAINER_NAME="${CONTAINER_NAME:-nl-biomero-omeroserver-1}"
 FINAL_OUTPUT_DIR="${OUTPUT_DIRECTORY:-./backup_and_restore/backups}"
 
 # Single timestamp for all backups
-timestamp=$(date '+%Y-%m-%d_%H-%M-%S-UTC')
+if [[ -n "$TIMESTAMP" ]]; then
+    # Use provided timestamp for coordinated backups
+    timestamp="$TIMESTAMP"
+    echo "Using provided timestamp: $timestamp"
+else
+    # Generate new timestamp
+    timestamp=$(date '+%Y-%m-%d_%H-%M-%S-UTC')
+fi
 
 # Create output directory
 mkdir -p "$FINAL_OUTPUT_DIR"
@@ -168,11 +180,19 @@ data_success=true
 if [[ "$DATA_ONLY" != "true" ]]; then
     echo "Exporting OMERO configuration to /OMERO/backup/omero.config..."
     
+    # Check if container exists and is running
+    if ! $ENGINE ps --filter "name=${FINAL_CONTAINER_NAME}" --format "{{.Names}}" | grep -q "^${FINAL_CONTAINER_NAME}$"; then
+        echo "Error: Container '${FINAL_CONTAINER_NAME}' not found or not running" >&2
+        echo "Available containers:" >&2
+        $ENGINE ps --format "table {{.Names}}\t{{.Status}}" >&2
+        exit 1
+    fi
+    
     # Create backup directory and export config - all in the server container
     config_cmd="mkdir -p /OMERO/backup && /opt/omero/server/venv3/bin/omero config get --show-password > /OMERO/backup/omero.config"
     
     if $ENGINE exec "$FINAL_CONTAINER_NAME" sh -c "$config_cmd" >/dev/null 2>&1; then
-        echo ">> Configuration exported to /OMERO/backup/omero.config"
+        echo "[OK] Configuration exported to /OMERO/backup/omero.config"
     else
         echo "Error: Failed to export OMERO configuration" >&2
         config_success=false
@@ -187,39 +207,56 @@ if [[ "$CONFIG_ONLY" != "true" ]]; then
     
     echo "Creating tar.gz archive (this may take a while)..."
     
+    # Check if container exists and is running
+    if ! $ENGINE ps --filter "name=${FINAL_CONTAINER_NAME}" --format "{{.Names}}" | grep -q "^${FINAL_CONTAINER_NAME}$"; then
+        echo "Error: Container '${FINAL_CONTAINER_NAME}' not found or not running" >&2
+        exit 1
+    fi
+    
     # Create tar archive - all in the server container
     backup_cmd="cd /OMERO && tar -czf /tmp/$data_file . && echo 'Archive created successfully'"
     
     if $ENGINE exec "$FINAL_CONTAINER_NAME" sh -c "$backup_cmd" >/dev/null 2>&1; then
         # Copy archive to host
-        if $ENGINE cp "$FINAL_CONTAINER_NAME:/tmp/$data_file" "$host_data_file"; then
+        if $ENGINE cp "$FINAL_CONTAINER_NAME:/tmp/$data_file" "$host_data_file" 2>/dev/null; then
             # Cleanup temp file in container
             $ENGINE exec "$FINAL_CONTAINER_NAME" rm "/tmp/$data_file" >/dev/null 2>&1
             
-            # Get file size (cross-platform)
-            if command -v stat >/dev/null 2>&1; then
-                if stat -f%z "$host_data_file" >/dev/null 2>&1; then
-                    # macOS/BSD stat
-                    data_size=$(stat -f%z "$host_data_file")
+            # Verify file was created and has reasonable size
+            if [[ -f "$host_data_file" ]]; then
+                # Get file size (cross-platform)
+                if command -v stat >/dev/null 2>&1; then
+                    if stat -f%z "$host_data_file" >/dev/null 2>&1; then
+                        # macOS/BSD stat
+                        data_size=$(stat -f%z "$host_data_file")
+                    else
+                        # GNU/Linux stat
+                        data_size=$(stat -c%s "$host_data_file")
+                    fi
                 else
-                    # GNU/Linux stat
-                    data_size=$(stat -c%s "$host_data_file")
+                    # Fallback using ls
+                    data_size=$(ls -l "$host_data_file" | awk '{print $5}')
+                fi
+                
+                # Check if file is too small (less than 1MB is suspicious for OMERO server)
+                if [[ $data_size -lt 1048576 ]]; then
+                    echo "Error: Archive file is suspiciously small ($(echo "scale=2; $data_size / 1024" | bc) KB)" >&2
+                    data_success=false
+                else
+                    # Calculate size in MB
+                    if command -v bc >/dev/null 2>&1; then
+                        data_size_mb=$(echo "scale=2; $data_size / 1048576" | bc)
+                    elif command -v python3 >/dev/null 2>&1; then
+                        data_size_mb=$(python3 -c "print(round($data_size/1048576, 2))")
+                    else
+                        data_size_mb=$(awk "BEGIN {printf \"%.2f\", $data_size/1048576}")
+                    fi
+                    echo "[OK] Complete OMERO backup: $host_data_file ($data_size_mb MB)"
                 fi
             else
-                # Fallback using ls
-                data_size=$(ls -l "$host_data_file" | awk '{print $5}')
+                echo "Error: Archive file was not created: $host_data_file" >&2
+                data_success=false
             fi
-            
-            # Calculate size in MB
-            if command -v bc >/dev/null 2>&1; then
-                data_size_mb=$(echo "scale=2; $data_size / 1048576" | bc)
-            elif command -v python3 >/dev/null 2>&1; then
-                data_size_mb=$(python3 -c "print(round($data_size/1048576, 2))")
-            else
-                data_size_mb=$(awk "BEGIN {printf \"%.2f\", $data_size/1048576}")
-            fi
-            
-            echo ">> Complete OMERO backup: $host_data_file ($data_size_mb MB)"
         else
             echo "Error: Failed to copy OMERO archive from container" >&2
             data_success=false
@@ -232,7 +269,7 @@ fi
 
 echo ""
 if [[ "$config_success" == "true" && "$data_success" == "true" ]]; then
-    echo "*** OMERO server backup completed successfully! ***"
+    echo "[SUCCESS] OMERO server backup completed successfully!"
     echo ""
     
     if [[ "$CONFIG_ONLY" == "true" ]]; then
@@ -246,10 +283,18 @@ if [[ "$config_success" == "true" && "$data_success" == "true" ]]; then
         echo "  omero-server.$timestamp.tar.gz"
         echo ""
         echo "Backup includes:"
-        echo ">> OMERO binary data store"
-        echo ">> Current configuration (/OMERO/backup/omero.config)"
+        echo "[OK] OMERO binary data store"
+        echo "[OK] Current configuration (/OMERO/backup/omero.config)"
     fi
+    exit 0
 else
-    echo "*** OMERO server backup failed! ***" >&2
+    echo "[FAIL] OMERO server backup failed!" >&2
+    if [[ "$config_success" != "true" ]]; then echo "  - Configuration export failed" >&2; fi
+    if [[ "$data_success" != "true" ]]; then echo "  - Data archive creation failed" >&2; fi
+    echo "" >&2
+    echo "Troubleshooting:" >&2
+    echo "  - Ensure container '$FINAL_CONTAINER_NAME' is running: $ENGINE ps" >&2
+    echo "  - Check container logs: $ENGINE logs $FINAL_CONTAINER_NAME" >&2
+    echo "  - Verify OMERO server is operational" >&2
     exit 1
 fi

@@ -1,12 +1,110 @@
-# Database & Server Backup & Restore Scripts
+# Database, Server & Metabase Backup & Restore Scripts
 
-**One-command backup and restore for NL-BIOMERO PostgreSQL databases and OMERO server configuration with PostgreSQL version upgrades.**
+**One-command backup and restore for NL-BIOMERO PostgreSQL databases, OMERO server configuration, and Metabase dashboards with PostgreSQL version upgrades.**
 
 For information on OMERO.server backup and restore, please take a look at [OME recommendations](https://omero.readthedocs.io/en/stable/sysadmins/server-backup-and-restore.html) on this topic first. The scripts in our repo will help to combine such backup & restore strategies with the containerized environment promoted in NL-BIOMERO. 
 
 They can also be used to bridge from existing deployments to containerized deployments (and vice versa), by backing up in one and restoring into the other.
 
-## 🚀 Core Value & Default Behavior
+## ⚠️ Important Backup Prerequisites
+
+Before running any backup, ensure data consistency by preventing any modifications during the backup process.
+
+Possible steps to achieve this:
+
+1. Stop containers that could modify data:
+  - Web interface containers (prevents user access), OMERO web or NGINX
+  - Import processing containers, ADI
+  - **Metabase container** (prevents dashboard/config changes)
+  - Keep only PostgreSQL and OMERO server running
+
+2. Verify no active operations:
+  - No ongoing imports/exports
+  - No background tasks
+  - No user sessions
+  - No Metabase dashboard editing
+
+Choose the appropriate measures for your setup to ensure no data changes occur during backup.
+
+## 🎯 Master Backup Script
+
+### **Synchronized Database + Server Backup** (Recommended)
+```powershell
+# Windows - Backup ALL databases AND server with same timestamp
+.\backup_and_restore\backup_master.ps1
+
+# Linux/macOS - Auto-detects Docker/Podman
+./backup_and_restore/backup_master.sh
+```
+**Creates:** All backups with **consistent timestamp** to ensure data integrity:
+- `omero.2025-07-24_14-30-15-UTC.pg_dump`
+- `biomero.2025-07-24_14-30-15-UTC.pg_dump` 
+- `omero-server.2025-07-24_14-30-15-UTC.tar.gz`
+- `metabase.2025-07-24_14-30-15-UTC.tar.gz`
+
+
+**�️ Data Consistency:** Single timestamp ensures no data loss from changes made between separate backup operations.
+
+### Master Backup Options
+```powershell
+# Parallel execution (possibly faster, but server generally takes way longer than the rest)
+.\backup_and_restore\backup_master.ps1 -parallel
+
+# Only OMERO database + server (skip BIOMERO database and Metabase)
+.\backup_and_restore\backup_master.ps1 -dbType omero -skipMetabase
+
+# Only databases and Metabase (skip server backup for quick daily backups)
+.\backup_and_restore\backup_master.ps1 -skipServer
+
+# Only server and Metabase (skip postgres databases)
+.\backup_and_restore\backup_master.ps1 -skipDatabase
+
+# Skip Metabase backup (if not using custom dashboards/config)
+.\backup_and_restore\backup_master.ps1 -skipMetabase
+
+# Force overwrite without confirmation
+.\backup_and_restore\backup_master.ps1 -force
+```
+
+---
+
+## � Typical Backup & Restore Workflow
+
+### **Production Backup Routine**
+```powershell
+# 1. Prepare system for backup
+docker-compose stop omeroweb metabase omeroadi  # Stop user-facing services
+# Keep omeroserver, databases running
+
+# 2. Create complete synchronized backup
+.\backup_and_restore\backup_master.ps1
+
+# 3. Restart services
+docker-compose up -d
+```
+
+### **Disaster Recovery Restore**
+```powershell
+# 1. Stop all services
+docker-compose down
+
+# 2. Restore databases (with PostgreSQL upgrade)
+.\backup_and_restore\restore_db.ps1 -postgresVersion 16
+
+# 3. Restore OMERO server data
+.\backup_and_restore\restore_server.ps1 -backupFile "omero-server.2025-07-24_14-30-15-UTC.tar.gz"
+
+# 4. Restore Metabase dashboards (auto-detects latest backup)
+.\backup_and_restore\restore_metabase.ps1
+
+# 5. Update docker-compose.yml to use restored volumes
+# 6. Start all services
+docker-compose up -d
+```
+
+---
+
+## 🚀 Individual Script Usage (Legacy/Advanced)
 
 ### **Database Backup** (from running containers)
 ```powershell
@@ -28,6 +126,39 @@ They can also be used to bridge from existing deployments to containerized deplo
 ```
 **Creates:** `omero-server.2025-07-24_14-30-15-UTC.tar.gz` (includes data + config)
 
+### **Metabase Backup** (dashboards + configurations)
+```powershell
+# Windows - Backs up Metabase H2 database and config
+.\backup_and_restore\backup_metabase.ps1
+
+# Linux/macOS
+./backup_and_restore/backup_metabase.sh
+```
+**Creates:** `metabase.2025-07-24_14-30-15-UTC.tar.gz` (includes dashboards, users, settings)
+
+**What's backed up:**
+- H2 database files (metabase.db.*)
+- Custom dashboards and visualizations
+- Data source configurations
+- User accounts and permissions
+- Custom settings and preferences
+
+### **Metabase Restore** (dashboards + configurations)
+```powershell
+# Windows - Auto-detect latest backup, restore to .\metabase
+.\backup_and_restore\restore_metabase.ps1
+
+# Restore to specific directory
+.\backup_and_restore\restore_metabase.ps1 -restoreDirectory "C:\MyMetabase"
+
+# Linux/macOS - Auto-detect latest backup
+./backup_and_restore/restore_metabase.sh
+
+# Restore to specific directory
+./backup_and_restore/restore_metabase.sh --restore-directory "/my-metabase"
+```
+**Restores:** All dashboards, data sources, users, and custom configurations
+
 ### **Database Restore** (to fresh containers)
 ```powershell
 # Windows - Restores BOTH databases to PostgreSQL 16 (latest)
@@ -37,6 +168,20 @@ They can also be used to bridge from existing deployments to containerized deplo
 ./backup_and_restore/restore_db.sh
 ```
 **Creates:** Descriptive Docker volumes ready for `docker-compose.yml`
+
+### **Metabase Restore**
+```powershell
+# Windows - Restores Metabase configuration and dashboards
+.\backup_and_restore\restore_metabase.ps1 -backupFile ".\backups\metabase.2025-07-24_14-30-15-UTC.tar.gz"
+
+# Linux/macOS
+./backup_and_restore/restore_metabase.sh --backup-file "./backups/metabase.2025-07-24_14-30-15-UTC.tar.gz"
+
+# Force overwrite without confirmation
+.\backup_and_restore\restore_metabase.ps1 -backupFile "backup.tar.gz" -force
+```
+
+**Important:** Stop Metabase container before restoring, then restart after successful restore.
 
 ### **PostgreSQL Version Upgrades** 🔥
 ```powershell
@@ -58,8 +203,9 @@ They can also be used to bridge from existing deployments to containerized deplo
 
 ## 🎯 Key Features
 
+- ✅ **Synchronized backups** - Master script ensures consistent timestamps across all components
 - ✅ **Zero configuration** - Reads from `.env`, auto-detects containers
-- ✅ **Complete system backup** - Databases + OMERO server + configuration
+- ✅ **Complete system backup** - Databases + OMERO server + Metabase dashboards + configuration
 - ✅ **PostgreSQL version upgrades** - Seamless 11→16 migrations
 - ✅ **Smart naming** - Timestamped volumes/folders you can identify
 - ✅ **Flexible targets** - Docker volumes OR local filesystem
@@ -67,22 +213,34 @@ They can also be used to bridge from existing deployments to containerized deplo
 - ✅ **Container engine agnostic** - Docker and Podman support (Linux)
 - ✅ **Production ready** - Error handling, validation, cleanup
 - ✅ **Configuration hierarchy** - Multiple ways to restore OMERO config
+- ✅ **Parallel execution** - Database, server, and Metabase backups run simultaneously for speed
+- ✅ **Metabase preservation** - Custom dashboards, data sources, and user configurations
 
 ---
 
 ## Scripts Available
 
-### Database Scripts
+### Master Scripts (Recommended)
+- **`backup_master.ps1`** - PowerShell (Windows) - Synchronized database + server + Metabase backup
+- **`backup_master.sh`** - Bash (Linux/macOS) - Synchronized database + server + Metabase backup with Docker/Podman auto-detect
+
+### Individual Database Scripts
 - **`backup_db.ps1`** - PowerShell (Windows) - Docker only
 - **`backup_db.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
 - **`restore_db.ps1`** - PowerShell (Windows) - Docker only
 - **`restore_db.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
 
-### Server Scripts
+### Individual Server Scripts
 - **`backup_server.ps1`** - PowerShell (Windows) - Docker only
 - **`backup_server.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
 - **`restore_server.ps1`** - PowerShell (Windows) - Docker only
 - **`restore_server.sh`** - Bash (Linux/macOS) - Docker/Podman auto-detect
+
+### Individual Metabase Scripts
+- **`backup_metabase.ps1`** - PowerShell (Windows) - Metabase folder backup
+- **`backup_metabase.sh`** - Bash (Linux/macOS) - Metabase folder backup
+- **`restore_metabase.ps1`** - PowerShell (Windows) - Metabase folder restore
+- **`restore_metabase.sh`** - Bash (Linux/macOS) - Metabase folder restore
 
 ---
 

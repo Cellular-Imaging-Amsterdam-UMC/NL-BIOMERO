@@ -3,6 +3,7 @@ param(
     [string]$containerName = "",
     [string]$outputDirectory = "",
     [string]$volumeName = "",
+    [string]$timestamp = "",
     [switch]$configOnly = $false,
     [switch]$dataOnly = $false,
     [switch]$help
@@ -64,7 +65,13 @@ $finalContainerName = if ($containerName) { $containerName } else { "nl-biomero-
 $finalOutputDir = if ($outputDirectory) { $outputDirectory } else { ".\backup_and_restore\backups" }
 
 # Single timestamp for all backups
-$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
+if ($timestamp) {
+    # Use provided timestamp for coordinated backups
+    Write-Output "Using provided timestamp: $timestamp"
+} else {
+    # Generate new timestamp
+    $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
+}
 
 # Create output directory
 New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
@@ -83,14 +90,24 @@ $dataSuccess = $true
 if (-not $dataOnly) {
     Write-Output "Exporting OMERO configuration to /OMERO/backup/omero.config..."
     
+    # Check if container exists and is running
+    $containerCheck = docker ps --filter "name=$finalContainerName" --format "{{.Names}}" 2>$null
+    if (-not $containerCheck) {
+        Write-Error "Container '$finalContainerName' not found or not running"
+        Write-Error "Available containers:"
+        docker ps --format "table {{.Names}}\t{{.Status}}" 2>$null
+        exit 1
+    }
+    
     # Create backup directory and export config - all in the server container
     $configCmd = "mkdir -p /OMERO/backup && /opt/omero/server/venv3/bin/omero config get --show-password > /OMERO/backup/omero.config"
     
-    docker exec $finalContainerName sh -c $configCmd 2>$null
+    $configResult = docker exec $finalContainerName sh -c $configCmd 2>&1
     if ($LASTEXITCODE -eq 0) {
-        Write-Output ">> Configuration exported to /OMERO/backup/omero.config"
+        Write-Output "[OK] Configuration exported to /OMERO/backup/omero.config"
     } else {
         Write-Error "Failed to export OMERO configuration"
+        Write-Error "Command output: $configResult"
         $configSuccess = $false
     }
 }
@@ -103,33 +120,53 @@ if (-not $configOnly) {
     
     Write-Output "Creating tar.gz archive (this may take a while)..."
     
+    # Check if container exists and is running
+    $containerCheck = docker ps --filter "name=$finalContainerName" --format "{{.Names}}" 2>$null
+    if (-not $containerCheck) {
+        Write-Error "Container '$finalContainerName' not found or not running"
+        exit 1
+    }
+    
     # Create tar archive - all in the server container
     $backupCmd = "cd /OMERO && tar -czf /tmp/$dataFile . && echo 'Archive created successfully'"
     
-    docker exec $finalContainerName sh -c $backupCmd 2>$null
+    $backupResult = docker exec $finalContainerName sh -c $backupCmd 2>&1
     if ($LASTEXITCODE -eq 0) {
         # Copy archive to host
-        docker cp "$finalContainerName`:/tmp/$dataFile" $hostDataFile
+        $copyResult = docker cp "$finalContainerName`:/tmp/$dataFile" $hostDataFile 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             # Cleanup temp file in container
             docker exec $finalContainerName rm "/tmp/$dataFile" 2>$null
             
-            $dataSize = (Get-Item $hostDataFile).Length
-            Write-Output ">> Complete OMERO backup: $hostDataFile ($([math]::Round($dataSize/1MB, 2)) MB)"
+            # Verify file was created and has reasonable size
+            if (Test-Path $hostDataFile) {
+                $dataSize = (Get-Item $hostDataFile).Length
+                if ($dataSize -lt 1MB) {
+                    Write-Error "Archive file is suspiciously small ($([math]::Round($dataSize/1KB, 2)) KB)"
+                    $dataSuccess = $false
+                } else {
+                    Write-Output "[OK] Complete OMERO backup: $hostDataFile ($([math]::Round($dataSize/1MB, 2)) MB)"
+                }
+            } else {
+                Write-Error "Archive file was not created: $hostDataFile"
+                $dataSuccess = $false
+            }
         } else {
             Write-Error "Failed to copy OMERO archive from container"
+            Write-Error "Copy error: $copyResult"
             $dataSuccess = $false
         }
     } else {
         Write-Error "Failed to create OMERO archive"
+        Write-Error "Backup command output: $backupResult"
         $dataSuccess = $false
     }
 }
 
 Write-Output ""
 if ($configSuccess -and $dataSuccess) {
-    Write-Output "*** OMERO server backup completed successfully! ***"
+    Write-Output "[SUCCESS] OMERO server backup completed successfully!"
     Write-Output ""
     
     if ($configOnly) {
@@ -143,10 +180,18 @@ if ($configSuccess -and $dataSuccess) {
         Write-Output "  omero-server.$timestamp.tar.gz"
         Write-Output ""
         Write-Output "Backup includes:"
-        Write-Output ">> OMERO binary data store"
-        Write-Output ">> Current configuration (/OMERO/backup/omero.config)"
+        Write-Output "[OK] OMERO binary data store"
+        Write-Output "[OK] Current configuration (/OMERO/backup/omero.config)"
     }
+    exit 0
 } else {
-    Write-Error "*** OMERO server backup failed! ***"
+    Write-Error "[FAIL] OMERO server backup failed!"
+    if (-not $configSuccess) { Write-Error "  - Configuration export failed" }
+    if (-not $dataSuccess) { Write-Error "  - Data archive creation failed" }
+    Write-Error ""
+    Write-Error "Troubleshooting:"
+    Write-Error "  - Ensure container '$finalContainerName' is running: docker ps"
+    Write-Error "  - Check container logs: docker logs $finalContainerName"
+    Write-Error "  - Verify OMERO server is operational"
     exit 1
 }

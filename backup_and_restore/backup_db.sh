@@ -7,6 +7,7 @@ DB_NAME=""
 USER=""
 OUTPUT_DIRECTORY=""
 DB_TYPE="both"
+TIMESTAMP=""
 CONTAINER_ENGINE=""
 HELP=false
 
@@ -116,6 +117,10 @@ while [[ $# -gt 0 ]]; do
             fi
             shift 2
             ;;
+        --timestamp)
+            TIMESTAMP="$2"
+            shift 2
+            ;;
         --containerEngine)
             if [[ "$2" == "docker" || "$2" == "podman" ]]; then
                 CONTAINER_ENGINE="$2"
@@ -154,7 +159,14 @@ else
 fi
 
 # Single timestamp for all backups
-timestamp=$(date '+%Y-%m-%d_%H-%M-%S-UTC')
+if [[ -n "$TIMESTAMP" ]]; then
+    # Use provided timestamp for coordinated backups
+    timestamp="$TIMESTAMP"
+    echo "Using provided timestamp: $timestamp"
+else
+    # Generate new timestamp
+    timestamp=$(date '+%Y-%m-%d_%H-%M-%S-UTC')
+fi
 
 # Function to backup one database
 backup_single() {
@@ -189,24 +201,32 @@ backup_single() {
     echo "Backing up: ${final_user}@${final_db_name} from ${final_container_name} (${db_type} database)"
     echo "Output: ${final_output}"
 
+    # Check if container exists and is running
+    if ! $ENGINE ps --filter "name=${final_container_name}" --format "{{.Names}}" | grep -q "^${final_container_name}$"; then
+        echo "Error: Container '${final_container_name}' not found or not running" >&2
+        echo "Available containers:" >&2
+        $ENGINE ps --format "table {{.Names}}\t{{.Status}}" >&2
+        return 1
+    fi
+
     # Backup with error checking (using detected container engine)
-    if ! $ENGINE exec "$final_container_name" pg_dump -Fc -f "/tmp/$filename" "$final_db_name" -U "$final_user"; then
+    if ! $ENGINE exec "$final_container_name" pg_dump -Fc -f "/tmp/$filename" "$final_db_name" -U "$final_user" 2>/dev/null; then
         echo "Error: pg_dump failed! Check container name and credentials." >&2
-        echo "Container: $final_container_name"
-        echo "Database: $final_db_name"
-        echo "User: $final_user"
-        echo "Engine: $ENGINE"
+        echo "Container: $final_container_name" >&2
+        echo "Database: $final_db_name" >&2
+        echo "User: $final_user" >&2
+        echo "Engine: $ENGINE" >&2
         return 1
     fi
 
     # Copy the backup file (using detected container engine)
-    if ! $ENGINE cp "${final_container_name}:/tmp/${filename}" "$final_output"; then
+    if ! $ENGINE cp "${final_container_name}:/tmp/${filename}" "$final_output" 2>/dev/null; then
         echo "Error: Failed to copy backup file!" >&2
         return 1
     fi
 
     # Cleanup temp file (using detected container engine)
-    $ENGINE exec "$final_container_name" rm "/tmp/$filename"
+    $ENGINE exec "$final_container_name" rm "/tmp/$filename" 2>/dev/null
 
     # Verify the backup size
     if [[ ! -f "$final_output" ]]; then
@@ -229,9 +249,9 @@ backup_single() {
     fi
     
     if [[ $backup_size -lt 10240 ]]; then
-        echo "Warning: Backup file is suspiciously small ($backup_size bytes). Check for errors!" >&2
-        echo "Content preview:"
-        head -10 "$final_output"
+        echo "Error: Backup file is suspiciously small ($backup_size bytes). Check for errors!" >&2
+        echo "Content preview:" >&2
+        head -10 "$final_output" >&2
         return 1
     else
         # Calculate size in MB
@@ -242,7 +262,7 @@ backup_single() {
         else
             backup_size_mb=$(awk "BEGIN {printf \"%.2f\", $backup_size/1048576}")
         fi
-        echo "Backup successful: ${final_output} (${backup_size_mb} MB)"
+        echo "[OK] Backup successful: ${final_output} (${backup_size_mb} MB)"
         return 0
     fi
 }
@@ -268,9 +288,12 @@ if [[ "$DB_TYPE" == "both" ]]; then
     
     echo ""
     if [[ "$omero_success" == "true" && "$biomero_success" == "true" ]]; then
-        echo "*** Both backups completed successfully! ***"
+        echo "[SUCCESS] Both backups completed successfully!"
+        exit 0
     else
-        echo "Error: One or more backups failed!" >&2
+        echo "[FAIL] One or more backups failed!" >&2
+        if [[ "$omero_success" != "true" ]]; then echo "  - OMERO backup failed" >&2; fi
+        if [[ "$biomero_success" != "true" ]]; then echo "  - BIOMERO backup failed" >&2; fi
         exit 1
     fi
 else
@@ -279,8 +302,10 @@ else
     echo ""
     if backup_single "$DB_TYPE" "$CONTAINER_NAME" "$DB_NAME" "$USER" "$OUTPUT_DIRECTORY" "$timestamp"; then
         echo ""
-        echo "*** Backup completed successfully! ***"
+        echo "[SUCCESS] $DB_TYPE backup completed successfully!"
+        exit 0
     else
+        echo "[FAIL] $DB_TYPE backup failed!" >&2
         exit 1
     fi
 fi

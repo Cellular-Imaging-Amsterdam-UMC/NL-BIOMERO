@@ -6,6 +6,7 @@ param(
     [string]$outputDirectory = "",
     [ValidateSet("omero", "biomero", "both")]
     [string]$dbType = "both",
+    [string]$timestamp = "",
     [switch]$help
 )
 
@@ -63,7 +64,13 @@ $envContent | ForEach-Object {
 }
 
 # Single timestamp for all backups
-$timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
+if ($timestamp) {
+    # Use provided timestamp for coordinated backups
+    Write-Output "Using provided timestamp: $timestamp"
+} else {
+    # Generate new timestamp
+    $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
+}
 
 # Function to backup one database 
 function Backup-Single {
@@ -90,38 +97,45 @@ function Backup-Single {
     # Create output directory
     New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
 
-    Write-Output "Backing up: $finalUser@$finalDbName from $finalContainerName ($dbType database)"
-    Write-Output "Output: $finalOutput"
+    Write-Host "Backing up: $finalUser@$finalDbName from $finalContainerName ($dbType database)"
+    Write-Host "Output: $finalOutput"
 
     # Backup with error checking 
-    $dumpResult = docker exec $finalContainerName pg_dump -Fc -f "/tmp/$filename" $finalDbName -U $finalUser
+    $dumpResult = docker exec $finalContainerName pg_dump -Fc -f "/tmp/$filename" $finalDbName -U $finalUser 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Error "pg_dump failed! Check container name and credentials."
-        Write-Output "Container: $finalContainerName"
-        Write-Output "Database: $finalDbName"
-        Write-Output "User: $finalUser"
+        Write-Error "Container: $finalContainerName"
+        Write-Error "Database: $finalDbName"
+        Write-Error "User: $finalUser"
+        Write-Error "Error output: $dumpResult"
         return $false
     }
 
     # Copy the backup file
-    docker cp "${finalContainerName}:/tmp/$filename" $finalOutput
+    $copyResult = docker cp "${finalContainerName}:/tmp/$filename" $finalOutput 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to copy backup file!"
+        Write-Error "Copy error: $copyResult"
         return $false
     }
 
     # Cleanup temp file
-    docker exec $finalContainerName rm "/tmp/$filename"
+    docker exec $finalContainerName rm "/tmp/$filename" 2>$null
 
     # Verify the backup size 
+    if (-not (Test-Path $finalOutput)) {
+        Write-Error "Backup file was not created: $finalOutput"
+        return $false
+    }
+    
     $backupSize = (Get-Item $finalOutput).Length
     if ($backupSize -lt 10KB) {
-        Write-Warning "Backup file is suspiciously small ($backupSize bytes). Check for errors!"
+        Write-Error "Backup file is suspiciously small ($backupSize bytes). Check for errors!"
         Write-Output "Content preview:"
         Get-Content $finalOutput -Head 10
         return $false
     } else {
-        Write-Output "Backup successful: $finalOutput ($([math]::Round($backupSize/1MB, 2)) MB)"
+        Write-Output "[OK] Backup successful: $finalOutput ($([math]::Round($backupSize/1MB, 2)) MB)"
         return $true
     }
 }
@@ -137,20 +151,25 @@ if ($dbType -eq "both") {
     
     Write-Output ""
     if ($omeroSuccess -and $biomeroSuccess) {
-        Write-Output "*** Both backups completed successfully! ***"
+        Write-Output "[SUCCESS] Both backups completed successfully!"
+        exit 0
     } else {
-        Write-Error "One or more backups failed!"
+        Write-Error "[FAIL] One or more backups failed!"
+        if (-not $omeroSuccess) { Write-Error "  - OMERO backup failed" }
+        if (-not $biomeroSuccess) { Write-Error "  - BIOMERO backup failed" }
         exit 1
     }
 } else {
-    # Single database backup (your existing behavior)
+    # Single database backup
     Write-Output "Backing up single database ($dbType) with timestamp: $timestamp"
     Write-Output ""
     $success = Backup-Single $dbType $containerName $dbName $user $outputDirectory $timestamp
     if (-not $success) {
+        Write-Error "[FAIL] $dbType backup failed!"
         exit 1
     } else {
         Write-Output ""
-        Write-Output "*** Backup completed successfully! ***"
+        Write-Output "[SUCCESS] $dbType backup completed successfully!"
+        exit 0
     }
 }

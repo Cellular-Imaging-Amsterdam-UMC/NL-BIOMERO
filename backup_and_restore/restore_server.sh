@@ -311,7 +311,7 @@ fi
 # Verify extraction
 extracted_files=$($ENGINE exec "$temp_container" sh -c "find /target -type f | wc -l" 2>/dev/null)
 if [[ -n "$extracted_files" && "$extracted_files" -gt 0 ]]; then
-    echo "✅ Backup extracted successfully ($extracted_files files)"
+    echo "[OK] Backup extracted successfully ($extracted_files files)"
 else
     echo "Error: Backup extraction appears to have failed (no files found)" >&2
     exit 1
@@ -332,14 +332,14 @@ if [[ -n "$CONFIG_FILE" ]]; then
     absolute_config_path=$(realpath "$CONFIG_FILE")
     if $ENGINE cp "$absolute_config_path" "$temp_container:/tmp/custom.config"; then
         if $ENGINE exec "$temp_container" cp "/tmp/custom.config" "/target/backup/omero.config"; then
-            echo "✅ Custom configuration installed: /OMERO/backup/omero.config"
+            echo "[OK] Custom configuration installed: /OMERO/backup/omero.config"
             has_config=true
             config_source="custom file: $(basename "$CONFIG_FILE")"
         else
             echo "Error: Failed to install custom configuration" >&2
             exit 1
         fi
-        
+
         # Cleanup temp file
         $ENGINE exec "$temp_container" rm "/tmp/custom.config" >/dev/null 2>&1
     else
@@ -350,11 +350,11 @@ if [[ -n "$CONFIG_FILE" ]]; then
 else
     # CHECK FOR EXISTING CONFIG from backup
     if $ENGINE exec "$temp_container" test -f "/target/backup/omero.config" >/dev/null 2>&1; then
-        echo "✅ Configuration backup found: /OMERO/backup/omero.config"
+        echo "[OK] Configuration backup found: /OMERO/backup/omero.config"
         has_config=true
         config_source="backup archive"
     else
-        echo "⚠️  No configuration backup found at /OMERO/backup/omero.config"
+        echo "[WARN] No configuration backup found at /OMERO/backup/omero.config"
         config_source="none - manual config required"
     fi
 fi
@@ -367,7 +367,7 @@ trap - EXIT
 cleanup_container
 
 echo ""
-echo "*** OMERO server restore completed successfully! ***"
+echo "[SUCCESS] OMERO server restore completed successfully!"
 echo ""
 
 if [[ -n "$TARGET_PATH" ]]; then
@@ -395,14 +395,14 @@ fi
 
 echo ""
 echo "Configuration restoration:"
-echo "  📁 Config source: $config_source"
+echo "  Config source: $config_source"
 if [[ "$has_config" == "true" ]]; then
-    echo "  ✅ 00-restore-config.sh will automatically load config on container start"
-    echo "  ✅ No manual configuration required!"
+    echo "  [OK] 00-restore-config.sh will automatically load config on container start"
+    echo "  [OK] No manual configuration required!"
 else
-    echo "  ⚠️  No config available - you'll need to configure manually"
-    echo "  💡 Use CONFIG_ environment variables in docker-compose.yml"
-    echo "  💡 Or mount .omero config files to /opt/omero/server/config/"
+    echo "  [WARN] No config available - you'll need to configure manually"
+    echo "  [TIP] Use CONFIG_ environment variables in docker-compose.yml"
+    echo "  [TIP] Or mount .omero config files to /opt/omero/server/config/"
 fi
 
 echo ""
@@ -421,7 +421,7 @@ fi
 if [[ -n "$CONFIG_FILE" ]]; then
     echo ""
     echo "Configuration override applied:"
-    echo "  📝 Original backup config (if any) was replaced"
-    echo "  📝 Custom config from: $CONFIG_FILE"
-    echo "  📝 Will be loaded automatically on container startup"
+    echo "  [INFO] Original backup config (if any) was replaced"
+    echo "  [INFO] Custom config from: $CONFIG_FILE"
+    echo "  [INFO] Will be loaded automatically on container startup"
 fi
