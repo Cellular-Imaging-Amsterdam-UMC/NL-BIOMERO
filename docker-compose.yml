@@ -8,8 +8,7 @@ services:
   # Name of our database, referenced in omero_db_host
   database:
     # Define a prebuilt Postgres image with a version
-    # image: "postgres:16" # Upgrade existing postgres 11 to 16 via backup and restore
-    image: "postgres:11"
+    image: "postgres:16" # Upgrade existing postgres 11 to 16 via backup and restore
     # Define environment variables (user/pass here)
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -130,8 +129,6 @@ services:
   # Service for the omero.web UI
   omeroweb:
     #image: "openmicroscopy/omero-web-standalone:5"
-    # We build this also locally in './web' folder, to add some extensions
-    # Environment variables for in the container
     build:
       context: ./
       dockerfile: ./web/Dockerfile
@@ -157,14 +154,10 @@ services:
     # Map ports to ports on the host machine, to allow opening of webpage
     ports:
       - "4080:4080"
-    # volumes:
-    # In case of further development, add volumes for local_omeroweb_edits here
-    # Once volumes are added, only omeroweb container reload necessary, not the whole docker-compose.
     volumes:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
       - "./web/L-Drive:/data:rw"
 
-  # New Metabase service
   metabase:
     image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
     container_name: metabase

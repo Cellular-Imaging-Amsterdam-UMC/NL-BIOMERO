@@ -8,7 +8,7 @@ services:
   # Name of our database, referenced in omero_db_host
   database:
     # Define a prebuilt Postgres image with a version
-    image: "postgres:11"
+    image: "postgres:16" # Upgrade existing postgres 11 to 16 via backup and restore
     # Define environment variables (user/pass here)
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
