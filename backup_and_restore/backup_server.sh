@@ -4,7 +4,6 @@
 ENV_FILE="./.env"
 CONTAINER_NAME=""
 OUTPUT_DIRECTORY=""
-VOLUME_NAME=""
 TIMESTAMP=""
 CONFIG_ONLY=false
 DATA_ONLY=false
@@ -44,7 +43,6 @@ PARAMETERS:
   --envFile <path>         Path to .env file (default: ./.env)
   --containerName <name>   Override OMERO server container name (default: nl-biomero-omeroserver-1)
   --outputDirectory <dir>  Output directory (default: ./backup_and_restore/backups)
-  --volumeName <name>      Override OMERO volume name (default: nl-biomero_omero)
   --configOnly             Export config to /OMERO/backup/omero.config only
   --dataOnly               Backup only data store (skip config export)
   --containerEngine <eng>  Force container engine: docker|podman (auto-detected)
@@ -97,10 +95,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --outputDirectory)
             OUTPUT_DIRECTORY="$2"
-            shift 2
-            ;;
-        --volumeName)
-            VOLUME_NAME="$2"
             shift 2
             ;;
         --configOnly)

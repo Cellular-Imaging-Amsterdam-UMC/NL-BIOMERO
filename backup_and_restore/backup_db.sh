@@ -177,14 +177,14 @@ backup_single() {
     local output_directory="$5"
     local timestamp="$6"
     
-    # Auto-configure based on database type
+    # Auto-configure based on database type (Linux defaults with underscores)
     if [[ "$db_type" == "biomero" ]]; then
-        final_container_name="${container_name:-nl-biomero-database-biomero-1}"
+        final_container_name="${container_name:-nl-biomero_database-biomero_1}"  # Linux default
         final_db_name="${db_name:-${env_hash[BIOMERO_POSTGRES_DB]}}"
         final_user="${user:-${env_hash[BIOMERO_POSTGRES_USER]}}"
     else
-        # Default to OMERO
-        final_container_name="${container_name:-nl-biomero-database-1}"
+        # OMERO database
+        final_container_name="${container_name:-nl-biomero_database_1}"  # Linux default
         final_db_name="${db_name:-${env_hash[POSTGRES_DB]}}"
         final_user="${user:-${env_hash[POSTGRES_USER]}}"
     fi

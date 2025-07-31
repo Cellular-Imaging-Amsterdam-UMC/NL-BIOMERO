@@ -2,7 +2,6 @@ param(
     [string]$envFile = ".\.env",
     [string]$containerName = "",
     [string]$outputDirectory = "",
-    [string]$volumeName = "",
     [string]$timestamp = "",
     [switch]$configOnly = $false,
     [switch]$dataOnly = $false,
@@ -25,7 +24,6 @@ PARAMETERS:
   -envFile <path>         Path to .env file (default: .\.env)
   -containerName <name>   Override OMERO server container name (default: nl-biomero-omeroserver-1)
   -outputDirectory <dir>  Output directory (default: .\backup_and_restore\backups)
-  -volumeName <name>      Override OMERO volume name (default: nl-biomero_omero)
   -configOnly             Export config to /OMERO/backup/omero.config only
   -dataOnly               Backup only data store (skip config export)
   -help                   Show this help message
