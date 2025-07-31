@@ -5,8 +5,8 @@ ENV_FILE="./.env"
 CONTAINER_NAME=""
 OUTPUT_DIRECTORY=""
 TIMESTAMP=""
-CONFIG_ONLY=false
-DATA_ONLY=false
+SKIP_DATA=false
+SKIP_CONFIG=false
 CONTAINER_ENGINE=""
 HELP=false
 
@@ -43,8 +43,8 @@ PARAMETERS:
   --envFile <path>         Path to .env file (default: ./.env)
   --containerName <name>   Override OMERO server container name (default: nl-biomero-omeroserver-1)
   --outputDirectory <dir>  Output directory (default: ./backup_and_restore/backups)
-  --configOnly             Export config to /OMERO/backup/omero.config only
-  --dataOnly               Backup only data store (skip config export)
+  --skipConfig             Skip configuration export to /OMERO/backup/omero.config
+  --skipData               Skip data store backup (tar.gz archive)
   --containerEngine <eng>  Force container engine: docker|podman (auto-detected)
   --help                   Show this help message
 
@@ -53,10 +53,10 @@ EXAMPLES:
   ./backup_and_restore/backup_server.sh
 
   # Export fresh config to /OMERO/backup only
-  ./backup_and_restore/backup_server.sh --configOnly
+  ./backup_and_restore/backup_server.sh --skipData
 
   # Backup data only (skip config export)
-  ./backup_and_restore/backup_server.sh --dataOnly
+  ./backup_and_restore/backup_server.sh --skipConfig
 
   # Force using podman
   ./backup_and_restore/backup_server.sh --containerEngine podman
@@ -65,8 +65,8 @@ EXAMPLES:
   ./backup_and_restore/backup_server.sh --containerName "my-omero" --outputDirectory "/backup"
 
 PROCESS:
-  1. Export current config to /OMERO/backup/omero.config (unless --dataOnly)
-  2. Create tar.gz archive of entire /OMERO volume (unless --configOnly)
+  1. Export current config to /OMERO/backup/omero.config (unless --skipData)
+  2. Create tar.gz archive of entire /OMERO volume (unless --skipConfig)
 
 OUTPUT:
   omero-server.{timestamp}.tar.gz (includes config, data, scripts, everything)
@@ -97,12 +97,12 @@ while [[ $# -gt 0 ]]; do
             OUTPUT_DIRECTORY="$2"
             shift 2
             ;;
-        --configOnly)
-            CONFIG_ONLY=true
+        --skipData)
+            SKIP_DATA=true
             shift
             ;;
-        --dataOnly)
-            DATA_ONLY=true
+        --skipConfig)
+            SKIP_CONFIG=true
             shift
             ;;
         --timestamp)
@@ -170,8 +170,8 @@ echo ""
 config_success=true
 data_success=true
 
-# Step 1: Export current configuration to /OMERO/backup (unless dataOnly)
-if [[ "$DATA_ONLY" != "true" ]]; then
+# Step 1: Export current configuration to /OMERO/backup (unless skipConfig)
+if [[ "$SKIP_CONFIG" != "true" ]]; then
     echo "Exporting OMERO configuration to /OMERO/backup/omero.config..."
     
     # Check if container exists and is running
@@ -193,8 +193,8 @@ if [[ "$DATA_ONLY" != "true" ]]; then
     fi
 fi
 
-# Step 2: Create tar.gz archive of entire /OMERO volume (unless configOnly)
-if [[ "$CONFIG_ONLY" != "true" ]]; then
+# Step 2: Create tar.gz archive of entire /OMERO volume (unless skipData)
+if [[ "$SKIP_DATA" != "true" ]]; then
     echo "Creating archive of complete OMERO data store..."
     data_file="omero-server.$timestamp.tar.gz"
     host_data_file="$absolute_output_dir/$data_file"
@@ -266,12 +266,10 @@ if [[ "$config_success" == "true" && "$data_success" == "true" ]]; then
     echo "[SUCCESS] OMERO server backup completed successfully!"
     echo ""
     
-    if [[ "$CONFIG_ONLY" == "true" ]]; then
-        echo "Configuration exported to:"
-        echo "  /OMERO/backup/omero.config (inside OMERO volume/mount)"
-    elif [[ "$DATA_ONLY" == "true" ]]; then
-        echo "Data backup created:"
-        echo "  omero-server.$timestamp.tar.gz"
+    if [[ "$SKIP_CONFIG" == "true" ]]; then
+        echo "Configuration export skipped."
+    elif [[ "$SKIP_DATA" == "true" ]]; then
+        echo "Data backup skipped."
     else
         echo "Complete backup created:"
         echo "  omero-server.$timestamp.tar.gz"
@@ -290,5 +288,10 @@ else
     echo "  - Ensure container '$FINAL_CONTAINER_NAME' is running: $ENGINE ps" >&2
     echo "  - Check container logs: $ENGINE logs $FINAL_CONTAINER_NAME" >&2
     echo "  - Verify OMERO server is operational" >&2
+    exit 1
+fi
+
+if [[ "$SKIP_CONFIG" == "true" && "$SKIP_DATA" == "true" ]]; then
+    echo "[FAIL] Both --skipConfig and --skipData specified, nothing to do!" >&2
     exit 1
 fi

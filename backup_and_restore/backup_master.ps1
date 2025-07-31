@@ -1,17 +1,15 @@
 param(
     [string]$envFile = ".\.env",
     [string]$outputDirectory = "",
-    [ValidateSet("omero", "biomero", "both")]
-    [string]$dbType = "both",
     [string]$serverContainerName = "",
-    [string]$volumeName = "",
+    [string]$omeroDbContainerName = "",
+    [string]$biomeroDbContainerName = "",
     [string]$metabaseFolder = "",
-    [switch]$configOnly = $false,
-    [switch]$dataOnly = $false,
-    [switch]$parallel = $false,
     [switch]$skipDatabase = $false,
     [switch]$skipServer = $false,
     [switch]$skipMetabase = $false,
+    [switch]$skipServerData = $false,
+    [switch]$skipServerConfig = $false,
     [switch]$help
 )
 
@@ -24,33 +22,30 @@ USAGE:
   .\backup_and_restore\backup_master.ps1 [OPTIONS]
 
 DESCRIPTION:
-  Master backup script that coordinates both database and server backups with a synchronized timestamp.
-  This ensures data consistency by backing up both components at the same point in time.
+  Master backup script that coordinates database, server, and Metabase backups with a synchronized timestamp.
+  This ensures data consistency by backing up all components at the same point in time.
+  Always backs up both OMERO and BIOMERO databases.
 
 PARAMETERS:
-  -envFile <path>           Path to .env file (default: .\.env)
-  -outputDirectory <dir>    Output directory (default: .\backup_and_restore\backups)
-  -dbType <type>            Database to backup: omero|biomero|both (default: both)
-  -serverContainerName <n>  Override OMERO server container name (default: nl-biomero-omeroserver-1)
-  -volumeName <n>           Override OMERO volume name (default: nl-biomero_omero)
-  -metabaseFolder <path>    Override metabase folder path (default: .\metabase)
-  -configOnly               Export config to /OMERO/backup/omero.config only (server backup)
-  -dataOnly                 Backup only data store, skip config export (server backup)
-  -parallel                 Run backups in parallel instead of sequentially
-  -skipDatabase             Skip database backup (database only)
-  -skipServer               Skip server backup (server only)
-  -skipMetabase             Skip Metabase backup (metabase only)
-  -help                     Show this help message
+  -envFile <path>                Path to .env file (default: .\.env)
+  -outputDirectory <dir>         Output directory (default: .\backup_and_restore\backups)
+  -serverContainerName <name>    Override OMERO server container name (default: nl-biomero-omeroserver-1)
+  -omeroDbContainerName <name>   Override OMERO database container name (default: nl-biomero_database_1)
+  -biomeroDbContainerName <name> Override BIOMERO database container name (default: nl-biomero_database-biomero_1)
+  -metabaseFolder <path>         Override metabase folder path (default: .\metabase)
+  -skipDatabase                  Skip database backup
+  -skipServer                    Skip server backup
+  -skipMetabase                  Skip Metabase backup
+  -skipServerData                Skip server data backup
+  -skipServerConfig              Skip server config export
+  -help                          Show this help message
 
 EXAMPLES:
   # Full synchronized backup (default - sequential execution)
   .\backup_and_restore\backup_master.ps1
 
-  # Parallel backup for faster execution
-  .\backup_and_restore\backup_master.ps1 -parallel
-
-  # Only OMERO database + server (skip BIOMERO database and Metabase)
-  .\backup_and_restore\backup_master.ps1 -dbType omero -skipMetabase
+  # Only server backup (skip databases and Metabase)
+  .\backup_and_restore\backup_master.ps1 -skipDatabase -skipMetabase
 
   # Only export fresh server config, backup both databases and Metabase
   .\backup_and_restore\backup_master.ps1 -configOnly
@@ -58,22 +53,19 @@ EXAMPLES:
   # Database and Metabase only (useful for regular automated backups)
   .\backup_and_restore\backup_master.ps1 -skipServer
 
-  # Server only with custom settings
-  .\backup_and_restore\backup_master.ps1 -skipDatabase -skipMetabase -serverContainerName "custom-omero"
-
-  # Skip Metabase backup (if not using dashboards/custom config)
-  .\backup_and_restore\backup_master.ps1 -skipMetabase
+  # Custom database container names
+  .\backup_and_restore\backup_master.ps1 -omeroDbContainerName "custom-omero-db" -biomeroDbContainerName "custom-biomero-db"
 
 BACKUP CONSISTENCY:
-  This script generates a single timestamp and passes it to both backup operations,
-  ensuring that the database and server backups represent the same point in time.
+  This script generates a single timestamp and passes it to all backup operations,
+  ensuring that all backups represent the same point in time.
 
 SEQUENTIAL VS PARALLEL:
   - Sequential (default): Database first, then server (safer, less resource intensive)
-  - Parallel: Both backups run simultaneously for speed (use if you have sufficient resources)
+  - Parallel: All backups run simultaneously for speed (use if you have sufficient resources)
 
 OUTPUT FILES:
-  Database: {database}.{timestamp}.pg_dump
+  Database: omero.{timestamp}.pg_dump, biomero.{timestamp}.pg_dump
   Server:   omero-server.{timestamp}.tar.gz
   Metabase: metabase.{timestamp}.tar.gz
   All files use the same timestamp for consistency
@@ -89,8 +81,8 @@ if ($skipDatabase -and $skipServer -and $skipMetabase) {
     exit 1
 }
 
-if ($skipServer -and ($configOnly -or $dataOnly)) {
-    Write-Error "Cannot use -configOnly or -dataOnly when skipping server backup."
+if ($skipServer -and ($skipServerData -or $skipServerConfig)) {
+    Write-Error "Cannot use -skipServerData or -skipServerConfig when skipping server backup."
     exit 1
 }
 
@@ -118,8 +110,12 @@ if (-not $skipMetabase -and -not (Test-Path $metabaseScript)) {
 # Generate single shared timestamp
 $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
 
-# Set default output directory
-$finalOutputDir = if ($outputDirectory) { $outputDirectory } else { ".\backup_and_restore\backups" }
+# Set output directory to subfolder with timestamp
+if ($outputDirectory) {
+    $finalOutputDir = Join-Path $outputDirectory $timestamp
+} else {
+    $finalOutputDir = ".\backup_and_restore\backups\$timestamp"
+}
 
 # Create output directory
 New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
@@ -139,23 +135,19 @@ Write-Output "====================================="
 Write-Output "  Timestamp: $timestamp"
 Write-Output "  Output Directory: $absoluteOutputDir"
 Write-Output "  Environment File: $absoluteEnvFile"
-Write-Output "  Database Type: $dbType"
-Write-Output "  Execution Mode: $(if ($parallel) { 'Parallel' } else { 'Sequential' })"
 Write-Output ""
 
 if ($skipDatabase) {
     Write-Output "  [SKIP] Database backup: SKIPPED"
 } else {
-    Write-Output "  [DB] Database backup: ENABLED ($dbType)"
+    Write-Output "  [DB] Database backup: ENABLED (both OMERO and BIOMERO)"
 }
-
 if ($skipServer) {
     Write-Output "  [SKIP] Server backup: SKIPPED"
 } else {
-    $serverMode = if ($configOnly) { "config only" } elseif ($dataOnly) { "data only" } else { "full backup" }
+    $serverMode = if ($skipServerData) { "config only" } elseif ($skipServerConfig) { "data only" } else { "full backup" }
     Write-Output "  [SERVER] Server backup: ENABLED ($serverMode)"
 }
-
 if ($skipMetabase) {
     Write-Output "  [SKIP] Metabase backup: SKIPPED"
 } else {
@@ -164,414 +156,199 @@ if ($skipMetabase) {
 Write-Output ""
 
 # Build command arguments - Use hashtables for proper parameter splatting
-$dbArgs = @{
+$omeroDbArgs = @{
     'envFile' = $absoluteEnvFile
     'outputDirectory' = $absoluteOutputDir
     'timestamp' = $timestamp
-    'dbType' = $dbType
+    'dbType' = 'omero'
 }
-
+$biomeroDbArgs = @{
+    'envFile' = $absoluteEnvFile
+    'outputDirectory' = $absoluteOutputDir
+    'timestamp' = $timestamp
+    'dbType' = 'biomero'
+}
+if ($omeroDbContainerName) { $omeroDbArgs['containerName'] = $omeroDbContainerName }
+if ($biomeroDbContainerName) { $biomeroDbArgs['containerName'] = $biomeroDbContainerName }
+# Server arguments
 $serverArgs = @{
     'envFile' = $absoluteEnvFile
-    'outputDirectory' = $absoluteOutputDir
+    'outputDirectory' = $finalOutputDir
     'timestamp' = $timestamp
 }
+if ($serverContainerName) { $serverArgs['containerName'] = $serverContainerName }
+if ($skipServerData) { $serverArgs['skipData'] = $true }
+if ($skipServerConfig) { $serverArgs['skipConfig'] = $true }
+$metabaseArgs = @{}
+if ($metabaseFolder) { $metabaseArgs['metabaseFolder'] = $metabaseFolder }
 
-$metabaseArgs = @{
-    'envFile' = $absoluteEnvFile
-    'outputDirectory' = $absoluteOutputDir
-    'timestamp' = $timestamp
-}
+# Sequential execution only
+Write-Output "Starting backup process..."
+Write-Output ""
 
-# Server-specific arguments
-if ($serverContainerName) {
-    $serverArgs['containerName'] = $serverContainerName
-}
-if ($volumeName) {
-    $serverArgs['volumeName'] = $volumeName
-}
-if ($configOnly) {
-    $serverArgs['configOnly'] = $true
-}
-if ($dataOnly) {
-    $serverArgs['dataOnly'] = $true
-}
-
-# Metabase-specific arguments
-if ($metabaseFolder) {
-    $metabaseArgs['metabaseFolder'] = $metabaseFolder
-}
-
-# Job tracking variables
-$dbJob = $null
-$serverJob = $null
-$metabaseJob = $null
-$dbSuccess = $null  # Changed: Start as null instead of true
-$serverSuccess = $null  # Changed: Start as null instead of true
-$metabaseSuccess = $null
-
-try {
-    if ($parallel) {
-        # PARALLEL EXECUTION
-        Write-Output "Starting parallel backup process..."
-        Write-Output ""
-        
-        # Start background jobs with parameters embedded in script blocks
-        if (-not $skipDatabase) {
-            Write-Output "[DB] Starting database backup job..."
-            $dbJob = Start-Job -ScriptBlock {
-                param($scriptPath, $envFile, $outputDir, $timestamp, $dbType)
-                & $scriptPath -envFile $envFile -outputDirectory $outputDir -timestamp $timestamp -dbType $dbType
-            } -ArgumentList $dbScript, $absoluteEnvFile, $absoluteOutputDir, $timestamp, $dbType
+# Step 1: Database backups
+if (-not $skipDatabase) {
+    Write-Output "[DB] STEP 1a: OMERO Database Backup"
+    Write-Output "-----------------------------------"
+    try {
+        $omeroDbResult = & $dbScript @omeroDbArgs 2>&1
+        $omeroDbExitCode = $LASTEXITCODE
+        if ($omeroDbResult -match "Cannot validate argument|ParameterBindingValidationException") {
+            $omeroDbSuccess = $false
+            Write-Output "[FAIL] Parameter validation error in OMERO database backup"
+        } elseif ($omeroDbExitCode -ne 0) {
+            $omeroDbSuccess = $false
+            Write-Output "[FAIL] OMERO database backup failed with exit code: $omeroDbExitCode"
+        } elseif ($omeroDbResult -match "\[FAIL\]|ERROR") {
+            $omeroDbSuccess = $false
+            Write-Output "[FAIL] OMERO database backup reported failure"
+        } else {
+            $omeroDbSuccess = $true
         }
-        
-        if (-not $skipServer) {
-            Write-Output "[SERVER] Starting server backup job..."
-            
-            # Build server command with proper parameter handling
-            $serverJob = Start-Job -ScriptBlock {
-                param($scriptPath, $envFile, $outputDir, $timestamp, $containerName, $volumeName, $configOnly, $dataOnly)
-                
-                # Build arguments properly as individual parameters
-                $jobArgs = @{
-                    'envFile' = $envFile
-                    'outputDirectory' = $outputDir
-                    'timestamp' = $timestamp
-                }
-                
-                if ($containerName) { $jobArgs['containerName'] = $containerName }
-                if ($volumeName) { $jobArgs['volumeName'] = $volumeName }
-                if ($configOnly) { $jobArgs['configOnly'] = $true }
-                if ($dataOnly) { $jobArgs['dataOnly'] = $true }
-                
-                & $scriptPath @jobArgs
-            } -ArgumentList $serverScript, $absoluteEnvFile, $absoluteOutputDir, $timestamp, $serverContainerName, $volumeName, $configOnly, $dataOnly
-        }
-
-        if (-not $skipMetabase) {
-            Write-Output "[METABASE] Starting Metabase backup job..."
-            
-            $metabaseJob = Start-Job -ScriptBlock {
-                param($scriptPath, $envFile, $outputDir, $timestamp, $metabaseFolder)
-                
-                $jobArgs = @{
-                    'envFile' = $envFile
-                    'outputDirectory' = $outputDir
-                    'timestamp' = $timestamp
-                }
-                
-                if ($metabaseFolder) { $jobArgs['metabaseFolder'] = $metabaseFolder }
-                
-                & $scriptPath @jobArgs
-            } -ArgumentList $metabaseScript, $absoluteEnvFile, $absoluteOutputDir, $timestamp, $metabaseFolder
-        }
-
-        Write-Output ""
-        Write-Output "Waiting for backup jobs to complete..."
-        
-        # Monitor job progress
-        $jobs = @()
-        if ($dbJob) { $jobs += $dbJob }
-        if ($serverJob) { $jobs += $serverJob }
-        if ($metabaseJob) { $jobs += $metabaseJob }
-        
-        if ($jobs.Count -gt 0) {
-            while ($jobs | Where-Object { $_.State -eq "Running" }) {
-                Start-Sleep -Seconds 10
-                Write-Output "   $(Get-Date -Format 'HH:mm:ss') - $(($jobs | Where-Object { $_.State -eq 'Running' }).Count) job(s) still running..."
-            }
-        }
-        
-        Write-Output ""
-        
-        # Collect results
-        if ($dbJob) {
-            Write-Output "[DB] DATABASE BACKUP RESULTS:"
-            Write-Output "-----------------------------"
-            
-            # Wait for job to complete and get exit code
-            Wait-Job -Job $dbJob | Out-Null
-            $dbResult = Receive-Job -Job $dbJob -Keep
-            
-            # Much more aggressive error detection for parallel jobs
-            $dbJobFailed = $true  # Start as failed, only mark success if we're sure
-            
-            # Check for obvious failure indicators first
-            if ($dbResult -match "Cannot validate argument|ParameterBindingValidationException") {
-                Write-Output "[FAIL] Parameter validation error detected"
-            } elseif ($dbResult -match "\[FAIL\]|ERROR|Failed to|not found|not running") {
-                Write-Output "[FAIL] Error keywords detected in output"
-            } elseif ($dbJob.State -eq "Failed") {
-                Write-Output "[FAIL] PowerShell job state indicates failure"
-            } elseif ($dbJob.ChildJobs[0].JobStateInfo.State -eq "Failed") {
-                Write-Output "[FAIL] Child job state indicates failure"
-            } elseif ($dbResult -match "\[SUCCESS\].*completed successfully") {
-                # Only mark as success if we see explicit success message
-                $dbJobFailed = $false
-                Write-Output "[OK] Success message detected in output"
-            } else {
-                Write-Output "[FAIL] No clear success indicator found"
-            }
-            
-            $dbSuccess = -not $dbJobFailed
-            
-            Write-Output $dbResult
-            
-            if ($dbSuccess) {
-                Write-Output "[OK] Database backup completed successfully"
-            } else {
-                Write-Output "[FAIL] Database backup failed"
-            }
-            Write-Output ""
-        }
-        
-        if ($serverJob) {
-            Write-Output "[SERVER] SERVER BACKUP RESULTS:"
-            Write-Output "-------------------------------"
-            
-            # Wait for job to complete and get exit code
-            Wait-Job -Job $serverJob | Out-Null
-            $serverResult = Receive-Job -Job $serverJob -Keep
-            
-            # Much more aggressive error detection for parallel jobs
-            $serverJobFailed = $true  # Start as failed, only mark success if we're sure
-            
-            # Check for obvious failure indicators first
-            if ($serverResult -match "Cannot validate argument|ParameterBindingValidationException") {
-                Write-Output "[FAIL] Parameter validation error detected"
-            } elseif ($serverResult -match "\[FAIL\]|ERROR|Failed to|not found|not running") {
-                Write-Output "[FAIL] Error keywords detected in output"
-            } elseif ($serverJob.State -eq "Failed") {
-                Write-Output "[FAIL] PowerShell job state indicates failure"
-            } elseif ($serverJob.ChildJobs[0].JobStateInfo.State -eq "Failed") {
-                Write-Output "[FAIL] Child job state indicates failure"
-            } elseif ($serverResult -match "\[SUCCESS\].*completed successfully") {
-                # Only mark as success if we see explicit success message
-                $serverJobFailed = $false
-                Write-Output "[OK] Success message detected in output"
-            } else {
-                Write-Output "[FAIL] No clear success indicator found"
-            }
-            
-            $serverSuccess = -not $serverJobFailed
-            
-            Write-Output $serverResult
-            
-            if ($serverSuccess) {
-                Write-Output "[OK] Server backup completed successfully"
-            } else {
-                Write-Output "[FAIL] Server backup failed"
-            }
-            Write-Output ""
-        }
-        
-        if ($metabaseJob) {
-            Write-Output "[METABASE] METABASE BACKUP RESULTS:"
-            Write-Output "----------------------------------"
-            
-            # Wait for job to complete and get exit code
-            Wait-Job -Job $metabaseJob | Out-Null
-            $metabaseResult = Receive-Job -Job $metabaseJob -Keep
-            
-            # Much more aggressive error detection for parallel jobs
-            $metabaseJobFailed = $true  # Start as failed, only mark success if we're sure
-            
-            # Check for obvious failure indicators first
-            if ($metabaseResult -match "Cannot validate argument|ParameterBindingValidationException") {
-                Write-Output "[FAIL] Parameter validation error detected"
-            } elseif ($metabaseResult -match "\[FAIL\]|ERROR|Failed to|not found|not running") {
-                Write-Output "[FAIL] Error keywords detected in output"
-            } elseif ($metabaseJob.State -eq "Failed") {
-                Write-Output "[FAIL] PowerShell job state indicates failure"
-            } elseif ($metabaseJob.ChildJobs[0].JobStateInfo.State -eq "Failed") {
-                Write-Output "[FAIL] Child job state indicates failure"
-            } elseif ($metabaseResult -match "\[SUCCESS\].*completed successfully") {
-                # Only mark as success if we see explicit success message
-                $metabaseJobFailed = $false
-                Write-Output "[OK] Success message detected in output"
-            } else {
-                Write-Output "[FAIL] No clear success indicator found"
-            }
-            
-            $metabaseSuccess = -not $metabaseJobFailed
-            
-            Write-Output $metabaseResult
-            
-            if ($metabaseSuccess) {
-                Write-Output "[OK] Metabase backup completed successfully"
-            } else {
-                Write-Output "[FAIL] Metabase backup failed"
-            }
-            Write-Output ""
-        }
-        
+        Write-Output $omeroDbResult
+    } catch {
+        $omeroDbSuccess = $false
+        Write-Output "[FAIL] OMERO database backup threw exception: $($_.Exception.Message)"
+    }
+    if ($omeroDbSuccess) {
+        Write-Output "[OK] OMERO database backup completed successfully"
     } else {
-        # SEQUENTIAL EXECUTION (DEFAULT)
-        Write-Output "Starting sequential backup process..."
-        Write-Output ""
-        
-        # Step 1: Database backup
-        if (-not $skipDatabase) {
-            Write-Output "[DB] STEP 1: Database Backup"
-            Write-Output "-----------------------------"
-            
-            # Execute database backup and capture all output
-            try {
-                $dbResult = & $dbScript @dbArgs 2>&1
-                $dbExitCode = $LASTEXITCODE
-                
-                # Check for validation errors in the output
-                if ($dbResult -match "Cannot validate argument|ParameterBindingValidationException") {
-                    $dbSuccess = $false
-                    Write-Output "[FAIL] Parameter validation error in database backup"
-                } elseif ($dbExitCode -ne 0) {
-                    $dbSuccess = $false
-                    Write-Output "[FAIL] Database backup failed with exit code: $dbExitCode"
-                } elseif ($dbResult -match "\[FAIL\]|ERROR") {
-                    $dbSuccess = $false
-                    Write-Output "[FAIL] Database backup reported failure"
-                } else {
-                    $dbSuccess = $true
-                }
-                
-                Write-Output $dbResult
-                
-            } catch {
-                $dbSuccess = $false
-                Write-Output "[FAIL] Database backup threw exception: $($_.Exception.Message)"
-            }
-            
-            if ($dbSuccess) {
-                Write-Output "[OK] Database backup completed successfully"
-            } else {
-                Write-Output "[FAIL] Database backup failed"
-            }
-            Write-Output ""
-        }
+        Write-Output "[FAIL] OMERO database backup failed"
+    }
+    Write-Output ""
 
-        # Step 2: Metabase backup (only if database succeeded or was skipped)
-        if (-not $skipMetabase -and ($dbSuccess -or $skipDatabase)) {
-            Write-Output "[METABASE] STEP 2: Metabase Backup"
-            Write-Output "---------------------------------"
-            
-            # Execute Metabase backup and capture all output
-            try {
-                $metabaseResult = & $metabaseScript @metabaseArgs 2>&1
-                $metabaseExitCode = $LASTEXITCODE
-                
-                # Check for validation errors in the output
-                if ($metabaseResult -match "Cannot validate argument|ParameterBindingValidationException") {
-                    $metabaseSuccess = $false
-                    Write-Output "[FAIL] Parameter validation error in Metabase backup"
-                } elseif ($metabaseExitCode -ne 0) {
-                    $metabaseSuccess = $false
-                    Write-Output "[FAIL] Metabase backup failed with exit code: $metabaseExitCode"
-                } elseif ($metabaseResult -match "\[FAIL\]|ERROR") {
-                    $metabaseSuccess = $false
-                    Write-Output "[FAIL] Metabase backup reported failure"
-                } else {
-                    $metabaseSuccess = $true
-                }
-                
-                Write-Output $metabaseResult
-                
-            } catch {
-                $metabaseSuccess = $false
-                Write-Output "[FAIL] Metabase backup threw exception: $($_.Exception.Message)"
-            }
-            
-            if ($metabaseSuccess) {
-                Write-Output "[OK] Metabase backup completed successfully"
-            } else {
-                Write-Output "[FAIL] Metabase backup failed"
-            }
-            Write-Output ""
+    Write-Output "[DB] STEP 1b: BIOMERO Database Backup"
+    Write-Output "-------------------------------------"
+    try {
+        $biomeroDbResult = & $dbScript @biomeroDbArgs 2>&1
+        $biomeroDbExitCode = $LASTEXITCODE
+        if ($biomeroDbResult -match "Cannot validate argument|ParameterBindingValidationException") {
+            $biomeroDbSuccess = $false
+            Write-Output "[FAIL] Parameter validation error in BIOMERO database backup"
+        } elseif ($biomeroDbExitCode -ne 0) {
+            $biomeroDbSuccess = $false
+            Write-Output "[FAIL] BIOMERO database backup failed with exit code: $biomeroDbExitCode"
+        } elseif ($biomeroDbResult -match "\[FAIL\]|ERROR") {
+            $biomeroDbSuccess = $false
+            Write-Output "[FAIL] BIOMERO database backup reported failure"
+        } else {
+            $biomeroDbSuccess = $true
         }
-        
-        # Step 3: Server backup (only if previous steps succeeded or were skipped)
-        if (-not $skipServer -and (($dbSuccess -or $skipDatabase) -and ($metabaseSuccess -or $skipMetabase))) {
-            Write-Output "[SERVER] STEP 3: Server Backup"
-            Write-Output "-------------------------------"
-            
-            # Execute server backup and capture all output
-            try {
-                $serverResult = & $serverScript @serverArgs 2>&1
-                $serverExitCode = $LASTEXITCODE
-                
-                # Check for validation errors in the output
-                if ($serverResult -match "Cannot validate argument|ParameterBindingValidationException") {
-                    $serverSuccess = $false
-                    Write-Output "[FAIL] Parameter validation error in server backup"
-                } elseif ($serverExitCode -ne 0) {
-                    $serverSuccess = $false
-                    Write-Output "[FAIL] Server backup failed with exit code: $serverExitCode"
-                } elseif ($serverResult -match "\[FAIL\]|ERROR") {
-                    $serverSuccess = $false
-                    Write-Output "[FAIL] Server backup reported failure"
-                } else {
-                    $serverSuccess = $true
-                }
-                
-                Write-Output $serverResult
-                
-            } catch {
-                $serverSuccess = $false
-                Write-Output "[FAIL] Server backup threw exception: $($_.Exception.Message)"
-            }
-            
-            if ($serverSuccess) {
-                Write-Output "[OK] Server backup completed successfully"
-            } else {
-                Write-Output "[FAIL] Server backup failed"
-            }
-            Write-Output ""
+        Write-Output $biomeroDbResult
+    } catch {
+        $biomeroDbSuccess = $false
+        Write-Output "[FAIL] BIOMERO database backup threw exception: $($_.Exception.Message)"
+    }
+    if ($biomeroDbSuccess) {
+        Write-Output "[OK] BIOMERO database backup completed successfully"
+    } else {
+        Write-Output "[FAIL] BIOMERO database backup failed"
+    }
+    Write-Output ""
+}
+
+# Step 2: Metabase backup (only if databases succeeded or were skipped)
+if (-not $skipMetabase -and (($omeroDbSuccess -and $biomeroDbSuccess) -or $skipDatabase)) {
+    Write-Output "[METABASE] STEP 2: Metabase Backup"
+    Write-Output "---------------------------------"
+    try {
+        $metabaseResult = & $metabaseScript @metabaseArgs 2>&1
+        $metabaseExitCode = $LASTEXITCODE
+        if ($metabaseResult -match "Cannot validate argument|ParameterBindingValidationException") {
+            $metabaseSuccess = $false
+            Write-Output "[FAIL] Parameter validation error in Metabase backup"
+        } elseif ($metabaseExitCode -ne 0) {
+            $metabaseSuccess = $false
+            Write-Output "[FAIL] Metabase backup failed with exit code: $metabaseExitCode"
+        } elseif ($metabaseResult -match "\[FAIL\]|ERROR") {
+            $metabaseSuccess = $false
+            Write-Output "[FAIL] Metabase backup reported failure"
+        } else {
+            $metabaseSuccess = $true
         }
+        Write-Output $metabaseResult
+    } catch {
+        $metabaseSuccess = $false
+        Write-Output "[FAIL] Metabase backup threw exception: $($_.Exception.Message)"
     }
-    
-} finally {
-    # Cleanup background jobs
-    if ($dbJob) {
-        Remove-Job -Job $dbJob -Force -ErrorAction SilentlyContinue
+    if ($metabaseSuccess) {
+        Write-Output "[OK] Metabase backup completed successfully"
+    } else {
+        Write-Output "[FAIL] Metabase backup failed"
     }
-    if ($serverJob) {
-        Remove-Job -Job $serverJob -Force -ErrorAction SilentlyContinue
+    Write-Output ""
+}
+
+# Step 3: Server backup (only if previous steps succeeded or were skipped)
+if (-not $skipServer -and (($omeroDbSuccess -and $biomeroDbSuccess) -or $skipDatabase) -and ($metabaseSuccess -or $skipMetabase)) {
+    Write-Output "[SERVER] STEP 3: Server Backup"
+    Write-Output "-------------------------------"
+    try {
+        $serverResult = & $serverScript @serverArgs 2>&1
+        $serverExitCode = $LASTEXITCODE
+        if ($serverResult -match "Cannot validate argument|ParameterBindingValidationException") {
+            $serverSuccess = $false
+            Write-Output "[FAIL] Parameter validation error in server backup"
+        } elseif ($serverExitCode -ne 0) {
+            $serverSuccess = $false
+            Write-Output "[FAIL] Server backup failed with exit code: $serverExitCode"
+        } elseif ($serverResult -match "\[FAIL\]|ERROR") {
+            $serverSuccess = $false
+            Write-Output "[FAIL] Server backup reported failure"
+        } else {
+            $serverSuccess = $true
+        }
+        Write-Output $serverResult
+    } catch {
+        $serverSuccess = $false
+        Write-Output "[FAIL] Server backup threw exception: $($_.Exception.Message)"
     }
-    if ($metabaseJob) {
-        Remove-Job -Job $metabaseJob -Force -ErrorAction SilentlyContinue
+    if ($serverSuccess) {
+        Write-Output "[OK] Server backup completed successfully"
+    } else {
+        Write-Output "[FAIL] Server backup failed"
     }
+    Write-Output ""
 }
 
 # Final summary
 Write-Output "BACKUP SUMMARY"
 Write-Output "=============="
 Write-Output "  Timestamp: $timestamp"
-Write-Output "  Execution: $(if ($parallel) { 'Parallel' } else { 'Sequential' })"
+Write-Output "  Execution: Sequential"
 
 if (-not $skipDatabase) {
-    if ($dbSuccess -eq $true) {
-        Write-Output "  [DB] Database: [OK] SUCCESS"
-        
-        # Show expected database files
-        $dbFiles = @()
-        if ($dbType -eq "both" -or $dbType -eq "omero") {
-            $dbFiles += "omero.$timestamp.pg_dump"
-        }
-        if ($dbType -eq "both" -or $dbType -eq "biomero") {
-            $dbFiles += "biomero.$timestamp.pg_dump"
-        }
-        $dbFiles | ForEach-Object { Write-Output "    * $_" }
-        
-    } elseif ($dbSuccess -eq $false) {
-        Write-Output "  [DB] Database: [FAIL] FAILED"
+    if ($omeroDbSuccess -eq $true) {
+        Write-Output "  [DB] OMERO Database: [OK] SUCCESS"
+        Write-Output "    * omero.$timestamp.pg_dump"
+    } elseif ($omeroDbSuccess -eq $false) {
+        Write-Output "  [DB] OMERO Database: [FAIL] FAILED"
     } else {
-        Write-Output "  [DB] Database: [SKIP] NOT ATTEMPTED"
+        Write-Output "  [DB] OMERO Database: [SKIP] NOT ATTEMPTED"
+    }
+    
+    if ($biomeroDbSuccess -eq $true) {
+        Write-Output "  [DB] BIOMERO Database: [OK] SUCCESS"
+        Write-Output "    * biomero.$timestamp.pg_dump"
+    } elseif ($biomeroDbSuccess -eq $false) {
+        Write-Output "  [DB] BIOMERO Database: [FAIL] FAILED"
+    } else {
+        Write-Output "  [DB] BIOMERO Database: [SKIP] NOT ATTEMPTED"
     }
 }
 
 if (-not $skipServer) {
     if ($serverSuccess -eq $true) {
-        Write-Output "  [SERVER] Server: [OK] SUCCESS"
-        Write-Output "    * omero-server.$timestamp.tar.gz"
+        $serverTar = Join-Path $finalOutputDir "omero-server.$timestamp.tar.gz"
+        if (Test-Path $serverTar) {
+            Write-Output "  [SERVER] Server: [OK] SUCCESS"
+            Write-Output "    * omero-server.$timestamp.tar.gz"
+        } elseif ($skipServerData) {
+            Write-Output "  [SERVER] Server: [OK] SUCCESS"
+            Write-Output "    * (config only, no tar.gz created)"
+        } else {
+            Write-Output "  [SERVER] Server: [OK] SUCCESS"
+        }
     } elseif ($serverSuccess -eq $false) {
         Write-Output "  [SERVER] Server: [FAIL] FAILED"
     } else {
@@ -594,16 +371,16 @@ Write-Output ""
 
 # Check actual files created - Fix file detection
 Write-Output ""
+Write-Output "Backup Location: $finalOutputDir"
+Write-Output ""
 Write-Output "Files Created:"
-$backupFiles = Get-ChildItem -Path $absoluteOutputDir -Filter "*$timestamp*" -ErrorAction SilentlyContinue
+$backupFiles = Get-ChildItem -Path $finalOutputDir -Filter "*$timestamp*" -File -ErrorAction SilentlyContinue
 if ($backupFiles -and $backupFiles.Count -gt 0) {
-    $actualFilesCreated = $true
     $backupFiles | ForEach-Object {
         $sizeMB = [math]::Round($_.Length / 1MB, 2)
         Write-Output "  [OK] $($_.Name) ($sizeMB MB)"
     }
 } else {
-    $actualFilesCreated = $false
     Write-Output "  [WARN] No files found with timestamp $timestamp"
 }
 
@@ -614,12 +391,21 @@ $overallSuccess = $true
 
 # Check database success
 if (-not $skipDatabase) {
-    if ($dbSuccess -ne $true) { 
+    if ($omeroDbSuccess -ne $true) { 
         $overallSuccess = $false
-        if ($dbSuccess -eq $false) {
-            Write-Output "  [REASON] Database backup failed"
+        if ($omeroDbSuccess -eq $false) {
+            Write-Output "  [REASON] OMERO database backup failed"
         } else {
-            Write-Output "  [REASON] Database backup was not attempted"
+            Write-Output "  [REASON] OMERO database backup was not attempted"
+        }
+    }
+    
+    if ($biomeroDbSuccess -ne $true) { 
+        $overallSuccess = $false
+        if ($biomeroDbSuccess -eq $false) {
+            Write-Output "  [REASON] BIOMERO database backup failed"
+        } else {
+            Write-Output "  [REASON] BIOMERO database backup was not attempted"
         }
     }
 }

@@ -3,8 +3,8 @@ param(
     [string]$containerName = "",
     [string]$outputDirectory = "",
     [string]$timestamp = "",
-    [switch]$configOnly = $false,
-    [switch]$dataOnly = $false,
+    [switch]$skipData = $false,
+    [switch]$skipConfig = $false,
     [switch]$help
 )
 
@@ -24,8 +24,8 @@ PARAMETERS:
   -envFile <path>         Path to .env file (default: .\.env)
   -containerName <name>   Override OMERO server container name (default: nl-biomero-omeroserver-1)
   -outputDirectory <dir>  Output directory (default: .\backup_and_restore\backups)
-  -configOnly             Export config to /OMERO/backup/omero.config only
-  -dataOnly               Backup only data store (skip config export)
+  -skipConfig             Skip configuration export (/OMERO/backup/omero.config)
+  -skipData               Skip data store backup (tar.gz archive)
   -help                   Show this help message
 
 EXAMPLES:
@@ -33,14 +33,14 @@ EXAMPLES:
   .\backup_and_restore\backup_server.ps1
 
   # Export fresh config to /OMERO/backup only
-  .\backup_and_restore\backup_server.ps1 -configOnly
+  .\backup_and_restore\backup_server.ps1 -skipData
 
   # Backup data only (skip config export)
-  .\backup_and_restore\backup_server.ps1 -dataOnly
+  .\backup_and_restore\backup_server.ps1 -skipConfig
 
 PROCESS:
-  1. Export current config to /OMERO/backup/omero.config (unless -dataOnly)
-  2. Create tar.gz archive of entire /OMERO volume (unless -configOnly)
+  1. Export current config to /OMERO/backup/omero.config (unless -skipData)
+  2. Create tar.gz archive of entire /OMERO volume (unless -skipConfig)
 
 OUTPUT:
   omero-server.{timestamp}.tar.gz (includes config, data, scripts, everything)
@@ -84,8 +84,13 @@ Write-Output ""
 $configSuccess = $true
 $dataSuccess = $true
 
-# Step 1: Export current configuration to /OMERO/backup (unless dataOnly)
-if (-not $dataOnly) {
+if ($skipConfig -and $skipData) {
+    Write-Error "Both -skipConfig and -skipData specified, nothing to do!"
+    exit 1
+}
+
+# Step 1: Export current configuration to /OMERO/backup (unless skipConfig)
+if (-not $skipConfig) {
     Write-Output "Exporting OMERO configuration to /OMERO/backup/omero.config..."
     
     # Check if container exists and is running
@@ -110,8 +115,8 @@ if (-not $dataOnly) {
     }
 }
 
-# Step 2: Create tar.gz archive of entire /OMERO volume (unless configOnly)
-if (-not $configOnly) {
+# Step 2: Create tar.gz archive of entire /OMERO volume (unless skipData)
+if (-not $skipData) {
     Write-Output "Creating archive of complete OMERO data store..."
     $dataFile = "omero-server.$timestamp.tar.gz"
     $hostDataFile = Join-Path $absoluteOutputDir $dataFile
@@ -167,12 +172,10 @@ if ($configSuccess -and $dataSuccess) {
     Write-Output "[SUCCESS] OMERO server backup completed successfully!"
     Write-Output ""
     
-    if ($configOnly) {
-        Write-Output "Configuration exported to:"
-        Write-Output "  /OMERO/backup/omero.config (inside OMERO volume/mount)"
-    } elseif ($dataOnly) {
-        Write-Output "Data backup created:"
-        Write-Output "  omero-server.$timestamp.tar.gz"
+    if ($skipConfig) {
+        Write-Output "Configuration export skipped."
+    } elseif ($skipData) {
+        Write-Output "Data backup skipped."
     } else {
         Write-Output "Complete backup created:"
         Write-Output "  omero-server.$timestamp.tar.gz"
