@@ -281,7 +281,7 @@ function Restore-Single {
             
             if ([int]$jobCount -gt 0) {
                 $dumpSize = (Get-Item $dumpPath).Length
-                Write-Host "✅ $dbType restore successful: $finalTargetPath ($([math]::Round($dumpSize/1MB, 2)) MB, $jobCount $tableName records)"
+                Write-Host "[SUCCESS] $dbType restore successful: $finalTargetPath ($([math]::Round($dumpSize/1MB, 2)) MB, $jobCount $tableName records)"
                 
                 # Return the final target for use in summary
                 return @{
