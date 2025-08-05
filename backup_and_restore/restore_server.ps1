@@ -118,7 +118,7 @@ if ($backupFileName -match "omero-server\.(.+)\.tar\.gz$") {
 
 # Determine target (volume or folder)
 if ($targetPath) {
-    # LOCAL FOLDER MODE
+    # LOCAL FOLDER MODE: extract directly, no container
     $finalTarget = Join-Path $targetPath "omero-server-$backupTimestamp"
     $targetType = "local folder"
     
@@ -131,9 +131,91 @@ if ($targetPath) {
     New-Item -ItemType Directory -Path $finalTarget -Force | Out-Null
     $finalTarget = (Resolve-Path $finalTarget).Path
     
-} else {
-    # DOCKER VOLUME MODE
-    if ($volumeName) {
+    Write-Output "OMERO Server Restore:"
+    Write-Output "  Backup: $backupPath"
+    Write-Output "  Target: $finalTarget ($targetType)"
+    Write-Output "  Timestamp: $backupTimestamp"
+    if ($configFile) {
+        Write-Output "  Config Override: $configFile"
+    }
+    Write-Output ""
+    
+    # Extract directly to local folder (no container needed)
+    Write-Output "Extracting OMERO backup directly to $finalTarget ..."
+    $extractResult = & tar -xzf $backupPath -C $finalTarget 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to extract backup archive: $extractResult"
+        exit 1
+    }
+    
+    # Handle configuration
+    $hasConfig = $false
+    $configSource = ""
+    if ($configFile) {
+        # CUSTOM CONFIG MODE - Override with provided config file
+        Write-Output "Installing custom configuration..."
+        $backupDir = Join-Path $finalTarget "backup"
+        New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
+        if (Copy-Item $configFile (Join-Path $backupDir "omero.config") -Force) {
+            Write-Output "[OK] Custom configuration installed: $backupDir\omero.config"
+            $hasConfig = $true
+            $configSource = "custom file: $(Split-Path $configFile -Leaf)"
+        } else {
+            Write-Error "Failed to install custom configuration"
+            exit 1
+        }
+    } else {
+        $configPath = Join-Path $finalTarget "backup\omero.config"
+        if (Test-Path $configPath) {
+            Write-Output "[OK] Configuration backup found: $configPath"
+            $hasConfig = $true
+            $configSource = "backup archive"
+        } else {
+            Write-Warning "No configuration backup found at $configPath"
+            $configSource = "none - manual config required"
+        }
+    }
+    
+    # Show result summary
+    Write-Output ""
+    Write-Output "[SUCCESS] OMERO server restore completed successfully!"
+    Write-Output ""
+    Write-Output "Local folder created: $finalTarget"
+    Write-Output ""
+    Write-Output "To use in docker-compose.yml:"
+    Write-Output "  services:"
+    Write-Output "    omeroserver:"
+    Write-Output "      volumes:"
+    Write-Output "        - `"${finalTarget}:/OMERO`""
+    Write-Output ""
+    Write-Output "Configuration restoration:"
+    Write-Output "  Config source: $configSource"
+    if ($hasConfig) {
+        Write-Output "  [OK] 00-restore-config.sh will automatically load config on container start"
+        Write-Output "  [OK] No manual configuration required!"
+    } else {
+        Write-Output "  [WARN] No config available - you'll need to configure manually"
+        Write-Output "  [TIP] Use CONFIG_ environment variables in docker-compose.yml"
+        Write-Output "  [TIP] Or mount .omero config files to /opt/omero/server/config/"
+    }
+    Write-Output ""
+    Write-Output "Next steps:"
+    Write-Output "  1. Update docker-compose.yml with the volume configuration above"
+    Write-Output "  2. Start OMERO containers: docker-compose up -d"
+    Write-Output "  3. Check logs: docker-compose logs omeroserver"
+    Write-Output "  4. Restored to: $finalTarget"
+    if ($configFile) {
+        Write-Output ""
+        Write-Output "Configuration override applied:"
+        Write-Output "  [INFO] Original backup config (if any) was replaced"
+        Write-Output "  [INFO] Custom config from: $configFile"
+        Write-Output "  [INFO] Will be loaded automatically on container startup"
+    }
+    exit 0
+}
+
+# DOCKER VOLUME MODE (existing container-based logic)
+if ($volumeName) {
         $finalVolumeName = $volumeName
     } else {
         # Generate volume name from backup timestamp

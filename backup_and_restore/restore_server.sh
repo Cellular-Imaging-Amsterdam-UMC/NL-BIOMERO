@@ -196,45 +196,123 @@ fi
 
 # Determine target (volume or folder)
 if [[ -n "$TARGET_PATH" ]]; then
-    # LOCAL FOLDER MODE
+    # LOCAL FOLDER MODE: extract directly, no container, no temp copy
     final_target="$TARGET_PATH/omero-server-$backup_timestamp"
     target_type="local folder"
-    
+
     if [[ -d "$final_target" ]]; then
         echo "Error: Target folder already exists: $final_target" >&2
         echo "Remove it first or choose a different path."
         exit 1
     fi
-    
+
     mkdir -p "$final_target"
     final_target=$(realpath "$final_target")
-    
-else
-    # DOCKER VOLUME MODE
-    if [[ -n "$VOLUME_NAME" ]]; then
-        final_volume_name="$VOLUME_NAME"
+
+    echo "OMERO Server Restore:"
+    echo "  Backup: $BACKUP_PATH"
+    echo "  Target: $final_target ($target_type)"
+    echo "  Timestamp: $backup_timestamp"
+    if [[ -n "$CONFIG_FILE" ]]; then
+        echo "  Config Override: $CONFIG_FILE"
+    fi
+    echo ""
+
+    # Extract directly to local folder
+    echo "Extracting OMERO backup directly to $final_target ..."
+    if ! tar -xzf "$BACKUP_PATH" -C "$final_target"; then
+        echo "Error: Failed to extract backup archive" >&2
+        exit 1
+    fi
+
+    # Handle configuration
+    has_config=false
+    config_source=""
+    if [[ -n "$CONFIG_FILE" ]]; then
+        # CUSTOM CONFIG MODE - Override with provided config file
+        echo "Installing custom configuration..."
+        mkdir -p "$final_target/backup"
+        if cp "$CONFIG_FILE" "$final_target/backup/omero.config"; then
+            echo "[OK] Custom configuration installed: $final_target/backup/omero.config"
+            has_config=true
+            config_source="custom file: $(basename "$CONFIG_FILE")"
+        else
+            echo "Error: Failed to install custom configuration" >&2
+            exit 1
+        fi
     else
-        # Generate volume name from backup timestamp
-        final_volume_name="omero-server-$backup_timestamp"
+        if [[ -f "$final_target/backup/omero.config" ]]; then
+            echo "[OK] Configuration backup found: $final_target/backup/omero.config"
+            has_config=true
+            config_source="backup archive"
+        else
+            echo "[WARN] No configuration backup found at $final_target/backup/omero.config"
+            config_source="none - manual config required"
+        fi
     fi
-    
-    # Check if volume exists
-    existing_volume=$($ENGINE volume ls -q --filter "name=^${final_volume_name}$" 2>/dev/null)
-    if [[ -n "$existing_volume" ]]; then
-        echo "Error: Volume already exists: $final_volume_name" >&2
-        echo "Remove it first with: $ENGINE volume rm $final_volume_name"
-        exit 1
+
+    # Show result summary
+    echo ""
+    echo "[SUCCESS] OMERO server restore completed successfully!"
+    echo ""
+    echo "Local folder created: $final_target"
+    echo ""
+    echo "To use in docker-compose.yml:"
+    echo "  services:"
+    echo "    omeroserver:"
+    echo "      volumes:"
+    echo "        - \"$final_target:/OMERO\""
+    echo ""
+    echo "Configuration restoration:"
+    echo "  Config source: $config_source"
+    if [[ "$has_config" == "true" ]]; then
+        echo "  [OK] 00-restore-config.sh will automatically load config on container start"
+        echo "  [OK] No manual configuration required!"
+    else
+        echo "  [WARN] No config available - you'll need to configure manually"
+        echo "  [TIP] Use CONFIG_ environment variables in docker-compose.yml"
+        echo "  [TIP] Or mount .omero config files to /opt/omero/server/config/"
     fi
-    
-    # Create volume
-    if ! $ENGINE volume create "$final_volume_name" >/dev/null; then
-        echo "Error: Failed to create Docker volume: $final_volume_name" >&2
-        exit 1
+    echo ""
+    echo "Next steps:"
+    echo "  1. Update docker-compose.yml with the volume configuration above"
+    echo "  2. Start OMERO containers: docker-compose up -d"
+    echo "  3. Check logs: docker-compose logs omeroserver"
+    echo "  4. Restored to: $final_target"
+    if [[ -n "$CONFIG_FILE" ]]; then
+        echo ""
+        echo "Configuration override applied:"
+        echo "  [INFO] Original backup config (if any) was replaced"
+        echo "  [INFO] Custom config from: $CONFIG_FILE"
+        echo "  [INFO] Will be loaded automatically on container startup"
     fi
-    
-    final_target="$final_volume_name"
-    target_type="Docker volume"
+    exit 0
 fi
+
+# DOCKER VOLUME MODE
+if [[ -n "$VOLUME_NAME" ]]; then
+    final_volume_name="$VOLUME_NAME"
+else
+    # Generate volume name from backup timestamp
+    final_volume_name="omero-server-$backup_timestamp"
+fi
+
+# Check if volume exists
+existing_volume=$($ENGINE volume ls -q --filter "name=^${final_volume_name}$" 2>/dev/null)
+if [[ -n "$existing_volume" ]]; then
+    echo "Error: Volume already exists: $final_volume_name" >&2
+    echo "Remove it first with: $ENGINE volume rm $final_volume_name"
+    exit 1
+fi
+
+# Create volume
+if ! $ENGINE volume create "$final_volume_name" >/dev/null; then
+    echo "Error: Failed to create Docker volume: $final_volume_name" >&2
+    exit 1
+fi
+
+final_target="$final_volume_name"
+target_type="Docker volume"
 
 echo "OMERO Server Restore:"
 echo "  Backup: $BACKUP_PATH"

@@ -41,8 +41,8 @@ USAGE:
   ./backup_and_restore/restore_db.sh [OPTIONS]
 
 DESCRIPTION:
-  Restore NL-BIOMERO PostgreSQL database dumps to new volumes with optional Postgres version upgrade.
-  Supports both Docker and Podman container engines.
+  Restore NL-BIOMERO PostgreSQL database dumps to new volumes or local folders.
+  Supports both Docker and Podman container engines with PostgreSQL version upgrades.
 
 PARAMETERS:
   --envFile <path>           Path to .env file (default: ./.env)
@@ -59,8 +59,11 @@ PARAMETERS:
   --help                   Show this help message
 
 EXAMPLES:
-  # Restore both databases from latest dumps to Postgres 16 (default)
+  # Restore both databases from latest dumps to Postgres 16 volumes (default)
   ./backup_and_restore/restore_db.sh
+
+  # Restore to local folder instead of Docker volumes
+  ./backup_and_restore/restore_db.sh --localFolder "/srv/postgresql"
 
   # Force using podman
   ./backup_and_restore/restore_db.sh --containerEngine podman
@@ -77,6 +80,10 @@ EXAMPLES:
 OUTPUT VOLUMES:
   Auto-generated names: {dbtype}-{timestamp}-pg{version}
   Example: omero-2025-07-24-14-06-06-pg16
+
+OUTPUT FOLDERS (with --localFolder):
+  {localFolder}/{dbtype}-{timestamp}-pg{version}/
+  Example: /srv/postgresql/omero-2025-07-24-14-06-06-pg16/
 
 CONTAINER ENGINES:
   Auto-detects podman or docker. Prefers podman if both are available.
@@ -336,15 +343,45 @@ restore_single() {
     
     # Start postgres container in background
     echo "Starting PostgreSQL container..."
-    local container_id
-    container_id=$($ENGINE run -d \
+    local container_id error_output
+    
+    # Capture both stdout and stderr
+    error_output=$($ENGINE run -d \
+        --userns=keep-id \
+        --security-opt label=disable \
         -v "$absolute_dump_path:/dump.pg_dump" \
         -v "$mount_string" \
         -e "POSTGRES_PASSWORD=$final_password" \
-        "postgres:$postgres_version" 2>/dev/null)
+        "postgres:$postgres_version" 2>&1)
+    
+    # Extract container ID from output (should be last line if successful)
+    container_id=$(echo "$error_output" | tail -1)
 
     if [[ -z "$container_id" || ${#container_id} -lt 10 ]]; then
-        echo "Error: Failed to start PostgreSQL container - invalid container ID: '$container_id'" >&2
+        echo "Error: Failed to start PostgreSQL container" >&2
+        echo "Container engine output: $error_output" >&2
+        echo "" >&2
+        echo "Debug info:" >&2
+        echo "  Dump path: $absolute_dump_path" >&2
+        echo "  Mount string: $mount_string" >&2
+        echo "  Target folder exists: $(ls -ld "$final_target_path" 2>/dev/null || echo "NO")" >&2
+        echo "  Target folder permissions: $(stat -c '%a %U:%G' "$final_target_path" 2>/dev/null || echo "N/A")" >&2
+        echo "  Dump file exists: $(ls -l "$absolute_dump_path" 2>/dev/null || echo "NO")" >&2
+        echo "  Available space in target: $(df -h "$final_target_path" 2>/dev/null | tail -1 || echo "N/A")" >&2
+        return 1
+    fi
+    
+    echo "Container started with ID: ${container_id:0:12}..."
+    
+    # Check if container is actually running
+    sleep 2
+    if ! $ENGINE ps --filter "id=$container_id" --format "{{.Status}}" | grep -q "Up"; then
+        echo "Error: Container started but is not running" >&2
+        echo "Container logs:" >&2
+        $ENGINE logs "$container_id" 2>&1 || echo "Could not retrieve logs"
+        echo "" >&2
+        echo "Container status:" >&2
+        $ENGINE ps -a --filter "id=$container_id" --format "table {{.ID}}\t{{.Status}}\t{{.Ports}}" 2>&1 || echo "Could not retrieve status"
         return 1
     fi
     
@@ -452,8 +489,7 @@ if [[ "$DB_TYPE" == "both" ]]; then
     echo "Restoring both databases to Postgres $POSTGRES_VERSION"
     echo ""
     
-    # Handle single volumeName for both databases
-    local omero_volume biomero_volume
+    # Remove 'local' keyword for variables in main script scope
     if [[ -n "$VOLUME_NAME" ]]; then
         omero_volume="$VOLUME_NAME-omero"
         biomero_volume="$VOLUME_NAME-biomero"
@@ -481,12 +517,10 @@ if [[ "$DB_TYPE" == "both" ]]; then
         echo "*** Both restores completed successfully! ***"
         echo ""
         echo "Volumes created:"
-        # Show the actual volume names that were created
         if [[ -n "$VOLUME_NAME" ]]; then
             echo "  $VOLUME_NAME-omero"
             echo "  $VOLUME_NAME-biomero"
         else
-            local omero_dump biomero_dump
             omero_dump=$(find_latest_dump "$BACKUP_DIRECTORY" "omero")
             biomero_dump=$(find_latest_dump "$BACKUP_DIRECTORY" "biomero")
             echo "  $(get_descriptive_volume_name "$omero_dump" "omero" "$POSTGRES_VERSION")"
@@ -506,17 +540,24 @@ else
     if restore_single "$DB_TYPE" "$DUMP_PATH" "$VOLUME_NAME" "$LOCAL_FOLDER" "$DB_NAME" "$USER" "$PASSWORD" "$POSTGRES_VERSION"; then
         echo ""
         echo "*** Restore completed successfully! ***"
-        local restored_volume
-        if [[ -n "$VOLUME_NAME" ]]; then
-            restored_volume="$VOLUME_NAME"
-        else
-            if [[ "$DB_TYPE" == "biomero" ]]; then
-                restored_volume="database-biomero-restored"
+        
+        if [[ -n "$LOCAL_FOLDER" ]]; then
+            # Local folder mode
+            descriptive_name=""
+            if [[ -n "$DUMP_PATH" ]]; then
+                descriptive_name=$(get_descriptive_volume_name "$DUMP_PATH" "$DB_TYPE" "$POSTGRES_VERSION")
             else
-                restored_volume="database-restored"
+                descriptive_name="database-$DB_TYPE-restored"
+            fi
+            echo "Local folder created: $LOCAL_FOLDER/$descriptive_name"
+        else
+            # Volume mode
+            if [[ -n "$VOLUME_NAME" ]]; then
+                echo "Volume created: $VOLUME_NAME"
+            else
+                echo "Volume created: database-$DB_TYPE-restored"
             fi
         fi
-        echo "Volume created: $restored_volume"
     else
         exit 1
     fi

@@ -3,6 +3,7 @@ param(
     [string]$containerName = "",
     [string]$outputDirectory = "",
     [string]$timestamp = "",
+    [string]$omeroFolder = "",
     [switch]$skipData = $false,
     [switch]$skipConfig = $false,
     [switch]$help
@@ -18,19 +19,24 @@ USAGE:
 
 DESCRIPTION:
   Backup OMERO server data store (/OMERO volume) including configuration.
-  Requires running OMERO server container.
+  Can backup from a running container or directly from a local folder.
 
 PARAMETERS:
   -envFile <path>         Path to .env file (default: .\.env)
   -containerName <name>   Override OMERO server container name (default: nl-biomero-omeroserver-1)
   -outputDirectory <dir>  Output directory (default: .\backup_and_restore\backups)
+  -omeroFolder <path>     Backup from local OMERO folder instead of container
   -skipConfig             Skip configuration export (/OMERO/backup/omero.config)
   -skipData               Skip data store backup (tar.gz archive)
+  -timestamp <timestamp>  Use specific timestamp (for coordinated backups)
   -help                   Show this help message
 
 EXAMPLES:
-  # Full backup (export fresh config + backup entire volume)
+  # Full backup from container (export fresh config + backup entire volume)
   .\backup_and_restore\backup_server.ps1
+
+  # Backup from local OMERO folder (no container needed)
+  .\backup_and_restore\backup_server.ps1 -omeroFolder "C:\omero"
 
   # Export fresh config to /OMERO/backup only
   .\backup_and_restore\backup_server.ps1 -skipData
@@ -38,9 +44,13 @@ EXAMPLES:
   # Backup data only (skip config export)
   .\backup_and_restore\backup_server.ps1 -skipConfig
 
-PROCESS:
-  1. Export current config to /OMERO/backup/omero.config (unless -skipData)
-  2. Create tar.gz archive of entire /OMERO volume (unless -skipConfig)
+PROCESS (Container Mode):
+  1. Export current config to /OMERO/backup/omero.config (unless -skipConfig)
+  2. Create tar.gz archive of entire /OMERO volume (unless -skipData)
+
+PROCESS (Folder Mode):
+  1. Create tar.gz archive directly from local folder (unless -skipData)
+  2. Config export skipped (no container access)
 
 OUTPUT:
   omero-server.{timestamp}.tar.gz (includes config, data, scripts, everything)
@@ -74,6 +84,51 @@ if ($timestamp) {
 # Create output directory
 New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
 $absoluteOutputDir = (Resolve-Path $finalOutputDir).Path
+
+# Check for folder mode first
+if ($omeroFolder) {
+    $finalOutputDir = if ($outputDirectory) { $outputDirectory } else { ".\backup_and_restore\backups" }
+    if ($timestamp) {
+        Write-Output "Using provided timestamp: $timestamp"
+    } else {
+        $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
+    }
+    New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
+    $absoluteOutputDir = (Resolve-Path $finalOutputDir).Path
+    $omeroFolderAbs = (Resolve-Path $omeroFolder).Path
+    
+    Write-Output "OMERO Server Folder Backup:"
+    Write-Output "  Source: $omeroFolderAbs"
+    Write-Output "  Output: $absoluteOutputDir"
+    Write-Output "  Timestamp: $timestamp"
+    Write-Output ""
+    
+    if (-not $skipData) {
+        $dataFile = "omero-server.$timestamp.tar.gz"
+        $hostDataFile = Join-Path $absoluteOutputDir $dataFile
+        Write-Output "Creating tar.gz archive of OMERO folder (this may take a while)..."
+        Push-Location (Split-Path $omeroFolderAbs -Parent)
+        $tarResult = & tar -czf $hostDataFile (Split-Path $omeroFolderAbs -Leaf) 2>&1
+        Pop-Location
+        if (Test-Path $hostDataFile) {
+            $dataSize = (Get-Item $hostDataFile).Length
+            if ($dataSize -lt 1MB) {
+                Write-Error "Archive file is suspiciously small ($([math]::Round($dataSize/1KB, 2)) KB)"
+                exit 1
+            } else {
+                Write-Output "[OK] OMERO folder backup: $hostDataFile ($([math]::Round($dataSize/1MB, 2)) MB)"
+                Write-Output "[SUCCESS] OMERO server folder backup completed successfully!"
+                exit 0
+            }
+        } else {
+            Write-Error "Archive file was not created: $hostDataFile"
+            exit 1
+        }
+    } else {
+        Write-Output "Data backup skipped (-skipData)."
+        exit 0
+    }
+}
 
 Write-Output "OMERO Server Backup:"
 Write-Output "  Container: $finalContainerName"

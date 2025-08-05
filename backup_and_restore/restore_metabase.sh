@@ -180,7 +180,6 @@ if [ -d "$TARGET_METABASE_PATH" ]; then
         exit 1
     fi
 fi
-fi
 
 # Check if tar is available
 if ! command -v tar &> /dev/null; then
