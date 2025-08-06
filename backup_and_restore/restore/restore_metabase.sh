@@ -51,10 +51,9 @@ DESCRIPTION:
 
 PARAMETERS:
   --backup-file <path>        Path to metabase backup file (.tar.gz) (auto-detects latest if not specified)
-  --restore-directory <dir>   Directory to restore to (default: current directory)
-  --metabase-folder <name>    Target metabase folder name (default: metabase)
+  --restore-directory <dir>   Directory to extract to (default: current directory)
   --backup-directory <dir>    Directory to search for latest backup (default: ./backup_and_restore/backups)
-  --force                     Overwrite existing metabase folder without confirmation
+  --force                     Overwrite existing files without confirmation
   --help                      Show this help message
 
 EXAMPLES:

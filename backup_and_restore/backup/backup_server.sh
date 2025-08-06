@@ -56,7 +56,7 @@ EXAMPLES:
   ./backup_and_restore/backup_server.sh
 
   # Backup from local OMERO folder (no container needed)
-  ./backup_and_restore/backup_server.sh --omero-folder "/srv/omero"
+  ./backup_and_restore/backup_server.sh --omeroFolder "/srv/omero"
 
   # Export fresh config to /OMERO/backup only
   ./backup_and_restore/backup_server.sh --skipData

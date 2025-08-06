@@ -47,8 +47,8 @@ EXAMPLES:
   # Only server backup (skip databases and Metabase)
   .\backup_and_restore\backup_master.ps1 -skipDatabase -skipMetabase
 
-  # Only export fresh server config, backup both databases and Metabase
-  .\backup_and_restore\backup_master.ps1 -configOnly
+  # Only export fresh server config, skip server data backup
+  .\backup_and_restore\backup_master.ps1 -skipServerData
 
   # Database and Metabase only (useful for regular automated backups)
   .\backup_and_restore\backup_master.ps1 -skipServer
