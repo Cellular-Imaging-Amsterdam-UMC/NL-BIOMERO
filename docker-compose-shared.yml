@@ -1,0 +1,36 @@
+# docker-compose-shared.yml - Simulates shared infrastructure VM
+version: "3"
+
+services:
+  database:
+    image: "postgres:16"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_HOST_PORT}:5432"  # Expose to host for external access
+    volumes:
+      - "${HOST_DATABASE_PATH}:/var/lib/postgresql/data"  # Host-mounted volume
+    networks:
+      - shared-infra
+    restart: unless-stopped
+
+  database-biomero:
+    image: "postgres:16"
+    environment:
+      POSTGRES_USER: ${BIOMERO_POSTGRES_USER}
+      POSTGRES_DB: ${BIOMERO_POSTGRES_DB}
+      POSTGRES_PASSWORD: ${BIOMERO_POSTGRES_PASSWORD}
+    ports:
+      - "${BIOMERO_POSTGRES_HOST_PORT}:5432"  # Different port for BIOMERO DB
+    volumes:
+      - "${HOST_BIOMERO_DATABASE_PATH}:/var/lib/postgresql/data"  # Host-mounted volume
+    networks:
+      - shared-infra
+    restart: unless-stopped
+
+networks:
+  shared-infra:
+    name: shared-infrastructure
+    driver: bridge

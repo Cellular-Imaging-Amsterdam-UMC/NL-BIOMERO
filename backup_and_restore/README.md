@@ -22,12 +22,12 @@ Backs up OMERO DB, BIOMERO DB, OMERO server (data/config), and Metabase with a s
 
 **Linux/macOS:**
 ```bash
-./backup_and_restore/backup_master.sh
+./backup_and_restore/backup/backup_master.sh
 ```
 
 **Windows:**
 ```powershell
-.\backup_and_restore\backup_master.ps1
+.\backup_and_restore\backup\backup_master.ps1
 ```
 
 **Creates:**
@@ -60,7 +60,7 @@ All files are placed in a timestamped subfolder under `./backup_and_restore/back
 docker-compose stop omeroweb metabase omeroadi
 
 # 2. Run master backup
-./backup_and_restore/backup_master.sh
+./backup_and_restore/backup/backup_master.sh
 
 # 3. Restart services
 docker-compose up -d
@@ -75,13 +75,13 @@ docker-compose up -d
 docker-compose down
 
 # 2. Restore databases
-./backup_and_restore/restore_db.sh
+./backup_and_restore/restore/restore_db.sh
 
 # 3. Restore OMERO server data/config
-./backup_and_restore/restore_server.sh
+./backup_and_restore/restore/restore_server.sh
 
 # 4. Restore Metabase dashboards
-./backup_and_restore/restore_metabase.sh
+./backup_and_restore/restore/restore_metabase.sh
 
 # 5. Update docker-compose.yml to use restored volumes/folders
 # 6. Start all services
@@ -95,7 +95,7 @@ docker-compose up -d
 ### Database Backup
 
 ```bash
-./backup_and_restore/backup_db.sh
+./backup_and_restore/backup/backup_db.sh
 ```
 - Backs up OMERO and BIOMERO DBs from containers.
 - Output: `omero.{timestamp}.pg_dump`, `biomero.{timestamp}.pg_dump`
@@ -103,7 +103,7 @@ docker-compose up -d
 ### Server Backup
 
 ```bash
-./backup_and_restore/backup_server.sh
+./backup_and_restore/backup/backup_server.sh
 ```
 - Backs up OMERO server data/config from container or host folder.
 - Output: `omero-server.{timestamp}.tar.gz`
@@ -112,7 +112,7 @@ docker-compose up -d
 ### Metabase Backup
 
 ```bash
-./backup_and_restore/backup_metabase.sh
+./backup_and_restore/backup/backup_metabase.sh
 ```
 - Backs up Metabase folder (H2 DB, configs, plugins).
 - Output: `metabase.{timestamp}.tar.gz`
@@ -122,9 +122,9 @@ docker-compose up -d
 
 ## Restore Scripts
 
-- `restore_db.sh` / `restore_db.ps1`: Restore OMERO/BIOMERO DBs to containers or local folders.
-- `restore_server.sh` / `restore_server.ps1`: Restore OMERO server data/config to volume or folder.
-- `restore_metabase.sh` / `restore_metabase.ps1`: Restore Metabase dashboards/configs to folder.
+- `restore/restore_db.sh` / `restore/restore_db.ps1`: Restore OMERO/BIOMERO DBs to containers or local folders.
+- `restore/restore_server.sh` / `restore/restore_server.ps1`: Restore OMERO server data/config to volume or folder.
+- `restore/restore_metabase.sh` / `restore/restore_metabase.ps1`: Restore Metabase dashboards/configs to folder.
 
 ---
 
@@ -139,13 +139,13 @@ docker-compose up -d
 ## Example: Backup OMERO from Host Folder
 
 ```bash
-./backup_and_restore/backup_server.sh --omero-folder "/srv/omero"
+./backup_and_restore/backup/backup_server.sh --omero-folder "/srv/omero"
 ```
 
 ## Example: Backup Metabase from Host Folder
 
 ```bash
-./backup_and_restore/backup_metabase.sh --metabase-folder "/srv/metabase"
+./backup_and_restore/backup/backup_metabase.sh --metabase-folder "/srv/metabase"
 ```
 
 ---

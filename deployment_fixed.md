@@ -1,35 +1,24 @@
 # NL-BIOMERO Deployment & Upgrade Guide
 
-This document outlines four main deployme## Notes
+This document outlines several deployment scenarios for the NL-BIOMERO platform.
+Containers are available prebuilt and deployment is possible on Linux, Windows (via Docker Desktop), or Podman (e.g. RHEL/SELinux). Kubernetes setups are also possible with correct disk mounts.
 
-- All mounts and port mappings are defined in the docker-compose files.
-- `.env` controls ports, secrets, paths — adjust before deploy.
-- Podman with SELinux is supported (e.g. on RHEL) with volume labels set.
-- For restore/upgrade: follow OMERO docs: https://omero.readthedocs.io/en/stable/sysadmins/server-backup-and-restore.html
+For detailed docker-compose configurations for each scenario, see [Docker Compose Scenarios](docker-compose-scenarios.md).
 
 ---
 
-## Development & Demo Setups
+## Scenario 0: Development & Demo
 
-In addition to the production scenarios above, we also provide configurations for development:
+- Development-focused deployments with source code access
+- Suitable for testing, development, and demonstration purposes
+- Builds containers from local source code
+- Can include special configurations for easier development workflow
 
 **Docker Compose Files:**
 - `docker-compose-dev.yml` - Development setup with special configurations
 - `docker-compose.yml` - Default configuration that builds from local code
 
----
-
-## Next Steps
-
-- Want a quick install? → Start with Scenario 1 and `docker-compose-from-dockerhub.yml`.
-- Migrating old data? → Use Scenario 2 with `docker-compose-with-restored-data.yml`.
-- Extending an existing OMERO setup? → Use Scenario 3 with either `docker-compose-biomero-only.yml` or `docker-compose-adi-only.yml`.
-- Avoiding containers? → Proceed with caution (Scenario 4).
-
-Containers reduce complexity — you're not stuck managing dependencies or OS quirks.e NL-BIOMERO platform.
-Containers are available prebuilt and deployment is possible on Linux, Windows (via Docker Desktop), or Podman (e.g. RHEL/SELinux). Kubernetes setups are also possible with correct disk mounts.
-
-For detailed docker-compose configurations for each scenario, see [Docker Compose Scenarios](docker-compose-scenarios.md).
+→ See [Docker Compose Scenarios](docker-compose-scenarios.md) for usage details.
 
 ---
 
@@ -108,7 +97,7 @@ It also describes the opposite (backing up containers).
 
 ## Notes
 
-- All mounts and port mappings are defined in `docker-compose.yml`.
+- All mounts and port mappings are defined in the docker-compose files.
 - `.env` controls ports, secrets, paths — adjust before deploy.
 - Podman with SELinux is supported (e.g. on RHEL) with volume labels set.
 - For restore/upgrade: follow OMERO docs: https://omero.readthedocs.io/en/stable/sysadmins/server-backup-and-restore.html
@@ -117,11 +106,11 @@ It also describes the opposite (backing up containers).
 
 ## Next Steps
 
-- Want a quick install? → Start with Scenario 1.
-- Migrating old data? → Use Scenario 2 and the restore scripts.
-- Extending an existing OMERO setup? → Use Scenario 3.
+- Want a quick install? → Start with Scenario 1 and `docker-compose-from-dockerhub.yml`.
+- Migrating old data? → Use Scenario 2 with `docker-compose-with-restored-data.yml`.
+- Extending an existing OMERO setup? → Use Scenario 3 with either `docker-compose-biomero-only.yml` or `docker-compose-adi-only.yml`.
 - Avoiding containers? → Proceed with caution (Scenario 4).
 
-Containers reduce complexity — you’re not stuck managing dependencies or OS quirks.
+Containers reduce complexity — you're not stuck managing dependencies or OS quirks.
 
 ---
