@@ -31,7 +31,7 @@ For Ubuntu/Linux deployments (with SSL support), see our dedicated guide:
 Clone this repository locally:
 
 ```bash
-git clone https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO.git
+git clone --recurse-submodules https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO.git
 cd NL-BIOMERO
 ```
 

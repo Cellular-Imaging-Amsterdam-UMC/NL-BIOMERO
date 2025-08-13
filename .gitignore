@@ -9,4 +9,11 @@ web/L-Drive/.processed/
 backup_and_restore/backups/
 backup_and_restore/biomero*
 backup_and_restore/omero*
+
+
 host-mounts
+logs
+
+
+# Sphinx documentation
+docs/_build/
