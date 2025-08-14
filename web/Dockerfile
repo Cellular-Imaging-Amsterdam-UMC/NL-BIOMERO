@@ -1,4 +1,4 @@
-FROM openmicroscopy/omero-web-standalone:5.29.1
+FROM openmicroscopy/omero-web-standalone:5.29.2
 
 USER root
 
