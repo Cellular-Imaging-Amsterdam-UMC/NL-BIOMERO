@@ -1,4 +1,4 @@
-FROM openmicroscopy/omero-web-standalone:5.29.1
+FROM openmicroscopy/omero-web-standalone:5.29.2
 
 USER root
 
@@ -34,7 +34,7 @@ RUN yum install -y python3-devel postgresql-devel gcc gettext
 # Update PATH manually based on known locations
 ENV PATH="/usr/pgsql-12/bin:/usr/pgsql-14/bin:${PATH}"
 
-## Setup slurm-config for biomero, for the BIOMERO django API in omero-boost
+## Setup slurm-config for biomero, for the BIOMERO django API in OMERO.biomero
 COPY biomeroworker/slurm-config.ini /etc/slurm-config.ini
 
 ### Install OMERO ADI library for import order creation ###
@@ -44,24 +44,24 @@ ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated
 RUN git clone --depth 1 -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git /auto-importer
 RUN /opt/omero/web/venv3/bin/python3.9 -m pip install /auto-importer
 
-### Install OMERO BOOST first ###
-ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/omero-boost/commits/main" /latest_commit_boost
-RUN git clone -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/omero-boost.git /opt/omero/web/omero-boost
+### Install OMERO.biomero first ###
+ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero/commits/main" /latest_commit_biomero
+RUN git clone -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero.git /opt/omero/web/OMERO.biomero
 
 # Create and set permissions for static directory
 RUN mkdir -p /opt/omero/web/OMERO.web/var/static && \
     chmod a+w /opt/omero/web/OMERO.web/var/static
 
-# Upgrade pip and install boost
-RUN /opt/omero/web/venv3/bin/python3.9 -m pip install --upgrade pip && \
-    /opt/omero/web/venv3/bin/pip install wheel setuptools && \
-    /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/omero-boost && \
-    /opt/omero/web/venv3/bin/omero-boost-setup
+# Upgrade pip and install OMERO.biomero
+RUN /opt/omero/web/venv3/bin/python3.9 -m pip install --upgrade pip
+RUN /opt/omero/web/venv3/bin/pip install wheel setuptools
+RUN /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/OMERO.biomero
+RUN /opt/omero/web/venv3/bin/omero-biomero-setup
 
-# Set permissions for omero-boost directory so omero-web user can write files
-RUN chown -R omero-web:omero-web /opt/omero/web/omero-boost && \
-    chmod -R 755 /opt/omero/web/omero-boost && \
-    chmod -R 775 /opt/omero/web/omero-boost/omero_boost
+# Set permissions for OMERO.biomero directory so omero-web user can write files
+RUN chown -R omero-web:omero-web /opt/omero/web/OMERO.biomero && \
+    chmod -R 755 /opt/omero/web/OMERO.biomero && \
+    chmod -R 775 /opt/omero/web/OMERO.biomero/omero_biomero
 
 ### Install OMERO.forms ###
 

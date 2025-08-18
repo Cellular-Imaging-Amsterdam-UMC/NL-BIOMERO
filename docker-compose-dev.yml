@@ -159,7 +159,7 @@ services:
     volumes:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
       - "./web/L-Drive:/data:rw"
-      - "../omero-boost/:/opt/omero/web/omero-boost"
+      - "../OMERO.biomero/:/opt/omero/web/OMERO.biomero"
     entrypoint: ["sh", "-c", "tail -f /dev/null"]
 
   # New Metabase service
