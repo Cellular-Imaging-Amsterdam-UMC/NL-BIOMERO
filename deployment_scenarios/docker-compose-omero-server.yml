@@ -4,7 +4,7 @@ version: "3"
 services:
   omeroserver:
     build:
-      context: ./
+      context: ../
       dockerfile: ./server/Dockerfile
       args:
         BIOMERO_VERSION: ${BIOMERO_VERSION}
@@ -37,7 +37,7 @@ services:
     restart: unless-stopped
 
   omeroworker-1:
-    build: ./worker
+    build: ../worker
     environment:
       CONFIG_omero_master_host: omeroserver
       OMERO_WORKER_NAME: omeroworker-1

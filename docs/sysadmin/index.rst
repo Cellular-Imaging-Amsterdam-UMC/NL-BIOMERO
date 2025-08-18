@@ -9,8 +9,7 @@ This section covers all aspects of NL-BIOMERO deployment, from initial setup to 
    :maxdepth: 2
 
    deployment
-   docker-compose-scenarios  
+   docker-compose-scenarios
+   linux-deployment
+   development-setup
    backup-restore
-   hybrid-deployment
-   troubleshooting
-   configuration

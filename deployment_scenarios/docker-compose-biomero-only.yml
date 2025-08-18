@@ -32,8 +32,8 @@ services:
       - biomero
     volumes:
       - "~/.ssh:/tmp/.ssh:ro"
-      - "./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
-      - "./web/L-Drive:/data"
+      - "../web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
+      - "../web/L-Drive:/data"
 
   omeroweb:
     image: "cellularimagingcf/omeroweb:${NL_BIOMERO_VERSION:-latest}"
@@ -58,8 +58,8 @@ services:
     ports:
       - "4080:4080"
     volumes:
-      - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
-      - "./web/L-Drive:/data:rw"
+      - "../web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "../web/L-Drive:/data:rw"
 
   metabase:
     image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
@@ -74,7 +74,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - "./metabase:/metabase-data"
+      - "../metabase:/metabase-data"
 
 networks:
   biomero:

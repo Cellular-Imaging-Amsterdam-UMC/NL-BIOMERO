@@ -10,9 +10,10 @@ This platform provides a complete solution for bioimage data management and anal
 
 * **OMERO** - Image data management platform
 * **BIOMERO** - BioImage analysis workflows with Slurm integration
-* **Enhanced Web UI** - Modern interfaces for data import and analysis
+* **OMERO.biomero** - Modern web interfaces for data import and analysis
+* **OMERO.forms** - Flexible form-based interfaces for metadata annotation
 * **Metabase** - Analytics and visualization dashboards
-* **Docker Compose** - Easy deployment and scaling
+* **Docker Compose** - Easy deployment and scaling scenarios
 
 Getting Started
 ===============

@@ -6,13 +6,30 @@ This document outlines the different deployment scenarios for NL-BIOMERO and map
 
 NL-BIOMERO supports multiple deployment scenarios from development to production. This guide will help you choose the right configuration for your needs.
 
+## Important Usage Note
+
+> **Note:** All Docker Compose configurations in this project can be run from the root of the git repository by:
+> 1. Specifying the compose file path with `-f`
+> 2. Providing the appropriate environment file with `--env-file`
+> 3. Using the `up -d` flags to start containers in detached mode
+>
+> **Example:**
+> ```bash
+> docker compose -f ./deployment_scenarios/docker-compose-adi-only.yml --env-file .env.shared up -d
+> ```
+
+The examples below assume you're in the `deployment_scenarios` directory, but you can run them from the project root with the above pattern. Just double check the relative paths if you run them from somewhere else, especially if they have to build the containers instead of pull them from DockerHub.
+
+
 ---
 
 ## Scenario 0: Development & Demo
 
 ### Scenario 0.1: Local Development Setup
 **Purpose**: For developers working on NL-BIOMERO components
+
 **Docker Compose File**: `docker-compose-dev.yml`
+
 **Key Features**:
 - Builds images from local source code
 - Includes development-specific settings
@@ -25,7 +42,9 @@ docker-compose -f docker-compose-dev.yml up -d
 
 ### Scenario 0.2: Default (Local Build)
 **Purpose**: Testing with locally built images
+
 **Docker Compose File**: `docker-compose.yml`
+
 **Key Features**:
 - Builds all components from local source code
 - Includes standard configuration
@@ -42,7 +61,9 @@ docker-compose up -d
 
 ### Scenario 1.1: Standard Production Deployment
 **Purpose**: Production deployment with prebuilt images
+
 **Docker Compose File**: `docker-compose-from-dockerhub.yml`
+
 **Key Features**:
 - Uses prebuilt images from Docker Hub
 - Standard configuration with production defaults
@@ -55,7 +76,9 @@ docker-compose -f docker-compose-from-dockerhub.yml up -d
 
 ### Scenario 1.2: Production with SSL (Ubuntu)
 **Purpose**: Secure production deployment with SSL
+
 **Docker Compose File**: `docker-compose-for-ubuntu-with-SSL.yml`
+
 **Key Features**:
 - Includes Nginx for SSL termination
 - Configured for Ubuntu environments
@@ -72,7 +95,9 @@ docker-compose -f docker-compose-for-ubuntu-with-SSL.yml up -d
 
 ### Scenario 2.1: Restore from OMERO Backup
 **Purpose**: Deploy with existing OMERO/BIOMERO data
+
 **Docker Compose File**: `docker-compose-with-restored-data.yml`
+
 **Key Features**:
 - Configured to use external volumes for restored data
 - Compatible with backup/restore scripts
@@ -93,9 +118,13 @@ docker-compose -f docker-compose-with-restored-data.yml up -d
 
 ## Scenario 3: Hybrid Deployment with Existing OMERO Server
 
+> **⚠️ Warning:** This scenario is not properly tested and requires advanced OMERO grid configuration. You will need to establish an OMERO.grid connection between your existing OMERO server and the NL-BIOMERO components, including ensuring port 4061 (and potentially others) of the host OMERO server is accessible. The docker-compose files provided are starting points and will likely require significant customization for your specific environment. Feel free to contact the development team (e.g. on <a href="https://image.sc" target="_blank">image.sc</a>) for any assistance with this deployment scenario.
+
 ### Scenario 3.1: BIOMERO Only (External OMERO)
 **Purpose**: Connect to existing external OMERO server
+
 **Docker Compose File**: `docker-compose-biomero-only.yml`
+
 **Key Features**:
 - Deploys only BIOMERO components
 - Configured to connect to external OMERO server
@@ -115,7 +144,9 @@ docker-compose -f docker-compose-biomero-only.yml up -d
 
 ### Scenario 3.2: ADI Only (External OMERO)
 **Purpose**: Deploy only Automated Data Import with existing OMERO
+
 **Docker Compose File**: `docker-compose-adi-only.yml`
+
 **Key Features**:
 - Deploys only ADI component
 - Configured to connect to external OMERO server
@@ -138,7 +169,7 @@ docker-compose -f docker-compose-adi-only.yml up -d
 ## Additional Configurations
 
 ### Component Selection with Profiles
-All standard docker-compose files support selective component deployment using profiles:
+Some docker-compose files support selective component deployment using profiles:
 
 ```bash
 # Deploy only with ADI enabled
@@ -148,8 +179,10 @@ docker-compose --profile adi_enabled up -d
 docker-compose up -d
 ```
 
+You can build that in to any of the compose files to have the option of deploying only a subset of containers, without having to maintain multiple docker-compose files. See [Docker docs](https://docs.docker.com/compose/how-tos/profiles/).
+
 ### Environment Customization
-All deployments can be customized by editing the `.env` file before deployment:
+All deployments should be customized by editing the `.env` file before deployment:
 
 ```bash
 # Edit environment variables
@@ -158,6 +191,8 @@ nano .env
 # Then deploy
 docker-compose up -d
 ```
+
+Note that all values in the original .env file are public open source knowledge, so don't deploy those values on your public facing instances. See the documentation on how to change passwords of the different services, like Metabase.
 
 ---
 
@@ -182,3 +217,23 @@ services:
 ---
 
 For more detailed information about each scenario, see the deployment scenarios in `deployment.md`.
+
+## Detailed Deployment Guides
+
+For specific, in-depth deployment instructions, see these platform-specific guides:
+
+### Production Deployments
+- **[Linux/Ubuntu with SSL](README.linux.md)** - Complete guide for production Ubuntu deployment with SSL certificates, nginx reverse proxy, and security configurations
+  - Covers `docker-compose-for-ubuntu-with-SSL.yml`
+  - SSL certificate setup with Let's Encrypt
+  - Nginx reverse proxy configuration
+  - Volume permissions and security considerations
+
+### Development & Demo Deployments  
+- **[BIOMERO 101 Installation Guide](BIOMERO%20101%20-%20installation%20guide.pdf)** - Step-by-step beginner's guide for development setup
+  - Perfect for first-time users and demonstrations
+  - Covers Docker Desktop installation on Windows
+  - WSL2 setup and configuration
+  - Basic development workflow
+
+These guides provide platform-specific details, troubleshooting tips, and best practices for their respective deployment scenarios.

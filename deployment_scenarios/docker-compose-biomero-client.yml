@@ -22,9 +22,9 @@ services:
     volumes:
       - "${HOST_OMERO_DATA_PATH}:/OMERO"  # Same host-mounted shared storage (simulates NFS)
       - "~/.ssh:/tmp/.ssh:ro"
-      - "./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
+      - "../web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
       - "${HOST_L_DRIVE_PATH}:/data"
-      - "./biomeroworker/99-run-external.sh:/startup/99-run.sh:ro"
+      - "../biomeroworker/99-run-external.sh:/startup/99-run.sh:ro"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
@@ -53,7 +53,7 @@ services:
     ports:
       - "${BIOMERO_WEB_HOST_PORT}:4080"  # Expose on different port
     volumes:
-      - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "../web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
       - "${HOST_L_DRIVE_PATH}:/data:rw"
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -71,7 +71,7 @@ services:
     ports:
       - "${METABASE_HOST_PORT}:3000"  # Expose on different port
     volumes:
-      - "./metabase-biomero:/metabase-data"  # Host-mounted for persistence
+      - "../metabase-biomero:/metabase-data"  # Host-mounted for persistence
     networks:
       - biomero-vm
     restart: unless-stopped

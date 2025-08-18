@@ -33,7 +33,7 @@ services:
     ports:
       - "4080:4080"
     volumes:
-      - "./web/L-Drive:/data:rw"
+      - "../web/L-Drive:/data:rw"
 
   metabase:
     image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
@@ -48,7 +48,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - "./metabase:/metabase-data"
+      - "../metabase:/metabase-data"
 
   omeroadi:
     image: "cellularimagingcf/omeroadi:${OMEROADI_VERSION:-latest}"
@@ -66,8 +66,8 @@ services:
     networks:
       - adi-network
     volumes:
-      - "./web/L-Drive:/data"
-      - "./config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
+      - "../web/L-Drive:/data"
+      - "../config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
     user: "1000:1000"
 
 networks:

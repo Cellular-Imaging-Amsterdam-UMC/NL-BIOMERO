@@ -178,6 +178,78 @@ Making Changes
    - Use environment variables for dynamic settings
    - Test startup script changes in development containers
 
+Customizing Login Page with Volume Mounts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can customize the OMERO.web login page without rebuilding the container by mounting custom files over the default ones. This is particularly useful for branding and institutional customization.
+
+**Example: Custom Institution Banner**
+
+Mount your custom banner image to replace the default AmsterdamUMC logo:
+
+.. code-block:: yaml
+
+   services:
+     omeroweb:
+       volumes:
+         - "../web/local_omeroweb_edits/pretty_login/login_page_images/bioimaging.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/AmsterdamUMC-logo.png:ro"
+
+**Example: Custom Footer Images**
+
+To customize the footer section with your own organization logos and links, mount custom image files:
+
+.. code-block:: yaml
+
+   services:
+     omeroweb:
+       volumes:
+         # Custom footer logos
+         - "../web/local_omeroweb_edits/pretty_login/login_page_images/your-org-logo.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/Cellular Imaging.png:ro"
+         - "../web/local_omeroweb_edits/pretty_login/login_page_images/your-sponsor-logo.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/DBI.png:ro"
+
+**Example: Complete Login Page Template**
+
+For more extensive customization, you can mount a completely custom login.html template. The changes are minimal and focus mainly on the footer section:
+
+**Key Changes in login.html:**
+
+**Custom Footer Section** - Replace the default footer with your organization's links:
+
+.. code-block:: html
+
+   <div class="footer-content">
+       <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO" class="footer-section custom-banner" target="_blank" rel="noopener noreferrer">
+           <img src="{% static 'webclient/image/login_page_images/Cellular Imaging.png' %}" alt="Cellular Imaging Icon" class="section-icon">
+           <p class="section-text">Cellular Imaging, Amsterdam UMC <br> Developing data management and analysis <br> for your research</p>
+       </a>
+       <a href="https://www.dbi-infra.eu/" class="footer-section uploader-section" target="_blank" rel="noopener noreferrer">
+           <img src="{% static 'webclient/image/login_page_images/DBI.png' %}" alt="DBI Icon" class="section-icon" style="height: 60px; width: auto;">
+           <p class="section-text">Server kindly supported <br> by Danish BioImaging Infrastructure!</p>
+       </a>
+   </div>
+
+
+
+**Docker Compose Mount:**
+
+.. code-block:: yaml
+
+   services:
+     omeroweb:
+       volumes:
+         # Custom login page template (minimal changes shown above)
+         - "../web/local_omeroweb_edits/pretty_login/login.html:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/templates/webclient/login.html:ro"
+         # Supporting images
+         - "../web/local_omeroweb_edits/pretty_login/login_page_images/:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/:ro"
+
+**Important Notes:**
+
+- All mounted files should be read-only (``:ro``) to prevent accidental modification
+- The custom login.html should maintain the same Django template structure
+- Footer links in the template can be updated to point to your organization's resources
+- Image paths in the login.html must match the mounted file locations
+- Changes take effect immediately without container rebuild
+
 Testing
 ~~~~~~~
 

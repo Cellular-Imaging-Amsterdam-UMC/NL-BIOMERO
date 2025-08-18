@@ -1,11 +1,11 @@
 # Containerized OMERO with BIOMERO
 
-These scripts spin up the entire OMERO environment required for [BIOMERO](https://github.com/NL-BioImaging/biomero), and other improvements by the Core Facility Cellular Imaging.
+These scripts spin up the entire OMERO environment required for <a href="https://github.com/NL-BioImaging/biomero" target="_blank" rel="noopener noreferrer">BIOMERO</a>, and other improvements by the Core Facility Cellular Imaging.
 
 It uses Docker Compose to setup an OMERO grid on one computer with a server, web, processor and a BIOMERO processor.
-If you also want to spin up a local HPC cluster with Docker Compose, to connect BIOMERO to, we host an example [here](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm).
+If you also want to spin up a local HPC cluster with Docker Compose, to connect BIOMERO to, we host an example <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm" target="_blank" rel="noopener noreferrer">here</a>.
 
-This is an adaptation of OME's [OMERO.server grid and OMERO.web (docker-compose)](https://github.com/ome/docker-example-omero-grid) / [OMERO.server components on multiple nodes using OMERO.grid](http://www.openmicroscopy.org/site/support/omero5/sysadmins/grid.html#nodes-on-multiple-hosts).
+This is an adaptation of OME's <a href="https://github.com/ome/docker-example-omero-grid" target="_blank" rel="noopener noreferrer">OMERO.server grid and OMERO.web (docker-compose)</a> / <a href="http://www.openmicroscopy.org/site/support/omero5/sysadmins/grid.html#nodes-on-multiple-hosts" target="_blank" rel="noopener noreferrer">OMERO.server components on multiple nodes using OMERO.grid</a>.
 
 OMERO.server is listening on the standard OMERO ports `4063` and `4064`.
 OMERO.web is listening on port `4080` (http://localhost:4080/).
@@ -117,7 +117,7 @@ exit
 To get started with data:
 
 1. **Web Import**: Use our built-in web importer at http://localhost:4080/omero_boost/canvas/
-2. **OMERO.insight**: Download the [desktop client](https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf)
+2. **OMERO.insight**: Download the <a href="https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf" target="_blank" rel="noopener noreferrer">desktop client</a>
    - Connect to `localhost:4063`
    - Login as `root` / `omero`
 
@@ -125,7 +125,7 @@ To get started with data:
 
 ## 🧬 BIOMERO - BioImage Analysis
 
-Checkout the [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for detailed usage instructions.
+Checkout the <a href="https://nl-bioimaging.github.io/biomero/" target="_blank" rel="noopener noreferrer">BIOMERO documentation</a> for detailed usage instructions.
 
 ### Quick Workflow Example:
 
@@ -185,7 +185,7 @@ docker-compose exec <container-name> bash
 ## 🔧 Configuration
 
 ### Slurm Connection Requirements
-See [BIOMERO documentation](https://nl-bioimaging.github.io/biomero/) for comprehensive setup details.
+See <a href="https://nl-bioimaging.github.io/biomero/" target="_blank" rel="noopener noreferrer">BIOMERO documentation</a> for comprehensive setup details.
 
 **Essential Components**:
 - **SSH Configuration**: Headless SSH to Slurm server
@@ -238,16 +238,16 @@ More details in [web/README.md](web/README.md).
 ## 📚 Additional Resources
 
 - 📖 **[Ubuntu/Linux Deployment](README.linux.md)** - Production deployment guide
-- 🧬 **[BIOMERO Documentation](https://nl-bioimaging.github.io/biomero/)** - Analysis workflows
-- 🏗️ **[Local Slurm Cluster](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm)** - Testing environment
-- 🔬 **[OMERO Documentation](https://omero.readthedocs.io/)** - Core platform docs
+- 🧬 **<a href="https://nl-bioimaging.github.io/biomero/" target="_blank" rel="noopener noreferrer">BIOMERO Documentation</a>** - Analysis workflows
+- 🏗️ **<a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm" target="_blank" rel="noopener noreferrer">Local Slurm Cluster</a>** - Testing environment
+- 🔬 **<a href="https://omero.readthedocs.io/" target="_blank" rel="noopener noreferrer">OMERO Documentation</a>** - Core platform docs
 
 ---
 
 ## 🤝 Support
 
-- **Issues**: [GitHub Issues](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO/issues)
-- **Discussions**: [image.sc](https://forum.image.sc/) (tag #biomero)
+- **Issues**: <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO/issues" target="_blank" rel="noopener noreferrer">GitHub Issues</a>
+- **Discussions**: <a href="https://forum.image.sc/" target="_blank" rel="noopener noreferrer">image.sc</a> (tag #biomero)
 - **Contact**: cellularimaging /at/ amsterdamumc.nl
 
 Happy imaging! 🔬✨
