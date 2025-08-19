@@ -156,10 +156,10 @@ volumes:
     name: <YOUR_RESTORED_DATABASE_VOLUME_NAME>  # <-- Replace with the actual name of your restored database volume
   database-biomero:
     external: true
-    name: biomero-database-restored  # Update this name to match your restored volume
+    name: <YOUR_RESTORED_DATABASE_BIOMERO_VOLUME_NAME>  # <-- Replace with the actual name of your restored database volume
   omero:
     external: true
-    name: omero-server-restored  # Update this name to match your restored volume
+    name: <YOUR_RESTORED_OMERO_VOLUME_NAME>  # <-- Replace with the actual name of your restored OMERO volume
   metabase:
     external: true
-    name: metabase-restored  # Update this name to match your restored volume
+    name: <YOUR_RESTORED_METABASE_VOLUME_NAME>  # <-- Replace with the actual name of your restored Metabase volume
