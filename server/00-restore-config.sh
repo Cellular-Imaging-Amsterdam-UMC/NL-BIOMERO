@@ -5,7 +5,9 @@
 set -eu
 
 omero=/opt/omero/server/venv3/bin/omero
-config_backup="/OMERO/backup/omero.config"
+# The path to the OMERO configuration backup file.
+# Override CONFIG_BACKUP_PATH environment variable to change location.
+config_backup="${CONFIG_BACKUP_PATH:-/OMERO/backup/omero.config}"
 
 echo "Checking for configuration backup..."
 
