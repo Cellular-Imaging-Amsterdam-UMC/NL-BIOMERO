@@ -43,4 +43,4 @@ RUN wget --no-hsts -P $OMERO_DIST/lib/server https://repo1.maven.org/maven2/com/
 RUN wget --no-hsts -P $OMERO_DIST/lib/server https://repo1.maven.org/maven2/dev/zarr/jzarr/0.4.2/jzarr-0.4.2.jar
 RUN wget --no-hsts -P $OMERO_DIST/lib/server https://repo1.maven.org/maven2/org/lasersonlab/s3fs/2.2.3/s3fs-2.2.3.jar
 RUN wget --no-hsts -P $OMERO_DIST/lib/server https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/1.12.659/aws-java-sdk-s3-1.12.659.jar
-COPY server/omero-zarr-pixel-buffer-0.5.0.jar $OMERO_DIST/lib/server/omero-zarr-pixel-buffer.jar
+RUN wget --no-hsts -O $OMERO_DIST/lib/server/omero-zarr-pixel-buffer.jar https://artifacts.glencoesoftware.com:443/artifactory/gs-omero-snapshots-local/com/glencoesoftware/omero/omero-zarr-pixel-buffer/0.5.0/omero-zarr-pixel-buffer-0.5.0.jar
