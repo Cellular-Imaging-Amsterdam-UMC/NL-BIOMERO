@@ -217,9 +217,3 @@ volumes:
   database:
   database-biomero:
   omero:
-  l-drive:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/web/L-Drive

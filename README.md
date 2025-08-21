@@ -122,7 +122,7 @@ If you disabled modules via `IMPORTER_ENABLED=FALSE` or `ANALYZER_ENABLED=FALSE`
 
 To get started with data:
 
-1. **Web Import**: Use our built-in web importer at http://localhost:4080/omero_boost/canvas/
+1. **Web Import**: Use the Importer tab in OMERO.biomero at http://localhost:4080/omero_biomero/biomero/
 2. **OMERO.insight**: Download the <a href="https://downloads.openmicroscopy.org/help/pdfs/getting-started-5.pdf" target="_blank" rel="noopener noreferrer">desktop client</a>
    - Connect to `localhost:4063`
    - Login as `root` / `omero`
@@ -148,8 +148,8 @@ Checkout the <a href="https://nl-bioimaging.github.io/biomero/" target="_blank" 
 
 OR
 
-2. **"CANVAS" UI**:
-   - Use our new interface at http://localhost:4080/omero_boost/canvas/?tab=biomero
+2. **OMERO.biomero Analyzer UI**:
+   - Use the Analyzer tab at http://localhost:4080/omero_biomero/biomero/?tab=biomero
    - Select your workflow: e.g., `Cellpose`
    - Add Dataset, select the image(s) you want to segment
    - Fill in the workflow parameters in tab 2, e.g. nuclei channel 3
@@ -213,13 +213,13 @@ See <a href="https://nl-bioimaging.github.io/biomero/" target="_blank" rel="noop
 ## 🎨 Frontend Customizations
 This deployment includes several UI enhancements:
 
-- **🎨 OMERO CANVAS***: Modern UI for ADI web importer and BIOMERO workflows
+- **🧩 OMERO.biomero Plugin**: Unified Importer (ADI) and Analyzer (BIOMERO) tabs
 - **📝 OMERO.forms**: Create custom metadata forms for users to fill in
 - **🔘 Better Buttons**: Improved some button design and accessibility
 - **🎭 Pretty Login**: Minor enhanced login page aesthetics
 
 
-\* (codename!)
+The previous codename "CANVAS" has been replaced by the official name OMERO.biomero.
 
 
 

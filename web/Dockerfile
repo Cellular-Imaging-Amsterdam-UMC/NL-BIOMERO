@@ -2,6 +2,47 @@ FROM openmicroscopy/omero-web-standalone:5.29.2
 
 USER root
 
+# Update to Python 3.12
+RUN dnf -y install epel-release \
+     && dnf -y install python3.12 python3.12-pip python3.12-devel \
+         postgresql-devel gcc make gettext openssl-devel libffi-devel bzip2-devel zlib-devel xz-devel readline-devel sqlite-devel \
+     && alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 312
+
+# Capture existing (3.9) virtualenv package set, then rebuild venv3 with Python 3.12 and reinstall.
+# Robust against missing/broken pip in original venv: bootstrap via ensurepip if needed.
+RUN set -eux; \
+    FREEZE_ORIG=/tmp/venv3-freeze-original.txt; \
+    if [ -d /opt/omero/web/venv3 ]; then \
+        echo "Found existing venv3; attempting to freeze packages"; \
+        if /opt/omero/web/venv3/bin/python -m pip --version >/dev/null 2>&1; then \
+            /opt/omero/web/venv3/bin/python -m pip freeze > "$FREEZE_ORIG" || true; \
+        else \
+            echo "pip missing or broken in old venv; bootstrapping with ensurepip"; \
+            /opt/omero/web/venv3/bin/python -m ensurepip --upgrade || true; \
+            /opt/omero/web/venv3/bin/python -m pip install --upgrade pip setuptools wheel || true; \
+            /opt/omero/web/venv3/bin/python -m pip freeze > "$FREEZE_ORIG" || true; \
+        fi; \
+    else \
+        echo "Original venv3 missing; proceeding without freeze"; \
+        touch "$FREEZE_ORIG"; \
+    fi; \
+    # Filter out meta-tools & Ice/omero-py (fresh install) & editable installs; ignore comments
+    grep -E -v '^(pip==|setuptools==|wheel==|zeroc-ice==|omero-py==|#|Editable\s)' "$FREEZE_ORIG" > /tmp/venv3-freeze-filtered.txt || true; \
+    rm -rf /opt/omero/web/venv3; \
+    python3.12 -m venv /opt/omero/web/venv3; \
+    /opt/omero/web/venv3/bin/python -m ensurepip --upgrade; \
+    /opt/omero/web/venv3/bin/pip install --upgrade pip setuptools wheel; \
+    /opt/omero/web/venv3/bin/pip install \
+        https://github.com/glencoesoftware/zeroc-ice-py-linux-x86_64/releases/download/20240202/zeroc_ice-3.6.5-cp312-cp312-manylinux_2_28_x86_64.whl \
+        omero-py; \
+    if [ -s /tmp/venv3-freeze-filtered.txt ]; then \
+        echo "Reinstalling previously captured packages"; \
+        /opt/omero/web/venv3/bin/pip install -r /tmp/venv3-freeze-filtered.txt || true; \
+    else \
+        echo "No previous packages to reinstall"; \
+    fi;
+
+
 # Create L-Drive directory and set permissions
 RUN mkdir -p /L-Drive && \
     chown omero-web:omero-web /L-Drive && \
@@ -28,8 +69,6 @@ RUN /opt/omero/web/venv3/bin/pip install \
         omero-webtagging-tagsearch \
         whitenoise
 
-# Install system dependencies
-RUN yum install -y python3-devel postgresql-devel gcc gettext
 
 # Update PATH manually based on known locations
 ENV PATH="/usr/pgsql-12/bin:/usr/pgsql-14/bin:${PATH}"
@@ -42,7 +81,7 @@ COPY biomeroworker/slurm-config.ini /etc/slurm-config.ini
 ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import/commits?sha=main&per_page=1" /latest_commit
 # Clone from main branch with Git metadata for version detection
 RUN git clone --depth 1 -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git /auto-importer
-RUN /opt/omero/web/venv3/bin/python3.9 -m pip install /auto-importer
+RUN /opt/omero/web/venv3/bin/python -m pip install /auto-importer
 
 ### Install OMERO.biomero first ###
 ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero/commits/main" /latest_commit_biomero
@@ -52,11 +91,9 @@ RUN git clone -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO.bi
 RUN mkdir -p /opt/omero/web/OMERO.web/var/static && \
     chmod a+w /opt/omero/web/OMERO.web/var/static
 
-# Upgrade pip and install OMERO.biomero
-RUN /opt/omero/web/venv3/bin/python3.9 -m pip install --upgrade pip
-RUN /opt/omero/web/venv3/bin/pip install wheel setuptools
-RUN /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/OMERO.biomero
-RUN /opt/omero/web/venv3/bin/omero-biomero-setup
+# Install OMERO.biomero (pip already upgraded earlier)
+RUN /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/OMERO.biomero \
+    && /opt/omero/web/venv3/bin/omero-biomero-setup
 
 # Set permissions for OMERO.biomero directory so omero-web user can write files
 RUN chown -R omero-web:omero-web /opt/omero/web/OMERO.biomero && \
@@ -69,10 +106,10 @@ RUN chown -R omero-web:omero-web /opt/omero/web/OMERO.biomero && \
 RUN /opt/omero/web/venv3/bin/pip install omero-forms==2.1.0
 
 # Set the working directory
-WORKDIR /opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb
+WORKDIR /opt/omero/web/venv3/lib/python3.12/site-packages/omeroweb
 
 # Run the script to update the login.html file from pretty_login
-RUN python3.9 /script/get_images_for_login_page.py /images/ /script/login.html ./webclient/templates/webclient/login.html
+RUN /opt/omero/web/venv3/bin/python /script/get_images_for_login_page.py /images/ /script/login.html ./webclient/templates/webclient/login.html
 
 # Login logos image and style page
 ADD web/local_omeroweb_edits/pretty_login/login_page_images ./webclient/static/webclient/image/login_page_images/

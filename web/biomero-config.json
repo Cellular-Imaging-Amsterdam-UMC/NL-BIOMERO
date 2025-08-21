@@ -1,5 +1,5 @@
 {
-  "EXTENSIONS_WITH_HIDDEN_ACCOMPANYING_FILES": [
+  "FILE_OR_EXTENSION_PATTERNS_EXCLUSIVE": [
     "experiment.db",
     ".xlef",
     ".mycoolcontainer"
