@@ -5,10 +5,25 @@ version: "3"
 
 # Define all the services: database, omero server, omero web
 services:
+  # Add nginx service
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-ssl
+    networks:
+      - omero
+    ports:
+      - "4080:4080"    # HTTP for omeroweb
+      - "4443:4443"    # HTTPS for omeroweb
+      - "3000:3000"    # HTTP for metabase
+      - "3443:3443"    # HTTPS for metabase
+    volumes:
+      - "../nginx/nginx.conf:/etc/nginx/nginx.conf:ro" # TODO: Make sure to have SSL certs match the location in nginx.conf, and change the server URL in the nginx.conf
+      - "/etc/letsencrypt/:/etc/letsencrypt:ro"   # TODO: Make sure to have SSL certs in this folder
+    
   # Name of our database, referenced in omero_db_host
   database:
     # Define a prebuilt Postgres image with a version
-    image: "postgres:11"
+    image: "postgres:16" # Upgrade existing postgres 11 to 16 via backup and restore
     # Define environment variables (user/pass here)
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -22,7 +37,7 @@ services:
       - "database:/var/lib/postgresql/data"
 
   database-biomero:
-    image: "postgres:16"
+    image: "postgres:16-alpine"
     environment:
       POSTGRES_USER: ${BIOMERO_POSTGRES_USER}
       POSTGRES_DB: ${BIOMERO_POSTGRES_DB}
@@ -39,7 +54,12 @@ services:
     image: "cellularimagingcf/omeroserver:${NL_BIOMERO_VERSION:-latest}"
     # Define environment variables for use in the container.
     # 'nodedescriptors' assigns roles to all the containers
-    # 'omero_db_*' are same as in 'database' description. 
+    # 'omero_db_*' are same as in 'database' description.
+    security_opt:
+      - seccomp=unconfined
+    ulimits:
+      nproc: 2048
+      stack: 16777216
     environment:
       CONFIG_omero_db_host: database
       CONFIG_omero_db_user: ${POSTGRES_USER}
@@ -63,13 +83,18 @@ services:
     # Define named volume and map a folder from the host machine
     volumes:
       - "omero:/OMERO"
-      - "./web/L-Drive:/data"
+      - "../web/L-Drive:/data"
 
-  # Name of our worker node, can be anything 
+  # Name of our worker node, can be anything
   omeroworker-1:
     image: "cellularimagingcf/omeroworker:${NL_BIOMERO_VERSION:-latest}"
     # Define variables for use in the container.
     # WORKER_NAME is used in the omero/ice node description
+    security_opt:
+      - seccomp=unconfined
+    ulimits:
+      nproc: 2048
+      stack: 16777216
     environment:
       CONFIG_omero_master_host: omeroserver
       OMERO_WORKER_NAME: omeroworker-1
@@ -80,7 +105,7 @@ services:
     # Named volume to share data access and persist data
     volumes:
       - "omero:/OMERO"
-      - "./web/L-Drive:/data"
+      - "../web/L-Drive:/data"
 
   # Define our processor worker
   biomeroworker:
@@ -88,6 +113,11 @@ services:
     # Define variables for use in the container.
     # WORKER_NAME is used in the omero/ice node description
     # logging_level doesn't work, but should increase logging
+    security_opt:
+      - seccomp=unconfined
+    ulimits:
+      nproc: 2048
+      stack: 16777216
     environment:
       CONFIG_omero_master_host: omeroserver
       OMERO_WORKER_NAME: biomeroworker
@@ -102,15 +132,20 @@ services:
     # Forward host SSH setup to container
     volumes:
       - "omero:/OMERO"
-      - "~/.ssh:/tmp/.ssh:ro"
-      - "./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
-      - "./web/L-Drive:/data"
+      - "/opt/omero/.ssh:/tmp/.ssh:ro" # TODO: Make sure to open permissions on the host e.g. chmod -R 777 /opt/omero/.ssh
+      - "../web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
+      - "../web/L-Drive:/data"
 
   # Service for the omero.web UI
   omeroweb:
     image: "cellularimagingcf/omeroweb:${NL_BIOMERO_VERSION:-latest}"
     # Environment variables for in the container
     # login__logo supplies a logo on the starting page of web UI
+    security_opt:
+      - seccomp=unconfined
+    ulimits:
+      nproc: 2048
+      stack: 16777216
     environment:
       OMEROHOST: omeroserver
       ROOTPASS: ${OMERO_ROOT_PASSWORD}
@@ -129,12 +164,13 @@ services:
     networks:
       - omero
     # Map ports to ports on the host machine, to allow opening of webpage
-    ports:
-      - "4080:4080"
+    # Remove port section when we add nginx to do it
+    #ports:
+    #  - "4080:4080"
     volumes:
-      - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
-      - "./web/local_omeroweb_edits/pretty_login/login_page_images/bioimaging.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/AmsterdamUMC-logo.png:ro"
-      - "./web/L-Drive:/data:rw"
+      - "../web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "../web/local_omeroweb_edits/pretty_login/login_page_images/bioimaging.png:/opt/omero/web/venv3/lib/python3.9/site-packages/omeroweb/webclient/static/webclient/image/login_page_images/AmsterdamUMC-logo.png:ro"
+      - "../web/L-Drive:/data:rw"
 
   metabase:
     image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
@@ -146,10 +182,11 @@ services:
       MB_PASSWORD: ${METABASE_PASSWORD}
     networks:
       - omero
-    ports:
-      - "3000:3000"
+    # Remove port section to let nginx handle it
+    #ports:
+    #  - "3000:3000"
     volumes:
-      - "./metabase:/metabase-data"
+      - "../metabase:/metabase-data"
 
   omeroadi:
     image: "cellularimagingcf/omeroadi:${OMEROADI_VERSION:-latest}"
@@ -164,12 +201,14 @@ services:
       OMERO_PASSWORD: ${OMERO_ROOT_PASSWORD}
       OMERO_PORT: 4064
       INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
+      PODMAN_USERNS_MODE: keep-id
     networks:
       - omero
     volumes:
       - "omero:/OMERO"
-      - "./web/L-Drive:/data"
-      - "./config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
+      - "../web/L-Drive:/data" # TODO: Make sure to open permissions on the host e.g. chmod -R 777 ./web/L-Drive
+      - "../config/omeroadi/settings.yml:/auto-importer/config/settings.yml"
+      - "../config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
     user: "1000:1000"
 
 # Define the network(s) to communicate between containers

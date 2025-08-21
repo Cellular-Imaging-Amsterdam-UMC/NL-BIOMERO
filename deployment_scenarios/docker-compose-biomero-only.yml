@@ -1,0 +1,85 @@
+# BIOMERO-only deployment that connects to an existing external OMERO server
+# Configure EXTERNAL_OMERO_HOST and related variables in .env file
+
+version: "3"
+
+services:
+  database-biomero:
+    image: "postgres:16"
+    environment:
+      POSTGRES_USER: ${BIOMERO_POSTGRES_USER}
+      POSTGRES_DB: ${BIOMERO_POSTGRES_DB}
+      POSTGRES_PASSWORD: ${BIOMERO_POSTGRES_PASSWORD}
+    networks:
+      - biomero
+    volumes:
+      - "database-biomero:/var/lib/postgresql/data"
+
+  biomeroworker:
+    image: "cellularimagingcf/biomero:${NL_BIOMERO_VERSION:-latest}"
+    environment:
+      CONFIG_omero_master_host: ${EXTERNAL_OMERO_HOST}
+      CONFIG_omero_master_port: ${EXTERNAL_OMERO_PORT:-4064}
+      OMERO_WORKER_NAME: biomeroworker
+      CONFIG_omero_logging_level: 10
+      CONFIG_omero_scripts_timeout: 604800000
+      PERSISTENCE_MODULE: eventsourcing_sqlalchemy
+      SQLALCHEMY_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
+      # External OMERO credentials
+      OMERO_USER: ${EXTERNAL_OMERO_USER:-root}
+      OMERO_PASSWORD: ${EXTERNAL_OMERO_PASSWORD}
+    networks:
+      - biomero
+    volumes:
+      - "~/.ssh:/tmp/.ssh:ro"
+      - "../web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
+      - "../web/L-Drive:/data"
+
+  omeroweb:
+    image: "cellularimagingcf/omeroweb:${NL_BIOMERO_VERSION:-latest}"
+    environment:
+      OMEROHOST: ${EXTERNAL_OMERO_HOST}
+      OMEROPORT: ${EXTERNAL_OMERO_PORT:-4064}
+      CONFIG_omero_web_login__logo: "https://cembo.eu/wp-content/uploads/2021/04/Amsterdam-UMC.png"
+      CONFIG_omero_scripts_timeout: 604800000
+      ENV: TEST
+      METABASE_SITE_URL: ${METABASE_SITE_URL}
+      METABASE_SECRET_KEY: ${METABASE_SECRET_KEY}
+      METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID: ${METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID}
+      METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID: ${METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID}
+      INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
+      IMPORT_MOUNT_PATH: /data
+      FORMS_MASTER_USER: ${FORMS_MASTER_USER}
+      FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
+      # External OMERO credentials
+      ROOTPASS: ${EXTERNAL_OMERO_PASSWORD}
+      IMPORTER_ENABLED: "FALSE"
+      ANALYZER_ENABLED: "TRUE"
+    networks:
+      - biomero
+    ports:
+      - "4080:4080"
+    volumes:
+      - "../web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "../web/L-Drive:/data:rw"
+
+  metabase:
+    image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
+    container_name: metabase
+    hostname: metabase
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+      MB_USER: ${METABASE_USER}
+      MB_PASSWORD: ${METABASE_PASSWORD}
+    networks:
+      - biomero
+    ports:
+      - "3000:3000"
+    volumes:
+      - "../metabase:/metabase-data"
+
+networks:
+  biomero:
+
+volumes:
+  database-biomero:

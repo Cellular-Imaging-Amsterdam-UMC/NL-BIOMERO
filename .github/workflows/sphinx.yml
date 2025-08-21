@@ -1,0 +1,36 @@
+name: Sphinx build
+
+on: 
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+        contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build HTML
+      uses: ammaraskar/sphinx-action@master
+      with:
+        pre-build-command: |
+          # Install necessary dependencies
+          apt-get update --allow-releaseinfo-change -y && apt-get install -y gcc python3-dev libpq-dev postgresql-client
+          pip install -r docs/requirements.txt
+        docs-folder: "docs/"
+      env:
+        SETUPTOOLS_SCM_PRETEND_VERSION: 1
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-docs
+        path: docs/_build/html/
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html
