@@ -148,7 +148,8 @@ services:
       IMPORT_MOUNT_PATH: /data
       FORMS_MASTER_USER: ${FORMS_MASTER_USER}
       FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
-      ADI_ENABLED: ${ADI_ENABLED}
+      IMPORTER_ENABLED: ${IMPORTER_ENABLED}
+      ANALYZER_ENABLED: ${ANALYZER_ENABLED}
     # Named network to communicate with other containers
     networks:
       - omero
@@ -179,7 +180,7 @@ services:
       context: https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git#main
     privileged: true
     profiles:
-      - "adi_enabled"
+      - "IMPORTER_ENABLED"
     devices:
       - "/dev/fuse:/dev/fuse"
     security_opt:

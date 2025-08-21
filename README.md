@@ -41,6 +41,10 @@ First, customize your environment file `.env`:
 ```bash
 # Edit .env with your secure passwords and configuration
 # Edit biomeroworker/slurm-config.ini if you need different BIOMERO settings
+# Toggle UI components (both default to TRUE):
+# IMPORTER_ENABLED=TRUE   # Enables the Automated Data Import (ADI) UI module
+# ANALYZER_ENABLED=TRUE   # Enables the BIOMERO analysis UI module
+# Set either to FALSE to hide that module from OMERO.web without removing containers
 ```
 
 ### 3. Setup Slurm Connection (Optional)
@@ -108,6 +112,8 @@ exit
   - **Login**: `root` / `omero` (change default password)
 - **Metabase**: http://localhost:3000  
   - **Login**: `admin@biomero.com` / `b1omero` (change default password)
+
+If you disabled modules via `IMPORTER_ENABLED=FALSE` or `ANALYZER_ENABLED=FALSE`, the corresponding UI tabs/panels won't appear.
 
 
 ---

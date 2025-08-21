@@ -181,6 +181,19 @@ docker-compose up -d
 
 You can build that in to any of the compose files to have the option of deploying only a subset of containers, without having to maintain multiple docker-compose files. See [Docker docs](https://docs.docker.com/compose/how-tos/profiles/).
 
+### Toggle UI Modules (OMERO.biomero plugin)
+In the `.env` file you can hide specific UI modules without removing containers:
+
+```bash
+# Automated Data Import (ADI) web UI
+IMPORTER_ENABLED=TRUE  # set FALSE to hide importer UI
+
+# BIOMERO analysis workflows UI
+ANALYZER_ENABLED=TRUE  # set FALSE to hide BIOMERO UI
+```
+
+Setting either variable to `FALSE` removes only the corresponding frontend elements in OMERO.web; backend containers can still run if present.
+
 ### Environment Customization
 All deployments should be customized by editing the `.env` file before deployment:
 

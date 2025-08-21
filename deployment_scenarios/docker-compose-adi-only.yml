@@ -27,7 +27,8 @@ services:
       IMPORT_MOUNT_PATH: /data
       # External OMERO credentials
       ROOTPASS: ${EXTERNAL_OMERO_PASSWORD}
-      ADI_ENABLED: "true"
+      IMPORTER_ENABLED: "TRUE"
+      ANALYZER_ENABLED: "FALSE"
     networks:
       - adi-network
     ports:

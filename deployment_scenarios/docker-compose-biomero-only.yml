@@ -53,6 +53,8 @@ services:
       FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
       # External OMERO credentials
       ROOTPASS: ${EXTERNAL_OMERO_PASSWORD}
+      IMPORTER_ENABLED: "FALSE"
+      ANALYZER_ENABLED: "TRUE"
     networks:
       - biomero
     ports:

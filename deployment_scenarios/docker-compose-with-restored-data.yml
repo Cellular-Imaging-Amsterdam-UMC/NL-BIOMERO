@@ -99,7 +99,7 @@ services:
       IMPORT_MOUNT_PATH: /data
       FORMS_MASTER_USER: ${FORMS_MASTER_USER}
       FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
-      ADI_ENABLED: ${ADI_ENABLED}
+      IMPORTER_ENABLED: ${IMPORTER_ENABLED}
     networks:
       - omero
     ports:
@@ -127,7 +127,7 @@ services:
     image: "cellularimagingcf/omeroadi:${OMEROADI_VERSION:-latest}"
     privileged: true
     profiles:
-      - "adi_enabled"
+      - "IMPORTER_ENABLED"
     devices:
       - "/dev/fuse:/dev/fuse"
     security_opt:
