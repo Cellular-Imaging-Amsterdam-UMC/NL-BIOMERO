@@ -1,0 +1,44 @@
+{
+  "EXTENSIONS_WITH_HIDDEN_ACCOMPANYING_FILES": [
+    "experiment.db",
+    ".xlef",
+    ".mycoolcontainer"
+  ],
+  "PREPROCESSING_EXTENSION_MAP": {
+    ".lif": "dataset_leica_uuid",
+    ".xlef": "dataset_leica_uuid",
+    ".lof": "dataset_leica_uuid",
+    ".db": "screen_db",
+    ".mycool": "mycool_preproc"
+  },
+  "PREPROCESSING_CONFIG": {
+    "screen_db": {
+      "container": "cellularimagingcf/cimagexpresstoometiff:v0.7",
+      "extra_params": {
+        "saveoption": "single"
+      }
+    },
+    "dataset_leica_uuid": {
+      "container": "cellularimagingcf/convertleica-docker:v1.2.0",
+      "extra_params": {
+        "image_uuid": "{UUID}"
+      }
+    },
+    "mycool_preproc": {
+      "container": "exampleorg/mycool-preproc:1.0.0",
+      "extra_params": {
+        "mode": "fast"
+      }
+    }
+  },
+  "group_mappings": {
+    "53": {
+      "folder": "Project A",
+      "groupName": "torectest"
+    },
+    "456": {
+      "folder": "SharedData",
+      "groupName": "Research"
+    }
+  }
+}
