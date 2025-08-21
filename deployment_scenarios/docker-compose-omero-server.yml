@@ -1,0 +1,57 @@
+# docker-compose-omero-server.yml - Simulates OMERO VM
+version: "3"
+
+services:
+  omeroserver:
+    build:
+      context: ../
+      dockerfile: ./server/Dockerfile
+      args:
+        BIOMERO_VERSION: ${BIOMERO_VERSION}
+    environment:
+      # Connect to external database via host
+      CONFIG_omero_db_host: host.docker.internal
+      CONFIG_omero_db_port: ${POSTGRES_HOST_PORT}
+      CONFIG_omero_db_user: ${POSTGRES_USER}
+      CONFIG_omero_db_pass: ${POSTGRES_PASSWORD}
+      CONFIG_omero_db_name: ${POSTGRES_DB}
+      CONFIG_omero_scripts_timeout: 604800000
+      CONFIG_omero_logging_level: 10
+      CONFIG_omero_server_nodedescriptors: >-
+        master:Blitz-0
+        omeroworker-1:Tables-0,Indexer-0,PixelData-0,DropBox,MonitorServer,FileServer,Storm
+        biomeroworker-external:Processor-0
+      CONFIG_omero_master_host: omeroserver
+      ROOTPASS: ${OMERO_ROOT_PASSWORD}
+    ports:
+      - "${OMERO_WEB_HOST_PORT}:4063"
+      - "${OMERO_HOST_PORT}:4064"  # Expose OMERO binary protocol to host
+      - "4061:4061"  # ICE grid registry port
+    volumes:
+      - "${HOST_OMERO_DATA_PATH}:/OMERO"  # Host-mounted shared storage
+      - "${HOST_L_DRIVE_PATH}:/data"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Access host services
+    networks:
+      - omero-vm
+    restart: unless-stopped
+
+  omeroworker-1:
+    build: ../worker
+    environment:
+      CONFIG_omero_master_host: omeroserver
+      OMERO_WORKER_NAME: omeroworker-1
+      CONFIG_omero_scripts_timeout: 604800000
+    volumes:
+      - "${HOST_OMERO_DATA_PATH}:/OMERO"  # Same host-mounted shared storage
+      - "${HOST_L_DRIVE_PATH}:/data"
+    networks:
+      - omero-vm
+    depends_on:
+      - omeroserver
+    restart: unless-stopped
+
+networks:
+  omero-vm:
+    name: omero-server-network
+    driver: bridge

@@ -8,7 +8,7 @@ services:
   # Name of our database, referenced in omero_db_host
   database:
     # Define a prebuilt Postgres image with a version
-    image: "postgres:11"
+    image: "postgres:16" # Upgrade existing postgres 11 to 16 via backup and restore
     # Define environment variables (user/pass here)
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -20,6 +20,8 @@ services:
     # Define named volumes to persist data on host after shutdown
     volumes:
       - "database:/var/lib/postgresql/data"
+      # - .\backup_and_restore\omero-2025-07-24-14-06-06-pg16:/var/lib/postgresql/data
+       
 
   database-biomero:
     # Define a prebuilt Postgres image with a version
@@ -127,8 +129,6 @@ services:
   # Service for the omero.web UI
   omeroweb:
     #image: "openmicroscopy/omero-web-standalone:5"
-    # We build this also locally in './web' folder, to add some extensions
-    # Environment variables for in the container
     build:
       context: ./
       dockerfile: ./web/Dockerfile
@@ -143,24 +143,23 @@ services:
       METABASE_SECRET_KEY: ${METABASE_SECRET_KEY}
       METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID: ${METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID}
       METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID: ${METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID}
+      CONFIG_omero_web_login__logo: "https://cembo.eu/wp-content/uploads/2021/04/Amsterdam-UMC.png"
       INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
       IMPORT_MOUNT_PATH: /data
       FORMS_MASTER_USER: ${FORMS_MASTER_USER}
       FORMS_MASTER_PASSWORD: ${FORMS_MASTER_PASSWORD}
+      IMPORTER_ENABLED: ${IMPORTER_ENABLED}
+      ANALYZER_ENABLED: ${ANALYZER_ENABLED}
     # Named network to communicate with other containers
     networks:
       - omero
     # Map ports to ports on the host machine, to allow opening of webpage
     ports:
       - "4080:4080"
-    # volumes:
-    # In case of further development, add volumes for local_omeroweb_edits here
-    # Once volumes are added, only omeroweb container reload necessary, not the whole docker-compose.
     volumes:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
       - "./web/L-Drive:/data:rw"
 
-  # New Metabase service
   metabase:
     image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
     container_name: metabase
@@ -180,6 +179,8 @@ services:
     build:
       context: https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git#main
     privileged: true
+    profiles:
+      - "IMPORTER_ENABLED"
     devices:
       - "/dev/fuse:/dev/fuse"
     security_opt:
@@ -204,13 +205,14 @@ networks:
   omero:
 
 # Define the named volume(s) to persist data to the host computer
+# Mount restored data to the named volumes with external: true and name: <volume_name>
 volumes:
   database:
+    # external: true
+    # name: nl-biomero_database16 # If you upgraded from 11 to 16, use the restored db name here
   database-biomero:
+    # external: true
+    # name: biomero-2025-07-24-14-06-06-pg16 # Restored data
   omero:
-  l-drive:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/web/L-Drive
+    # external: true
+    # name: omero-server-2025-07-29_12-09-40-UTC #  Restored data

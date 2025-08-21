@@ -10,7 +10,8 @@ USER root
 RUN yum -y install git 
 USER omero-server
 
-# Configuration file
+# Configuration files - use shell script for restore
+ADD server/00-restore-config.sh* /startup/
 ADD server/01-ldap-config.omero /opt/omero/server/config/
 
 # Development versions:

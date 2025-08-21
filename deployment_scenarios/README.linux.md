@@ -43,7 +43,7 @@ chmod -R 700 ~/.ssh
 You could add this into a bash script so you don't forget. Or just keep the .ssh folder open (but then you can't use it manually from the host). Btw, you could move that folder to /opt/omero or something, it doesn't need to be your user's home folder .ssh.
 
 ### 4. Containerized Slurm Build
-**Note**: this is only about the "fake" Slurm [NL-BIOMERO-Local-Slurm](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm). If you connect to an actual HPC you won't have these issues of course. You will have other issues probably ;)
+**Note**: this is only about the "fake" Slurm <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm" target="_blank" rel="noopener noreferrer">NL-BIOMERO-Local-Slurm</a>. If you connect to an actual HPC you won't have these issues of course. You will have other issues probably ;)
 
 Slurm doesn't build cleanly on Ubuntu. Build on Windows or CI, push to Docker Hub, then use, e.g.:
 
@@ -57,10 +57,10 @@ services:
   slurmctld:
     image: cellularimagingcf/slurm-docker-cluster-slurmctld:latest
 ```
-In short: use [`docker-compose-from-dockerhub.yml`](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm/blob/master/docker-compose-from-dockerhub.yml) for deployment for local Slurm.
+In short: use <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm/blob/master/docker-compose-from-dockerhub.yml" target="_blank" rel="noopener noreferrer">`docker-compose-from-dockerhub.yml`</a> for deployment for local Slurm.
 
 ### 5. Host Networking (host.docker.internal Replacement)
-**Note**: this is only about the "fake" Slurm [NL-BIOMERO-Local-Slurm](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm). If you connect to an actual HPC you won't have these issues of course. You will have other issues probably ;)
+**Note**: this is only about the "fake" Slurm <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm" target="_blank" rel="noopener noreferrer">NL-BIOMERO-Local-Slurm</a>. If you connect to an actual HPC you won't have these issues of course. You will have other issues probably ;)
 
 Ubuntu doesn't support `host.docker.internal`. Use Docker's gateway IP (e.g. `172.17.0.1`). Also:
 
@@ -222,10 +222,10 @@ docker-compose -f /opt/omero/docker-compose-for-ubuntu-with-SSL.yml up -d --buil
 
 ## 🔗 Additional Resources
 
-- [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [Let's Encrypt Ubuntu Guide](https://certbot.eff.org/instructions?ws=nginx&os=ubuntu)
-- [OMERO Documentation](https://omero.readthedocs.io/)
-- [NL-BIOMERO GitHub](https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO)
+- <a href="https://docs.docker.com/compose/" target="_blank" rel="noopener noreferrer">Docker Compose Documentation</a>
+- <a href="https://certbot.eff.org/instructions?ws=nginx&os=ubuntu" target="_blank" rel="noopener noreferrer">Let's Encrypt Ubuntu Guide</a>
+- <a href="https://omero.readthedocs.io/" target="_blank" rel="noopener noreferrer">OMERO Documentation</a>
+- <a href="https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO" target="_blank" rel="noopener noreferrer">NL-BIOMERO GitHub</a>
 
 If you run into any issues anyway, feel free to make an image.sc post or a GitHub issue for it; you will probably help other people with the same issues!
 
