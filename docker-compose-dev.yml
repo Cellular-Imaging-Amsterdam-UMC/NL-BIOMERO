@@ -76,6 +76,12 @@ services:
     volumes:
       - "omero:/OMERO"
       - "./web/L-Drive:/data"
+      - "./logs/omeroserver:/opt/omero/server/OMERO.server/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # Name of our worker node, can be anything
   omeroworker-1:
@@ -94,6 +100,12 @@ services:
     volumes:
       - "omero:/OMERO"
       - "./web/L-Drive:/data"
+      - "./logs/omeroworker-1:/opt/omero/server/OMERO.server/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # Define our processor worker
   biomeroworker:
@@ -125,6 +137,12 @@ services:
       - "~/.ssh:/tmp/.ssh:ro"
       - "./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
       - "./web/L-Drive:/data"
+      - "./logs/biomeroworker:/opt/omero/server/OMERO.server/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # Service for the omero.web UI
   omeroweb:
@@ -166,6 +184,13 @@ services:
       - "./web/L-Drive:/data:rw"
       - "../OMERO.biomero/:/opt/omero/web/OMERO.biomero"
       - "./web/biomero-config.json:/opt/omero/web/OMERO.web/var/biomero-config.json:rw"
+      - "./logs/omeroweb:/opt/omero/web/OMERO.web/var/log"
+      - "./logs/nginx:/var/log/nginx"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
     entrypoint: ["sh", "-c", "tail -f /dev/null"]
 
   # New Metabase service
@@ -208,7 +233,13 @@ services:
       - "./omeroadi/logs:/auto-importer/logs"
       - "./omeroadi/config:/auto-importer/config"
       - "./omeroadi/omero_adi:/auto-importer/omero_adi"
+      - "./logs/omeroadi:/auto-importer/logs"
     user: "1000:1000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 
 # Define the network(s) to communicate between containers

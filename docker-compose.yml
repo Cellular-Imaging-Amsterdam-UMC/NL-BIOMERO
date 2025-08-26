@@ -76,6 +76,12 @@ services:
     volumes:
       - "omero:/OMERO"
       - "./web/L-Drive:/data"
+      - "./logs/omeroserver:/opt/omero/server/OMERO.server/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # Name of our worker node, can be anything
   omeroworker-1:
@@ -94,6 +100,12 @@ services:
     volumes:
       - "omero:/OMERO"
       - "./web/L-Drive:/data"
+      - "./logs/omeroworker-1:/opt/omero/server/OMERO.server/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # Define our processor worker
   biomeroworker:
@@ -125,6 +137,12 @@ services:
       - "~/.ssh:/tmp/.ssh:ro"
       - "./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw"
       - "./web/L-Drive:/data"
+      - "./logs/biomeroworker:/opt/omero/server/OMERO.server/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   # Service for the omero.web UI
   omeroweb:
@@ -159,6 +177,12 @@ services:
     volumes:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
       - "./web/L-Drive:/data:rw"
+      - "./logs/omeroweb:/opt/omero/web/OMERO.web/var/log"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   metabase:
     image: metabase/metabase@sha256:f7b5dc52c21aaa2dca910a450e7e6119a975090ce9fc80726aa0742882ca176c
@@ -198,6 +222,12 @@ services:
       - "omero:/OMERO"
       - "./web/L-Drive:/data"
       - "./config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
+      - "./logs/omeroadi:/auto-importer/logs"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
     user: "1000:1000"
 
 
