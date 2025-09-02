@@ -76,29 +76,31 @@ ENV PATH="/usr/pgsql-12/bin:/usr/pgsql-14/bin:${PATH}"
 ## Setup slurm-config for biomero, for the BIOMERO django API in OMERO.biomero
 COPY biomeroworker/slurm-config.ini /etc/slurm-config.ini
 
-### Install OMERO ADI library for import order creation ###
-# Check for new commits to invalidate cache when repo changes
-ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import/commits?sha=main&per_page=1" /latest_commit
-# Clone from main branch with Git metadata for version detection
-RUN git clone --depth 1 -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git /auto-importer
-RUN /opt/omero/web/venv3/bin/python -m pip install /auto-importer
+### OMERO ADI will be installed as a dependency of OMERO.biomero ###
 
 ### Install OMERO.biomero first ###
-ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero/commits/main" /latest_commit_biomero
-RUN git clone -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero.git /opt/omero/web/OMERO.biomero
 
-# Create and set permissions for static directory
-RUN mkdir -p /opt/omero/web/OMERO.web/var/static && \
-    chmod a+w /opt/omero/web/OMERO.web/var/static
+# For development install with a local biomero.omero clone, activate these lines again:
+# ADD "https://api.github.com/repos/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero/commits/main" /latest_commit_biomero
+# RUN git clone -b main https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO.biomero.git /opt/omero/web/OMERO.biomero
 
-# Install OMERO.biomero (pip already upgraded earlier)
-RUN /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/OMERO.biomero \
+# # Create and set permissions for static directory
+# RUN mkdir -p /opt/omero/web/OMERO.web/var/static && \
+#     chmod a+w /opt/omero/web/OMERO.web/var/static
+
+# # Install OMERO.biomero (pip already upgraded earlier)
+# RUN /opt/omero/web/venv3/bin/pip install -e /opt/omero/web/OMERO.biomero \
+#     && /opt/omero/web/venv3/bin/omero-biomero-setup
+
+# # Set permissions for OMERO.biomero directory so omero-web user can write files
+# RUN chown -R omero-web:omero-web /opt/omero/web/OMERO.biomero && \
+#     chmod -R 755 /opt/omero/web/OMERO.biomero && \
+#     chmod -R 775 /opt/omero/web/OMERO.biomero/omero_biomero
+
+# Install released OMERO.biomero from PyPI and run setup
+RUN /opt/omero/web/venv3/bin/pip install omero-biomero==1.0.0b1 \
     && /opt/omero/web/venv3/bin/omero-biomero-setup
 
-# Set permissions for OMERO.biomero directory so omero-web user can write files
-RUN chown -R omero-web:omero-web /opt/omero/web/OMERO.biomero && \
-    chmod -R 755 /opt/omero/web/OMERO.biomero && \
-    chmod -R 775 /opt/omero/web/OMERO.biomero/omero_biomero
 
 ### Install OMERO.forms ###
 

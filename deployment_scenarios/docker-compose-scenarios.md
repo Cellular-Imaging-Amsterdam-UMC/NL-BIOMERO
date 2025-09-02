@@ -2,6 +2,8 @@
 
 This document outlines the different deployment scenarios for NL-BIOMERO and maps them to corresponding docker-compose configurations.
 
+> Note: The docker-compose files and flows described here are examples for inspiration. They are not official recommendations or complete fixes; review and adapt them for your environment before production use.
+
 ## Overview
 
 NL-BIOMERO supports multiple deployment scenarios from development to production. This guide will help you choose the right configuration for your needs.

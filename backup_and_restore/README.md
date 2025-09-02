@@ -2,6 +2,8 @@
 
 **One-command backup and restore for NL-BIOMERO PostgreSQL databases, OMERO server data/config, and Metabase dashboards.**
 
+> Important: The scripts and approaches described here are examples for inspiration, not prescriptive recommendations. Always review, test, and adapt to your specific environment, security policies, and operational requirements.
+
 ## Key Features
 
 - **Synchronized backups:** All components use a single timestamp for consistency.

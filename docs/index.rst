@@ -15,6 +15,9 @@ This platform provides a complete solution for bioimage data management and anal
 * **Metabase** - Analytics and visualization dashboards
 * **Docker Compose** - Easy deployment and scaling scenarios
 
+.. note::
+   Deployment, migration, and backup procedures shown in this documentation are examples for inspiration. They are not prescriptive recommendations and may not address all environments. Always adapt and validate them for your organization’s security, compliance, and operational requirements.
+
 Getting Started
 ===============
 
