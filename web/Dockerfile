@@ -98,7 +98,7 @@ COPY biomeroworker/slurm-config.ini /etc/slurm-config.ini
 #     chmod -R 775 /opt/omero/web/OMERO.biomero/omero_biomero
 
 # Install released OMERO.biomero from PyPI and run setup
-RUN /opt/omero/web/venv3/bin/pip install omero-biomero==1.0.0b1 \
+RUN /opt/omero/web/venv3/bin/pip install omero-biomero==1.0.0b4 \
     && /opt/omero/web/venv3/bin/omero-biomero-setup
 
 

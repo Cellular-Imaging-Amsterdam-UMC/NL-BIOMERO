@@ -1,18 +1,19 @@
 {
   "FILE_OR_EXTENSION_PATTERNS_EXCLUSIVE": [
     "experiment.db",
-    ".xlef",
-    ".mycoolcontainer"
+    ".xlef"
   ],
   "PREPROCESSING_EXTENSION_MAP": {
     ".lif": "dataset_leica_uuid",
     ".xlef": "dataset_leica_uuid",
     ".lof": "dataset_leica_uuid",
-    ".db": "screen_db",
-    ".mycool": "mycool_preproc"
+    ".db": "screen_db"
   },
   "PREPROCESSING_CONFIG": {
     "screen_db": {
+      "container": "cellularimagingcf/image-db-to-ome:latest"
+    },
+    "screen_db_to_tiff": {
       "container": "cellularimagingcf/cimagexpresstoometiff:v0.7",
       "extra_params": {
         "saveoption": "single"
@@ -22,12 +23,6 @@
       "container": "cellularimagingcf/convertleica-docker:v1.2.0",
       "extra_params": {
         "image_uuid": "{UUID}"
-      }
-    },
-    "mycool_preproc": {
-      "container": "exampleorg/mycool-preproc:1.0.0",
-      "extra_params": {
-        "mode": "fast"
       }
     }
   },

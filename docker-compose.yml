@@ -157,11 +157,11 @@ services:
       ROOTPASS: ${OMERO_ROOT_PASSWORD}
       CONFIG_omero_scripts_timeout: 604800000
       ENV: TEST
+      OMERO_BIOMERO_CONFIG_FILE: /opt/omero/web/OMERO.web/var/biomero-config.json
       METABASE_SITE_URL: ${METABASE_SITE_URL}
       METABASE_SECRET_KEY: ${METABASE_SECRET_KEY}
       METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID: ${METABASE_IMPORTS_DB_PAGE_DASHBOARD_ID}
       METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID: ${METABASE_WORKFLOWS_DB_PAGE_DASHBOARD_ID}
-      CONFIG_omero_web_login__logo: "https://cembo.eu/wp-content/uploads/2021/04/Amsterdam-UMC.png"
       INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
       IMPORT_MOUNT_PATH: /data
       FORMS_MASTER_USER: ${FORMS_MASTER_USER}
@@ -176,6 +176,7 @@ services:
       - "4080:4080"
     volumes:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
+      - "./web/biomero-config.json:/opt/omero/web/OMERO.web/var/biomero-config.json:rw"
       - "./web/L-Drive:/data:rw"
       - "./logs/omeroweb:/opt/omero/web/OMERO.web/var/log"
     logging:
