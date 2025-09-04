@@ -183,6 +183,7 @@ services:
       - "./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw"
       - "./web/L-Drive:/data:rw"
       - "../OMERO.biomero/:/opt/omero/web/OMERO.biomero"
+      - "../OMERO.forms/:/opt/omero/web/OMERO.forms"
       - "./web/biomero-config.json:/opt/omero/web/OMERO.web/var/biomero-config.json:rw"
       - "./logs/omeroweb:/opt/omero/web/OMERO.web/var/log"
       - "./logs/nginx:/var/log/nginx"

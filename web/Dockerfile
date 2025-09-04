@@ -105,7 +105,7 @@ RUN /opt/omero/web/venv3/bin/pip install omero-biomero==1.0.0b4 \
 ### Install OMERO.forms ###
 
 # Install OMERO.forms from PyPI
-RUN /opt/omero/web/venv3/bin/pip install omero-forms==2.1.0
+RUN /opt/omero/web/venv3/bin/pip install omero-forms==2.1.1
 
 # Set the working directory
 WORKDIR /opt/omero/web/venv3/lib/python3.12/site-packages/omeroweb
