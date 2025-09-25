@@ -60,6 +60,12 @@ For more information, see: backup_and_restore/README.md
     exit 0
 }
 
+# Validate parameters
+if ($skipConfig -and $skipData) {
+    Write-Error "Both -skipConfig and -skipData specified, nothing to do!"
+    exit 1
+}
+
 # Simple .env reader
 $envContent = Get-Content $envFile -ErrorAction SilentlyContinue | Where-Object { $_ -match '^[^#]*=' }
 $envHash = @{}
@@ -81,18 +87,8 @@ if ($timestamp) {
     $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
 }
 
-# Create output directory
-New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
-$absoluteOutputDir = (Resolve-Path $finalOutputDir).Path
-
-# Check for folder mode first
+# Check for folder mode first - if specified, skip all container logic
 if ($omeroFolder) {
-    $finalOutputDir = if ($outputDirectory) { $outputDirectory } else { ".\backup_and_restore\backups" }
-    if ($timestamp) {
-        Write-Output "Using provided timestamp: $timestamp"
-    } else {
-        $timestamp = Get-Date -Format "yyyy-MM-dd_HH-mm-ss-UTC"
-    }
     New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
     $absoluteOutputDir = (Resolve-Path $finalOutputDir).Path
     $omeroFolderAbs = (Resolve-Path $omeroFolder).Path
@@ -101,6 +97,7 @@ if ($omeroFolder) {
     Write-Output "  Source: $omeroFolderAbs"
     Write-Output "  Output: $absoluteOutputDir"
     Write-Output "  Timestamp: $timestamp"
+    Write-Output "  Config export: SKIPPED (folder mode - no container access)"
     Write-Output ""
     
     if (-not $skipData) {
@@ -129,6 +126,10 @@ if ($omeroFolder) {
         exit 0
     }
 }
+
+# Container mode setup (only reached if not in folder mode)
+New-Item -ItemType Directory -Path $finalOutputDir -Force | Out-Null
+$absoluteOutputDir = (Resolve-Path $finalOutputDir).Path
 
 Write-Output "OMERO Server Backup:"
 Write-Output "  Container: $finalContainerName"

@@ -140,20 +140,10 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Detect container engine
-ENGINE=$(detect_container_engine)
-echo "Using container engine: $ENGINE"
-
-# Read environment file
-declare -A env_hash
-if [[ -f "$ENV_FILE" ]]; then
-    while IFS= read -r line; do
-        if [[ $line =~ ^[^#]*= ]]; then
-            key=$(echo "$line" | cut -d'=' -f1 | xargs)
-            value=$(echo "$line" | cut -d'=' -f2- | xargs)
-            env_hash["$key"]="$value"
-        fi
-    done < "$ENV_FILE"
+# Validate parameters
+if [[ "$SKIP_CONFIG" == "true" && "$SKIP_DATA" == "true" ]]; then
+    echo "[FAIL] Both --skipConfig and --skipData specified, nothing to do!" >&2
+    exit 1
 fi
 
 # Auto-configure defaults
@@ -168,6 +158,30 @@ if [[ -n "$TIMESTAMP" ]]; then
 else
     # Generate new timestamp
     timestamp=$(date '+%Y-%m-%d_%H-%M-%S-UTC')
+fi
+
+# Check for folder mode first - if specified, skip all container logic
+if [[ -n "$OMERO_FOLDER" ]]; then
+    mkdir -p "$FINAL_OUTPUT_DIR"
+    absolute_output_dir=$(realpath "$FINAL_OUTPUT_DIR")
+    backup_omero_folder "$OMERO_FOLDER" "$absolute_output_dir" "$timestamp" "$SKIP_DATA"
+    exit $?
+fi
+
+# Detect container engine (only needed for container mode)
+ENGINE=$(detect_container_engine)
+echo "Using container engine: $ENGINE"
+
+# Read environment file
+declare -A env_hash
+if [[ -f "$ENV_FILE" ]]; then
+    while IFS= read -r line; do
+        if [[ $line =~ ^[^#]*= ]]; then
+            key=$(echo "$line" | cut -d'=' -f1 | xargs)
+            value=$(echo "$line" | cut -d'=' -f2- | xargs)
+            env_hash["$key"]="$value"
+        fi
+    done < "$ENV_FILE"
 fi
 
 # Create output directory
@@ -296,6 +310,7 @@ backup_omero_folder() {
     echo "  Source: $abs_folder"
     echo "  Output: $output_dir"
     echo "  Timestamp: $timestamp"
+    echo "  Config export: SKIPPED (folder mode - no container access)"
     echo ""
     
     echo "Creating tar.gz archive of OMERO folder (this may take a while)..."
@@ -322,14 +337,6 @@ backup_omero_folder() {
         return 1
     fi
 }
-
-# Main logic - check for folder mode first
-if [[ -n "$OMERO_FOLDER" ]]; then
-    mkdir -p "$FINAL_OUTPUT_DIR"
-    absolute_output_dir=$(realpath "$FINAL_OUTPUT_DIR")
-    backup_omero_folder "$OMERO_FOLDER" "$absolute_output_dir" "$timestamp" "$SKIP_DATA"
-    exit $?
-fi
 
 echo ""
 if [[ "$config_success" == "true" && "$data_success" == "true" ]]; then
