@@ -4,7 +4,7 @@
 ENV_FILE="./.env"
 DUMP_PATH=""
 VOLUME_NAME=""
-LOCAL_FOLDER=""  # NEW: Local folder instead of Docker volume
+LOCAL_FOLDER=""
 DB_NAME=""
 USER=""
 PASSWORD=""

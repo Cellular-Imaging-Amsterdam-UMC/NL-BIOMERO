@@ -40,6 +40,10 @@ while [[ $# -gt 0 ]]; do
             BIOMERO_DB_CONTAINER_NAME="$2"
             shift 2
             ;;
+        --omero-folder)
+            OMERO_FOLDER="$2"
+            shift 2
+            ;;
         --metabase-folder)
             METABASE_FOLDER="$2"
             shift 2
@@ -95,6 +99,7 @@ OPTIONS:
   --omero-db-container-name <name> Override OMERO database container name (default: nl-biomero_database_1)
   --biomero-db-container-name <n>  Override BIOMERO database container name (default: nl-biomero_database-biomero_1)
   --metabase-folder <path>         Override metabase folder path (default: ./metabase)
+  --omero-folder <path>            Backup from local OMERO folder instead of container
   --skip-server-data               Skip OMERO server data backup (only config)
   --skip-server-config             Skip OMERO server config backup (only data)
   --skip-database                  Skip database backup
@@ -238,6 +243,9 @@ SERVER_ARGS+=("--outputDirectory" "$OUTPUT_DIRECTORY")
 SERVER_ARGS+=("--timestamp" "$TIMESTAMP")
 if [[ -n "$SERVER_CONTAINER_NAME" ]]; then
     SERVER_ARGS+=("--containerName" "$SERVER_CONTAINER_NAME")
+fi
+if [[ -n "$OMERO_FOLDER" ]]; then
+    SERVER_ARGS+=("--omero-folder" "$OMERO_FOLDER")
 fi
 if [[ "$SKIP_SERVER_DATA" == "true" ]]; then
     SERVER_ARGS+=("--skipData")
