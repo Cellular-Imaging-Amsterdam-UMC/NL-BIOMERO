@@ -23,7 +23,12 @@ Use the default credentials to get started:
 - **Password**: ``omero``
 
 .. warning::
-   Change the default password immediately after first login for security.
+   **Security Setup Required**: Change default passwords and configure security settings immediately after first deployment.
+   
+   For OMERO: Change the default password after first login.
+   
+   For Metabase: Follow the complete security setup procedure in :doc:`../developer/containers/metabase` 
+   which includes changing passwords, updating database connections, and regenerating security keys.
 
 Next Steps
 ~~~~~~~~~~

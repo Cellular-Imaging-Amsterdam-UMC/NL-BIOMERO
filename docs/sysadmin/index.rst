@@ -9,6 +9,7 @@ This section covers all aspects of NL-BIOMERO deployment, from initial setup to 
    :maxdepth: 2
 
    deployment
+   omero-biomero-admin
    docker-compose-scenarios
    linux-deployment
    development-setup
