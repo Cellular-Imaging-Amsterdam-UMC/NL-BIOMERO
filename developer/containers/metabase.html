@@ -56,6 +56,33 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html">OMERO.biomero Plugin Administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#accessing-admin-interfaces">Accessing Admin Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#importer-admin-configuration">Importer Admin Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#group-folder-mappings">Group Folder Mappings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#configuration-file-management">Configuration File Management</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#analyzer-admin-configuration">Analyzer Admin Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#configuration-file-sharing">Configuration File Sharing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#settings-interface-usage">Settings Interface Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#settings-categories">Settings Categories</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#ssh-settings">1. SSH Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#slurm-settings">2. Slurm Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#analytics-settings">3. Analytics Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#converters-settings">4. Converters Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#models-settings-workflows">5. Models Settings (Workflows)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#slurm-check-setup-output">Slurm Check Setup Output</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#security-considerations">Security Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html#related-documentation">Related Documentation</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../sysadmin/docker-compose-scenarios.html">Docker Compose Scenarios</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../sysadmin/docker-compose-scenarios.html#nl-biomero-deployment-scenarios-and-docker-compose-files">NL-BIOMERO Deployment Scenarios and Docker Compose Files</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../sysadmin/docker-compose-scenarios.html#overview">Overview</a></li>
@@ -171,6 +198,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Metabase Container</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#why-metabase">Why Metabase?</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#dashboard-development">Dashboard Development</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
@@ -336,6 +364,58 @@ Regenerate the static embedding key there if needed.</p></li>
 <li><p>Dashboards run real-time queries against these connections.</p></li>
 </ul>
 </section>
+<section id="initial-security-setup">
+<h3>Initial Security Setup<a class="headerlink" href="#initial-security-setup" title="Permalink to this heading"></a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>When deploying NL-BIOMERO in any environment, you must change the default Metabase admin password
+immediately. The default credentials in NL-BIOMERO are publicly documented in the project
+repository and should never be used in production environments.</p>
+</div>
+<p><strong>After first deployment, follow these security setup steps:</strong></p>
+<ol class="arabic simple">
+<li><p><strong>Change admin password</strong></p>
+<ul class="simple">
+<li><p>Go to your metabase URL in a browser (e.g. localhost:3000)</p></li>
+<li><p>Log in with the default credentials: <code class="docutils literal notranslate"><span class="pre">admin&#64;biomero.com</span></code> / <code class="docutils literal notranslate"><span class="pre">b1omero</span></code></p></li>
+<li><p>Go to Settings &gt; Account settings &gt; Password</p></li>
+<li><p>Change to a secure password and save</p></li>
+</ul>
+</li>
+<li><p><strong>Update database connection passwords</strong></p>
+<ul class="simple">
+<li><p>Go to Settings &gt; Admin settings &gt; Databases</p></li>
+<li><p>For each database (BIOMERO and OMERO):</p>
+<ul>
+<li><p>Click on the database name</p></li>
+<li><p>Change the password to match your environment’s database passwords</p></li>
+<li><p>Update host/port if different from defaults</p></li>
+<li><p>Click “Save changes”</p></li>
+<li><p>Click “Sync database schema now” and “Re-scan field values now”</p></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>Regenerate embedding key</strong></p>
+<ul class="simple">
+<li><p>Go to Settings &gt; Admin settings &gt; Embedding</p></li>
+<li><p>Click “Manage” on the Static embedding card</p></li>
+<li><p>Click “Regenerate key”</p></li>
+<li><p>Update your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file with the new <code class="docutils literal notranslate"><span class="pre">METABASE_SECRET_KEY</span></code></p></li>
+<li><p>Restart OMERO.web to pick up the new key</p></li>
+</ul>
+</li>
+<li><p><strong>Update dashboard URL redirects</strong></p>
+<ul class="simple">
+<li><p>Open the sidebar (Ctrl + .), click on “OMERO Automated Data Importer” dashboard</p></li>
+<li><p>Click “Edit dashboard” (pen icon)</p></li>
+<li><p>Hover over the “Upload Status” table and click “Click behavior”</p></li>
+<li><p>Update all “GO TO CUSTOM DESTINATION” URLs to match your environment</p></li>
+<li><p>Repeat for the “BIOMERO Analytics” dashboard</p></li>
+</ul>
+</li>
+</ol>
+</section>
 <section id="user-account-and-password">
 <h3>User account and password<a class="headerlink" href="#user-account-and-password" title="Permalink to this heading"></a></h3>
 <ul class="simple">
@@ -343,12 +423,6 @@ Regenerate the static embedding key there if needed.</p></li>
 <li><p>You can also review your login history there for security audits.</p></li>
 <li><p>Resetting (admin) password, see <a class="reference external" href="https://www.metabase.com/docs/latest/people-and-groups/managing#resetting-the-admin-password">https://www.metabase.com/docs/latest/people-and-groups/managing#resetting-the-admin-password</a></p></li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>When deploying NL-BIOMERO in any environment, you must change the default Metabase admin password
-immediately. The default credentials in NL-BIOMERO are publicly documented in the project
-repository and should never be used in production environments.</p>
-</div>
 </section>
 <section id="versioning-and-migration">
 <h3>Versioning and migration<a class="headerlink" href="#versioning-and-migration" title="Permalink to this heading"></a></h3>
@@ -364,10 +438,85 @@ repository and should never be used in production environments.</p>
 <li><p>Consider committing the DB file to source control only if acceptable for your security model.</p></li>
 </ul>
 </section>
+<section id="upgrading-metabase-dashboards">
+<h3>Upgrading Metabase Dashboards<a class="headerlink" href="#upgrading-metabase-dashboards" title="Permalink to this heading"></a></h3>
+<p>Upgrading metabase dashboards is not straightforward sadly (at least not in the free version). You have 2 ways to go about this:</p>
+<ol class="arabic simple">
+<li><p><strong>Replace database with updated dashboards</strong> - Take a new metabase database (<code class="docutils literal notranslate"><span class="pre">metabase.db.mv.db</span></code>) with updated dashboards and manually update all the admin values to match your environment again</p></li>
+<li><p><strong>Keep existing database</strong> - Keep your metabase database (<code class="docutils literal notranslate"><span class="pre">metabase.db.mv.db</span></code>) and manually apply all the dashboard updates</p></li>
+</ol>
+<section id="upgrade-scenario-1-replace-database">
+<h4>Upgrade Scenario 1: Replace Database<a class="headerlink" href="#upgrade-scenario-1-replace-database" title="Permalink to this heading"></a></h4>
+<p><strong>Step 1: Replace the database file</strong></p>
+<ul class="simple">
+<li><p>Copy a <code class="docutils literal notranslate"><span class="pre">metabase.db.mv.db</span></code> (e.g. from our latest GitHub release) to your mount location of your metabase container</p></li>
+<li><p>Restart the container</p></li>
+</ul>
+<p><strong>Step 2: Reconfigure environment settings</strong></p>
+<p>Now you need to reconfigure all security settings for your environment. This is essentially the same process as the initial setup described in the <a class="reference internal" href="#initial-security-setup">Initial Security Setup</a> section above, with the difference that you’ll be using default credentials to log in:</p>
+<ul class="simple">
+<li><p>Go to your metabase URL in a browser (e.g. localhost:3000 or whatever you mapped it to with your reverse proxy)</p></li>
+<li><p>Log in with the default login credentials (e.g. see the .env in our latest GitHub release), not with your changed credentials</p></li>
+<li><p>Follow steps 2-4 from the <a class="reference internal" href="#initial-security-setup">Initial Security Setup</a> section to update database connections, regenerate the embedding key, and update URL redirects</p></li>
+<li><p>Change your admin password: Settings &gt; Account settings &gt; Password</p></li>
+</ul>
+<p><strong>Step 3: Restart OMERO.web</strong></p>
+<p>Restart OMERO.web to take the new METABASE_SECRET_KEY into account.</p>
+</section>
+<section id="upgrade-scenario-2-keep-existing-database">
+<h4>Upgrade Scenario 2: Keep Existing Database<a class="headerlink" href="#upgrade-scenario-2-keep-existing-database" title="Permalink to this heading"></a></h4>
+<ul class="simple">
+<li><p>Go to your metabase URL in a browser (e.g. localhost:3000 or whatever you mapped it to with your reverse proxy)</p></li>
+<li><p>Log in with your specific credentials</p></li>
+<li><p>Make all the changes you need to the 2 dashboards manually: Open the sidebar (Ctrl + .), click on the bookmarked dashboard and do a combination of the following:</p></li>
+</ul>
+<p><strong>Edit dashboard layout and components:</strong></p>
+<ul class="simple">
+<li><p>Edit dashboard (“Edit dashboard” button, the pen icon below the Search bar)</p>
+<ul>
+<li><p>to move around tables / graphs or to add new ones or remove current ones</p></li>
+<li><p>Or hover over a table to change “Visualization options” like color highlights, or “Click behavior” like URL redirects</p></li>
+<li><p>Or click on the filter buttons (like “Workflow” or “User”) to change which values/columns on a table/graph they should filter</p></li>
+</ul>
+</li>
+<li><p>Click Save (at the top) to keep your changes (or Cancel to discard them)</p></li>
+</ul>
+<p><strong>Edit individual queries and visualizations:</strong></p>
+<ul class="simple">
+<li><p>Edit an existing table/graph by clicking on its title (e.g. “Biomero Workflow Progress”). This will open the view of just that one query and its result.</p>
+<ul>
+<li><p>There is a button “Show editor” underneath the Search bar where you can change the query using Metabase’s fancy filters etc. See the Metabase documentation for all the options.</p></li>
+<li><p>Or (if it says “This question is written in SQL.”) there is a “OPEN EDITOR” button where you can change the literal SQL query that creates this result for you. When you change something, you can click the play button (Ctrl + enter) to see the result live (or no results if you misformed your SQL). Another important factor in SQL queries in Metabase is the “Variables” which you see at the top (e.g. “User Name”) and that are used in the query like “{{user_name}}”. You can find more info and change their behavior on the right hand side at the “{x}” button. See also the “HELP” tab there. Also here you can use the “Run query” button to see your changes, very useful.</p></li>
+<li><p>When you’re happy, click “Save” and “Replace original question” to immediately have it changed on your dashboard. Or “Save as new question” if so inclined. To add new questions to your dashboard, go to “Edit dashboard” again.</p></li>
+</ul>
+</li>
+</ul>
+<p>The changes should take effect in Metabase and OMERO.web without any delays or restarts.</p>
+</section>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h2>
+<section id="common-issues-and-solutions">
+<h3>Common Issues and Solutions<a class="headerlink" href="#common-issues-and-solutions" title="Permalink to this heading"></a></h3>
+<p><strong>“Message seems corrupt or manipulated” error in OMERO.web iFrame</strong></p>
+<p>If you see the metabase iframe saying “Message seems corrupt or manipulated” in the OMERO.web plugin, it means that the embedding key for Metabase is not correct.</p>
+<p><strong>Solution:</strong>
+Change the <code class="docutils literal notranslate"><span class="pre">METABASE_SECRET_KEY</span></code> environment variable for OMERO.web to match the embedding key in Metabase:</p>
+<ol class="arabic simple">
+<li><p>Go to Metabase: Settings &gt; Admin settings &gt; Embedding</p></li>
+<li><p>Click “Manage” on the Static embedding card</p></li>
+<li><p>Copy the current embedding key</p></li>
+<li><p>Update your <code class="docutils literal notranslate"><span class="pre">.env</span></code> file: <code class="docutils literal notranslate"><span class="pre">METABASE_SECRET_KEY=&lt;the_copied_key&gt;</span></code></p></li>
+<li><p>Restart OMERO.web to pick up the new key</p></li>
+</ol>
+<p>Alternatively, you can regenerate a new embedding key in Metabase (step 2 above: “Regenerate key”) and then update your environment variable accordingly.</p>
+</section>
 </section>
 <section id="related-documentation">
 <h2>Related Documentation<a class="headerlink" href="#related-documentation" title="Permalink to this heading"></a></h2>
 <ul class="simple">
+<li><p><a class="reference internal" href="../../sysadmin/omero-biomero-admin.html"><span class="doc">OMERO.biomero Plugin Administration</span></a> - OMERO.biomero plugin administration guide</p></li>
 <li><p><a class="reference internal" href="omeroweb.html"><span class="doc">OMERO Web Container</span></a> - Web interface integration</p></li>
 <li><p><a class="reference internal" href="../architecture.html"><span class="doc">Architecture Overview</span></a> - System architecture</p></li>
 <li><p><a class="reference external" href="https://www.metabase.com/docs/">Metabase Documentation</a></p></li>

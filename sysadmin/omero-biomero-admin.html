@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Administration Guide &mdash; NL-BIOMERO latest documentation</title>
+  <title>OMERO.biomero Plugin Administration &mdash; NL-BIOMERO latest documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,8 +17,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Deployment Guide" href="deployment.html" />
-    <link rel="prev" title="Welcome to NL-BIOMERO’s documentation!" href="../index.html" /> 
+    <link rel="next" title="Docker Compose Scenarios" href="docker-compose-scenarios.html" />
+    <link rel="prev" title="Deployment Guide" href="deployment.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,7 +42,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">System Administration</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">System Administration Guide</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Administration Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#nl-biomero-deployment-upgrade-guide">NL-BIOMERO Deployment &amp; Upgrade Guide</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="deployment.html#scenario-0-development-demo">Scenario 0: Development &amp; Demo</a></li>
@@ -56,31 +56,31 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html">OMERO.biomero Plugin Administration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#accessing-admin-interfaces">Accessing Admin Interfaces</a></li>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#importer-admin-configuration">Importer Admin Configuration</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#group-folder-mappings">Group Folder Mappings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#configuration-file-management">Configuration File Management</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">OMERO.biomero Plugin Administration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#accessing-admin-interfaces">Accessing Admin Interfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#importer-admin-configuration">Importer Admin Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#group-folder-mappings">Group Folder Mappings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-file-management">Configuration File Management</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#analyzer-admin-configuration">Analyzer Admin Configuration</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#configuration-file-sharing">Configuration File Sharing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#settings-interface-usage">Settings Interface Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#analyzer-admin-configuration">Analyzer Admin Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#configuration-file-sharing">Configuration File Sharing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#settings-interface-usage">Settings Interface Usage</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#settings-categories">Settings Categories</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#ssh-settings">1. SSH Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#slurm-settings">2. Slurm Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#analytics-settings">3. Analytics Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#converters-settings">4. Converters Settings</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#models-settings-workflows">5. Models Settings (Workflows)</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omero-biomero-admin.html#slurm-check-setup-output">Slurm Check Setup Output</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#settings-categories">Settings Categories</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ssh-settings">1. SSH Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slurm-settings">2. Slurm Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#analytics-settings">3. Analytics Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#converters-settings">4. Converters Settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#models-settings-workflows">5. Models Settings (Workflows)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slurm-check-setup-output">Slurm Check Setup Output</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#security-considerations">Security Considerations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#related-documentation">Related Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security-considerations">Security Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="docker-compose-scenarios.html">Docker Compose Scenarios</a><ul>
@@ -268,9 +268,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">System Administration Guide</li>
+          <li class="breadcrumb-item"><a href="index.html">System Administration Guide</a></li>
+      <li class="breadcrumb-item active">OMERO.biomero Plugin Administration</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/sysadmin/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sysadmin/omero-biomero-admin.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -278,52 +279,269 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="system-administration-guide">
-<h1>System Administration Guide<a class="headerlink" href="#system-administration-guide" title="Permalink to this heading"></a></h1>
-<p>Complete guide for deploying and managing NL-BIOMERO infrastructure.</p>
-<p>This section covers all aspects of NL-BIOMERO deployment, from initial setup to ongoing maintenance.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#nl-biomero-deployment-upgrade-guide">NL-BIOMERO Deployment &amp; Upgrade Guide</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="omero-biomero-admin.html">OMERO.biomero Plugin Administration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#accessing-admin-interfaces">Accessing Admin Interfaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#importer-admin-configuration">Importer Admin Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#analyzer-admin-configuration">Analyzer Admin Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#settings-categories">Settings Categories</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#security-considerations">Security Considerations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#related-documentation">Related Documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="docker-compose-scenarios.html">Docker Compose Scenarios</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="docker-compose-scenarios.html#nl-biomero-deployment-scenarios-and-docker-compose-files">NL-BIOMERO Deployment Scenarios and Docker Compose Files</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="linux-deployment.html">Linux/Ubuntu Deployment</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="linux-deployment.html#nlbiomero-ubuntu-linux">NL‑BIOMERO (Ubuntu/Linux) 🚀</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="development-setup.html">Development &amp; Demo Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="development-setup.html#biomero-101-installation-guide">BIOMERO 101 Installation Guide</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="backup-restore.html">Backup and Restore</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="backup-restore.html#nl-biomero-backup-restore-scripts">NL-BIOMERO Backup &amp; Restore Scripts</a></li>
-</ul>
-</li>
-</ul>
+  <section id="omero-biomero-plugin-administration">
+<h1>OMERO.biomero Plugin Administration<a class="headerlink" href="#omero-biomero-plugin-administration" title="Permalink to this heading"></a></h1>
+<p>The OMERO.biomero plugin provides two administrative interfaces for managing the Importer (ADI) and Analyzer components. These admin screens are accessible from the OMERO.web interface and provide essential configuration options for system administrators.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For technical details about the Metabase integration and container configuration,
+see <a class="reference internal" href="../developer/containers/metabase.html"><span class="doc">Metabase Container</span></a>.</p>
 </div>
+<section id="accessing-admin-interfaces">
+<h2>Accessing Admin Interfaces<a class="headerlink" href="#accessing-admin-interfaces" title="Permalink to this heading"></a></h2>
+<p>The admin interfaces are available through the OMERO.web plugin after logging in as an administrator:</p>
+<ol class="arabic simple">
+<li><p>Navigate to the OMERO.biomero plugin in OMERO.web</p></li>
+<li><p>Select the “Admin” tab for Import or Analyze</p></li>
+</ol>
+</section>
+<section id="importer-admin-configuration">
+<h2>Importer Admin Configuration<a class="headerlink" href="#importer-admin-configuration" title="Permalink to this heading"></a></h2>
+<p>The Importer Admin tab manages settings for the Automated Data Importer (ADI).</p>
+<section id="group-folder-mappings">
+<h3>Group Folder Mappings<a class="headerlink" href="#group-folder-mappings" title="Permalink to this heading"></a></h3>
+<p><strong>Purpose</strong>: Restrict which OMERO groups have access to specific folders that the importer can import from.</p>
+<p><strong>Configuration</strong>:
+- Currently supports 1:1 mapping only
+- Each OMERO group can be mapped to one subfolder instead of the full mounted disk folder</p>
+<p><strong>Setup Process</strong>:</p>
+<ol class="arabic simple">
+<li><p>Select the target OMERO group</p></li>
+<li><p>Choose the folder from the available options</p></li>
+<li><p>Save the mapping</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Folder Selection Limitation</strong>: The folder selector only shows currently loaded subfolders (1st level).</p>
+<p><strong>Workaround</strong>: To select deeper subfolders:</p>
+<ol class="arabic simple">
+<li><p>Go to the “Import Images” tab</p></li>
+<li><p>Navigate and expand the desired subfolder</p></li>
+<li><p>This loads sub-subfolders into ReactJS memory</p></li>
+<li><p>Return to Admin tab where they will now be selectable</p></li>
+</ol>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Changes Not Visible Immediately</strong>: Don’t refresh (F5) to see changes. Instead:</p>
+<ol class="arabic simple">
+<li><p>Log out and log in again</p></li>
+<li><p>Change “Select group” to a different group</p></li>
+<li><p>The mapping should take effect showing only the mapped subfolder as import options</p></li>
+</ol>
+</div>
+</section>
+<section id="configuration-file-management">
+<h3>Configuration File Management<a class="headerlink" href="#configuration-file-management" title="Permalink to this heading"></a></h3>
+<p><strong>Storage</strong>: Changes are written via Django API to a configuration file.</p>
+<dl class="simple">
+<dt><strong>Environment Variable</strong>: <code class="docutils literal notranslate"><span class="pre">OMERO_BIOMERO_CONFIG_FILE</span></code></dt><dd><ul class="simple">
+<li><p>Example: <code class="docutils literal notranslate"><span class="pre">/opt/omero/web/OMERO.web/var/biomero-config.json</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Docker Mount Example</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./web/biomero-config.json:/opt/omero/web/OMERO.web/var/biomero-config.json:rw&quot;</span>
+</pre></div>
+</div>
+<p><strong>Important</strong>: Ensure the container user has write access to this file.</p>
+<p><strong>Additional Settings</strong>: The configuration file contains more UI variables than what the Admin tab can modify directly.</p>
+</section>
+</section>
+<section id="analyzer-admin-configuration">
+<h2>Analyzer Admin Configuration<a class="headerlink" href="#analyzer-admin-configuration" title="Permalink to this heading"></a></h2>
+<p>The Analyzer Admin screen is split into two sections: BIOMERO settings (left) and OMERO scripts (right).</p>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h3>
+<p><strong>Left Side</strong>: All BIOMERO settings in UI form
+<strong>Right Side</strong>: OMERO scripts, organized with admin scripts “Slurm Init” and “Slurm Check Setup” shown by default</p>
+<p><strong>Important Workflow</strong>: Major changes (like adding new workflows) require:</p>
+<ol class="arabic simple">
+<li><p>Save settings in the left panel</p></li>
+<li><p>Run the “Slurm Init” script from the right panel</p></li>
+</ol>
+</section>
+<section id="configuration-file-sharing">
+<h3>Configuration File Sharing<a class="headerlink" href="#configuration-file-sharing" title="Permalink to this heading"></a></h3>
+<p><strong>File</strong>: <code class="docutils literal notranslate"><span class="pre">slurm-config.ini</span></code> - shared between OMERO.web and BIOMERO worker</p>
+<p><strong>Recommended Setup</strong>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># OMERO.web service</span>
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./web/slurm-config.ini:/opt/omero/web/OMERO.web/var/slurm-config.ini:rw&quot;</span>
+
+<span class="c1"># BIOMERO worker service</span>
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./web/slurm-config.ini:/opt/omero/server/slurm-config.ini:rw&quot;</span>
+</pre></div>
+</div>
+<p>This allows OMERO.web to write changes while BIOMERO worker reads the current configuration.</p>
+</section>
+<section id="settings-interface-usage">
+<h3>Settings Interface Usage<a class="headerlink" href="#settings-interface-usage" title="Permalink to this heading"></a></h3>
+<p><strong>Edit Mode</strong>: Click the pencil icon to make fields editable
+<strong>Saving</strong>: Click “Save Settings” to write changes to disk via Django API
+<strong>Undo</strong>: Use “Undo All Changes” to reset current modifications</p>
+</section>
+</section>
+<section id="settings-categories">
+<h2>Settings Categories<a class="headerlink" href="#settings-categories" title="Permalink to this heading"></a></h2>
+<section id="ssh-settings">
+<h3>1. SSH Settings<a class="headerlink" href="#ssh-settings" title="Permalink to this heading"></a></h3>
+<p><strong>SSH Alias</strong>: Configure the alias used by BIOMERO to connect to the Slurm cluster</p>
+<ul class="simple">
+<li><p>Must reflect an existing SSH alias configured in the BIOMERO container</p></li>
+<li><p>Used for headless connection to Slurm</p></li>
+</ul>
+</section>
+<section id="slurm-settings">
+<h3>2. Slurm Settings<a class="headerlink" href="#slurm-settings" title="Permalink to this heading"></a></h3>
+<p><strong>Slurm Data Path</strong>: Storage location for OMERO I/O data on Slurm cluster
+<strong>Slurm Images Path</strong>: Storage location for container images
+<strong>Slurm Script Path</strong>: Storage location for Slurm job scripts
+<strong>Slurm Script Repository</strong>: (Optional) GitHub repository URL for custom Slurm scripts</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Script Repository</strong>: Either use a repository with scripts for ALL workflows, or let BIOMERO
+generate scripts automatically (recommended). Only use custom repositories for advanced cases.</p>
+</div>
+</section>
+<section id="analytics-settings">
+<h3>3. Analytics Settings<a class="headerlink" href="#analytics-settings" title="Permalink to this heading"></a></h3>
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p><strong>NOT RECOMMENDED FOR MODIFICATION</strong></p>
+<p><strong>FOR ADVANCED USERS ONLY</strong></p>
+</div>
+<p><strong>Tracking</strong>: Controls BIOMERO 2.0 eventsourcing system</p>
+<ul class="simple">
+<li><p><strong>Warning</strong>: Disabling tracking breaks views/listeners and progress monitoring</p></li>
+<li><p><strong>Dependencies</strong>: Views/listeners create database tables from tracking records</p></li>
+<li><p><strong>Impact</strong>: Progress tables in OMERO.biomero web plugin depend on this system</p></li>
+</ul>
+</section>
+<section id="converters-settings">
+<h3>4. Converters Settings<a class="headerlink" href="#converters-settings" title="Permalink to this heading"></a></h3>
+<p><strong>FOR ADVANCED USERS ONLY</strong></p>
+<p><strong>Add Custom Converters</strong>:</p>
+<ul class="simple">
+<li><p><strong>Naming Convention</strong>: <code class="docutils literal notranslate"><span class="pre">X_to_Y</span></code> format (e.g., <code class="docutils literal notranslate"><span class="pre">zarr_to_tiff</span></code>)</p></li>
+<li><p><strong>Docker Image</strong>: Specify container image (e.g., <code class="docutils literal notranslate"><span class="pre">cellularimagingcf/convert_zarr_to_tiff:1.14.0</span></code>)</p></li>
+<li><p><strong>Default Behavior</strong>: BIOMERO generates <code class="docutils literal notranslate"><span class="pre">zarr_to_tiff</span></code> converter automatically</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>Manual Integration Required</strong>: Custom converters require additional script modifications:</p>
+<ol class="arabic simple">
+<li><p>Modify Slurm Workflow script to use custom conversion</p></li>
+<li><p>Update Run Workflow script for user selection</p></li>
+<li><p>Ensure Slurm Remote Conversion script handles custom converter</p></li>
+</ol>
+</div>
+</section>
+<section id="models-settings-workflows">
+<h3>5. Models Settings (Workflows)<a class="headerlink" href="#models-settings-workflows" title="Permalink to this heading"></a></h3>
+<p><strong>Primary Function</strong>: Manage available workflows in BIOMERO</p>
+<section id="adding-new-workflows">
+<h4>Adding New Workflows<a class="headerlink" href="#adding-new-workflows" title="Permalink to this heading"></a></h4>
+<p>Click “Add Model” and configure:</p>
+<p><strong>Name</strong>: No spaces (becomes folder name on Slurm)
+<strong>GitHub Repository</strong>: Versioned URL (e.g., <code class="docutils literal notranslate"><span class="pre">https://github.com/user/repo/tree/v1.0.0</span></code>)
+<strong>Slurm Job Script</strong>: Usually <code class="docutils literal notranslate"><span class="pre">jobs/&lt;name&gt;.sh</span></code> (auto-generated default)
+<strong>Additional Slurm Parameters</strong>: SBATCH options specific to this workflow</p>
+</section>
+<section id="common-sbatch-parameters">
+<h4>Common SBATCH Parameters<a class="headerlink" href="#common-sbatch-parameters" title="Permalink to this heading"></a></h4>
+<p>Add as <code class="docutils literal notranslate"><span class="pre">&lt;key&gt;=&lt;value&gt;</span></code> format (without <code class="docutils literal notranslate"><span class="pre">--</span></code> prefix):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># GPU allocation
+gres=gpu:1g.10gb:1
+
+# Partition selection
+partition=luna-gpu-short
+
+# Memory allocation
+mem=15GB
+
+# Time limits (d-hh:mm:ss)
+time=08:00:00
+</pre></div>
+</div>
+</section>
+<section id="editing-existing-workflows">
+<h4>Editing Existing Workflows<a class="headerlink" href="#editing-existing-workflows" title="Permalink to this heading"></a></h4>
+<p><strong>Edit Model</strong>: Click pencil icon to modify settings
+<strong>Version Updates</strong>: Change GitHub Repository URL version
+<strong>Parameter Management</strong>: Add/edit/delete Additional Slurm Parameters
+<strong>Reset</strong>: “Reset values” button undos changes to specific model
+<strong>Remove</strong>: “Delete model” button removes workflow entirely</p>
+<p><strong>Save Requirement</strong>: Click “Save Settings” after modifications</p>
+</section>
+<section id="required-follow-up-actions">
+<h4>Required Follow-up Actions<a class="headerlink" href="#required-follow-up-actions" title="Permalink to this heading"></a></h4>
+<p>After model changes (except Additional Slurm Parameters):</p>
+<ol class="arabic simple">
+<li><p><strong>Save Settings</strong> first</p></li>
+<li><p><strong>Run “Slurm Init” script</strong> - installs changes on Slurm cluster</p></li>
+<li><p><strong>Verify with “Slurm Check Setup”</strong> - shows available/pending models</p></li>
+</ol>
+</section>
+</section>
+<section id="slurm-check-setup-output">
+<h3>Slurm Check Setup Output<a class="headerlink" href="#slurm-check-setup-output" title="Permalink to this heading"></a></h3>
+<p>The “Slurm Check Setup” script provides:</p>
+<ul class="simple">
+<li><p><strong>Available Models</strong> (with versions)</p></li>
+<li><p><strong>Pending Models</strong></p></li>
+<li><p><strong>Available Converters</strong></p></li>
+<li><p><strong>Available Data</strong></p></li>
+<li><p><strong>Singularity Log</strong> for download progress monitoring</p></li>
+</ul>
+<p><strong>Example Output</strong>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>starting cellpose v1.3.1
+starting stardist v1.3.2
+FATAL: Image file already exists: &quot;cellpose/w_nucleisegmentation-cellpose_v1.3.1.sif&quot; - will not overwrite
+finished cellpose v1.3.1
+</pre></div>
+</div>
+<p><strong>Status Indicators</strong>:
+- <code class="docutils literal notranslate"><span class="pre">FATAL:</span> <span class="pre">Image</span> <span class="pre">file</span> <span class="pre">already</span> <span class="pre">exists</span></code> - Good (no redownload needed)
+- <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> - Problem occurred
+- <code class="docutils literal notranslate"><span class="pre">starting/finished</span></code> - Normal download process</p>
+</section>
+</section>
+<section id="security-considerations">
+<h2>Security Considerations<a class="headerlink" href="#security-considerations" title="Permalink to this heading"></a></h2>
+<p><strong>Configuration Files</strong>: Ensure proper file permissions for mounted configuration files
+<strong>SSH Access</strong>: Verify SSH aliases and key access for Slurm connectivity
+<strong>Database Access</strong>: Confirm BIOMERO worker can access shared configuration files</p>
+<p>For initial security setup including Metabase integration, see <a class="reference internal" href="../developer/containers/metabase.html"><span class="doc">Metabase Container</span></a>.</p>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h2>
+<p><strong>Changes Not Visible</strong>: Log out and back in instead of refreshing
+<strong>Slurm Connection Issues</strong>: Verify SSH alias configuration and key access
+<strong>Model Not Available</strong>: Run “Slurm Init” after adding/modifying workflows
+<strong>Permission Errors</strong>: Check file permissions on mounted configuration files</p>
+<p>For Metabase-specific troubleshooting (e.g., “Message seems corrupt” errors),
+see <a class="reference internal" href="../developer/containers/metabase.html"><span class="doc">Metabase Container</span></a>.</p>
+</section>
+<section id="related-documentation">
+<h2>Related Documentation<a class="headerlink" href="#related-documentation" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../developer/containers/metabase.html"><span class="doc">Metabase Container</span></a> - Metabase container configuration and troubleshooting</p></li>
+<li><p><a class="reference internal" href="../developer/containers/omeroweb.html"><span class="doc">OMERO Web Container</span></a> - OMERO.web container setup</p></li>
+<li><p><a class="reference internal" href="deployment.html"><span class="doc">Deployment Guide</span></a> - Initial deployment configuration</p></li>
+<li><p><a class="reference internal" href="docker-compose-scenarios.html"><span class="doc">Docker Compose Scenarios</span></a> - Container orchestration examples</p></li>
+</ul>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to NL-BIOMERO’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="deployment.html" class="btn btn-neutral float-right" title="Deployment Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="deployment.html" class="btn btn-neutral float-left" title="Deployment Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="docker-compose-scenarios.html" class="btn btn-neutral float-right" title="Docker Compose Scenarios" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
