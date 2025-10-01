@@ -202,7 +202,8 @@ services:
 
   omeroadi:
     build:
-      context: https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import.git#main
+      context: ./omeroadi  # Adjust if needed
+      dockerfile: ./Dockerfile  # Path to the Dockerfile for your local build
     privileged: true
     profiles:
       - "IMPORTER_ENABLED"
