@@ -461,14 +461,14 @@ ssh<span class="w"> </span>localslurm
 <ol class="arabic simple">
 <li><p><strong>Initialize Environment</strong>:</p>
 <ul class="simple">
-<li><p>Run script: <code class="docutils literal notranslate"><span class="pre">slurm/init/SLURM</span> <span class="pre">Init</span> <span class="pre">environment...</span></code></p></li>
+<li><p>Run script: <code class="docutils literal notranslate"><span class="pre">biomero</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">admin</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">SLURM</span> <span class="pre">Init</span> <span class="pre">environment...</span></code></p></li>
 <li><p>☕ Grab coffee (10+ min download time for a few workflow containers)</p></li>
 </ul>
 </li>
 <li><p><strong>Run Analysis</strong>:</p>
 <ul class="simple">
 <li><p>Select your image/dataset</p></li>
-<li><p>Run script: <code class="docutils literal notranslate"><span class="pre">slurm/workflows/SLURM</span> <span class="pre">Run</span> <span class="pre">Workflow...</span></code></p></li>
+<li><p>Run script: <code class="docutils literal notranslate"><span class="pre">biomero</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">__workflows</span></code> &gt;<code class="docutils literal notranslate"><span class="pre">SLURM</span> <span class="pre">Run</span> <span class="pre">Workflow...</span></code></p></li>
 <li><p>Configure import: Change <code class="docutils literal notranslate"><span class="pre">Import</span> <span class="pre">into</span> <span class="pre">NEW</span> <span class="pre">Dataset</span></code> → <code class="docutils literal notranslate"><span class="pre">hello_world</span></code></p></li>
 <li><p>Select workflow: e.g., <code class="docutils literal notranslate"><span class="pre">cellpose</span></code></p></li>
 <li><p>Set parameters: nucleus channel, GPU settings, etc.</p></li>
@@ -483,7 +483,7 @@ ssh<span class="w"> </span>localslurm
 <li><p>Select your workflow: e.g., <code class="docutils literal notranslate"><span class="pre">Cellpose</span></code></p></li>
 <li><p>Add Dataset, select the image(s) you want to segment</p></li>
 <li><p>Fill in the workflow parameters in tab 2, e.g. nuclei channel 3</p></li>
-<li><p>Select desired output target, e.g. Select Dataset <code class="docutils literal notranslate"><span class="pre">hello_world</span></code> again; and Run!</p></li>
+<li><p>Select desired output target, e.g. Select Dataset <code class="docutils literal notranslate"><span class="pre">hello_world</span></code> again (don’t forget to press ENTER if you’re typing it); and Run!</p></li>
 <li><p>Track your workflow status at the <code class="docutils literal notranslate"><span class="pre">Status</span></code> tab</p></li>
 </ul>
 </li>
