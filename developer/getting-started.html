@@ -358,7 +358,7 @@ OMERO.web is listening on port <code class="docutils literal notranslate"><span 
 git<span class="w"> </span>clone<span class="w"> </span>https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm
 <span class="nb">cd</span><span class="w"> </span>NL-BIOMERO-Local-Slurm
 cp<span class="w"> </span>~/.ssh/id_rsa.pub<span class="w"> </span>.
-docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
+docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>.<span class="se">\d</span>ocker-compose-from-dockerhub.yml<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
 <span class="nb">cd</span><span class="w"> </span>../NL-BIOMERO
 </pre></div>
 </div>
@@ -375,6 +375,11 @@ ssh<span class="w"> </span>-i<span class="w"> </span>~/.ssh/id_rsa<span class="w
 </div>
 <p>If successful, create an SSH alias:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>ssh.config.example<span class="w"> </span>~/.ssh/config
+</pre></div>
+</div>
+<p>If not successful, try forcing ownership and permissions (and then try ssh again):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># from your host machine:</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>slurmctld<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;chown -R slurm:slurm /home/slurm/.ssh &amp;&amp; chmod 700 /home/slurm/.ssh &amp;&amp; chmod 600 /home/slurm/.ssh/authorized_keys&quot;</span>
 </pre></div>
 </div>
 </section>
