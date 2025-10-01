@@ -155,12 +155,12 @@ Checkout the <a href="https://nl-bioimaging.github.io/biomero/" target="_blank" 
 ### Quick Workflow Example:
 
 1. **Initialize Environment**:
-   - Run script: `slurm/init/SLURM Init environment...`
+   - Run script: `biomero` > `admin` > `SLURM Init environment...`
    - ☕ Grab coffee (10+ min download time for a few workflow containers)
 
 2. **Run Analysis**:
    - Select your image/dataset
-   - Run script: `slurm/workflows/SLURM Run Workflow...`
+   - Run script: `biomero` > `__workflows` >`SLURM Run Workflow...`
    - Configure import: Change `Import into NEW Dataset` → `hello_world`
    - Select workflow: e.g., `cellpose`
    - Set parameters: nucleus channel, GPU settings, etc.
@@ -172,7 +172,7 @@ OR
    - Select your workflow: e.g., `Cellpose`
    - Add Dataset, select the image(s) you want to segment
    - Fill in the workflow parameters in tab 2, e.g. nuclei channel 3
-   - Select desired output target, e.g. Select Dataset `hello_world` again; and Run!
+   - Select desired output target, e.g. Select Dataset `hello_world` again (don't forget to press ENTER if you're typing it); and Run!
    - Track your workflow status at the `Status` tab
 
 
