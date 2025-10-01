@@ -1,2 +1,15 @@
-*.sh eol=lf
-/scripts/*.py=lf
+# Shell scripts anywhere
+*.sh text eol=lf
+
+# Python scripts anywhere
+*.py text eol=lf
+
+# Dockerfiles
+Dockerfile text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+*.db binary
+*.svg binary
