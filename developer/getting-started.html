@@ -387,20 +387,33 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 <h5>5. Deploy NL-BIOMERO<a class="headerlink" href="#deploy-nl-biomero" title="Permalink to this heading"></a></h5>
 <p>Launch the full stack:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># For development (with local builds)</span>
-docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
+docker-compose<span class="w"> </span>build<span class="w"> </span>--no-cache
+<span class="c1"># Then run in the background</span>
+docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+
+<span class="c1"># OR</span>
 
 <span class="c1"># For production (using pre-built images)</span>
-docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-from-dockerhub.yml<span class="w"> </span>up<span class="w"> </span>-d
+docker-compose<span class="w"> </span>--env-file<span class="w"> </span>.<span class="se">\.</span>env<span class="w"> </span>-f<span class="w"> </span>.<span class="se">\d</span>eployment_scenarios<span class="se">\d</span>ocker-compose-from-dockerhub.yml<span class="w"> </span>pull
+<span class="c1"># wait ~10 min for download</span>
+docker-compose<span class="w"> </span>--env-file<span class="w"> </span>.<span class="se">\.</span>env<span class="w"> </span>-f<span class="w"> </span>.<span class="se">\d</span>eployment_scenarios<span class="se">\d</span>ocker-compose-from-dockerhub.yml<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
 <p>Monitor the deployment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker-compose<span class="w"> </span>logs<span class="w"> </span>-f
+
+<span class="c1"># OR</span>
+
+docker-compose<span class="w"> </span>--env-file<span class="w"> </span>.<span class="se">\.</span>env<span class="w"> </span>-f<span class="w"> </span>.<span class="se">\d</span>eployment_scenarios<span class="se">\d</span>ocker-compose-from-dockerhub.yml<span class="w"> </span>logs<span class="w"> </span>-f
 </pre></div>
 </div>
 <p>Exit w/ CTRL + C</p>
 <p>Verify the alias works:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># go inside your biomeroworker container:</span>
 docker-compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>biomeroworker<span class="w"> </span>bash
+<span class="c1"># OR</span>
+docker-compose<span class="w"> </span>--env-file<span class="w"> </span>.<span class="se">\.</span>env<span class="w"> </span>-f<span class="w"> </span>.<span class="se">\d</span>eployment_scenarios<span class="se">\d</span>ocker-compose-from-dockerhub.yml<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>biomeroworker<span class="w"> </span>bash
+
 <span class="c1"># from inside your biomeroworker container:</span>
 ssh<span class="w"> </span>localslurm
 <span class="nb">exit</span>
