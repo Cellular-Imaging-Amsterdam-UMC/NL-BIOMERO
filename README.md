@@ -89,16 +89,26 @@ Launch the full stack:
 
 ```bash
 # For development (with local builds)
-docker-compose up -d --build
+docker-compose build --no-cache
+# Then run in the background
+docker-compose up -d
+
+# OR 
 
 # For production (using pre-built images)
-docker-compose -f docker-compose-from-dockerhub.yml up -d
+docker-compose --env-file .\.env -f .\deployment_scenarios\docker-compose-from-dockerhub.yml pull
+# wait ~10 min for download
+docker-compose --env-file .\.env -f .\deployment_scenarios\docker-compose-from-dockerhub.yml up -d
 ```
 
 Monitor the deployment:
 
 ```bash
 docker-compose logs -f
+
+# OR
+
+docker-compose --env-file .\.env -f .\deployment_scenarios\docker-compose-from-dockerhub.yml logs -f
 ```
 Exit w/ CTRL + C
 
@@ -107,6 +117,9 @@ Verify the alias works:
 ```bash
 # go inside your biomeroworker container:
 docker-compose exec biomeroworker bash
+# OR
+docker-compose --env-file .\.env -f .\deployment_scenarios\docker-compose-from-dockerhub.yml exec biomeroworker bash 
+
 # from inside your biomeroworker container:
 ssh localslurm
 exit

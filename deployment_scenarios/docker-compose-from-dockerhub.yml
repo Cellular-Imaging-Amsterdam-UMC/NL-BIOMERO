@@ -179,7 +179,5 @@ networks:
 # Define the named volume(s) to persist data to the host computer
 volumes:
   database:
-    external: true
-    name: nl-biomero_database16 # Test the restored data
   database-biomero:
   omero:
