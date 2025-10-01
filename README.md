@@ -56,7 +56,7 @@ cd ..
 git clone https://github.com/Cellular-Imaging-Amsterdam-UMC/NL-BIOMERO-Local-Slurm
 cd NL-BIOMERO-Local-Slurm
 cp ~/.ssh/id_rsa.pub .
-docker-compose up -d --build
+docker compose -f .\docker-compose-from-dockerhub.yml up -d --build  
 cd ../NL-BIOMERO
 ```
 
@@ -77,6 +77,12 @@ If successful, create an SSH alias:
 cp ssh.config.example ~/.ssh/config
 ```
 
+If not successful, try forcing ownership and permissions (and then try ssh again):
+
+```bash
+# from your host machine:
+docker exec -it slurmctld bash -c "chown -R slurm:slurm /home/slurm/.ssh && chmod 700 /home/slurm/.ssh && chmod 600 /home/slurm/.ssh/authorized_keys" 
+```
 
 ### 5. Deploy NL-BIOMERO
 Launch the full stack:
