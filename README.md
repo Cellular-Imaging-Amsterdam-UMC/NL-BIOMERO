@@ -27,6 +27,15 @@ For Ubuntu/Linux deployments (with SSL support), see our dedicated guide:
 
 **Note**: This quickstart is based on Windows Docker Desktop and uses `host.docker.internal` to communicate between local clusters. Linux users should refer to the [Ubuntu/Linux guide](README.linux.md).
 
+### 0. Prerequisites
+
+- Docker Desktop
+- Git for Windows
+- a SSH keypair (@ ~/.ssh/id_rsa)
+- Powershell
+
+Then do all these steps in Powershell:
+
 ### 1. Clone and Setup
 Clone this repository locally:
 
