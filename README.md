@@ -51,8 +51,8 @@ First, customize your environment file `.env`:
 # Edit .env with your secure passwords and configuration
 # Edit biomeroworker/slurm-config.ini if you need different BIOMERO settings
 # Toggle UI components (both default to TRUE):
-# IMPORTER_ENABLED=TRUE   # Enables the Automated Data Import (ADI) UI module
-# ANALYZER_ENABLED=TRUE   # Enables the BIOMERO analysis UI module
+# IMPORTER_ENABLED=TRUE   # Enables the BIOMERO.importer UI module
+# ANALYZER_ENABLED=TRUE   # Enables the BIOMERO.analyzer UI module
 # Set either to FALSE to hide that module from OMERO.web without removing containers
 ```
 
@@ -241,7 +241,7 @@ See <a href="https://nl-bioimaging.github.io/biomero/" target="_blank" rel="noop
 ## 🎨 Frontend Customizations
 This deployment includes several UI enhancements:
 
-- **🧩 OMERO.biomero Plugin**: Unified Importer (ADI) and Analyzer (BIOMERO) tabs
+- **🧩 OMERO.biomero Plugin**: Unified BIOMERO.importer and BIOMERO.analyzer tabs
 - **📝 OMERO.forms**: Create custom metadata forms for users to fill in
 - **🔘 Better Buttons**: Improved some button design and accessibility
 - **🎭 Pretty Login**: Minor enhanced login page aesthetics

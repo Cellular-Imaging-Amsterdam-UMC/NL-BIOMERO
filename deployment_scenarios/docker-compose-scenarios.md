@@ -144,13 +144,13 @@ nano .env
 docker-compose -f docker-compose-biomero-only.yml up -d
 ```
 
-### Scenario 3.2: ADI Only (External OMERO)
-**Purpose**: Deploy only Automated Data Import with existing OMERO
+### Scenario 3.2: BIOMERO.importer Only (External OMERO)
+**Purpose**: Deploy only BIOMERO.importer with existing OMERO
 
 **Docker Compose File**: `docker-compose-adi-only.yml`
 
 **Key Features**:
-- Deploys only ADI component
+- Deploys only BIOMERO.importer component
 - Configured to connect to external OMERO server
 - Focused on automated data import functionality
 
@@ -162,7 +162,7 @@ cp external-omero.env.example .env
 # Edit .env to set external OMERO server details
 nano .env
 
-# Deploy ADI components
+# Deploy BIOMERO.importer components
 docker-compose -f docker-compose-adi-only.yml up -d
 ```
 
@@ -187,10 +187,10 @@ You can build that in to any of the compose files to have the option of deployin
 In the `.env` file you can hide specific UI modules without removing containers:
 
 ```bash
-# Automated Data Import (ADI) web UI
+# BIOMERO.importer web UI
 IMPORTER_ENABLED=TRUE  # set FALSE to hide importer UI
 
-# BIOMERO analysis workflows UI
+# BIOMERO.analyzer workflows UI
 ANALYZER_ENABLED=TRUE  # set FALSE to hide BIOMERO UI
 ```
 

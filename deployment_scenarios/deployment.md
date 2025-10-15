@@ -56,9 +56,9 @@ It also describes the opposite (backing up containers).
 
 - Keep your existing OMERO.server + PostgreSQL.
 - Deploy (perhaps on a separate VM) only a subset of containers, e.g.:
-  - `biomero`, `metabase`, `omeroweb`, `biomero-database`, `adi` (BIOMERO & ADI)
-  - `biomero`, `metabase`, `omeroweb`, `biomero-database` (BIOMERO only)
-  - `adi`, `metabase`, `omeroweb`, `biomero-database`  (ADI only)
+  - `biomero`, `metabase`, `omeroweb`, `biomero-database`, `adi` (BIOMERO.analyzer & BIOMERO.importer)
+  - `biomero`, `metabase`, `omeroweb`, `biomero-database` (BIOMERO.analyzer only)
+  - `adi`, `metabase`, `omeroweb`, `biomero-database`  (BIOMERO.importer only)
 - Connect these to the external OMERO server through the env/config variables.
   - Specifically, this would require an OMERO.grid connection between the 2 VMs. See for example the <a href="https://omero.readthedocs.io/en/stable/sysadmins/server-setup-examples.html#micron-oxford" target="_blank" rel="noopener noreferrer">Micron Oxford setup</a> and <a href="https://omero.readthedocs.io/en/stable/sysadmins/grid.html#nodes-on-multiple-hosts" target="_blank" rel="noopener noreferrer">OMERO docs on multiple hosts</a> for such a split.
 - Still requires some minimal config/scripts additions to your OMERO server to make the rest work. For now, see the Dockerfile of `server` and its config in the deployment configurations.

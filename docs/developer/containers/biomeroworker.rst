@@ -17,7 +17,7 @@ Based on the ``openmicroscopy/omero-server`` image, this container is configured
       omeroworker-1:Tables-0,Indexer-0,PixelData-0,DropBox,MonitorServer,FileServer,Storm
       biomeroworker-external:Processor-0
 
-This ensures all OMERO script execution (**including BIOMERO scripts**) is routed to this container, which has the specialized environment needed for HPC cluster integration.
+This ensures all OMERO script execution (**including BIOMERO.scripts**) is routed to this container, which has the specialized environment needed for HPC cluster integration.
 
 Key Features
 ------------
@@ -118,7 +118,7 @@ BIOMERO Library Integration
 
 **Supporting Libraries**:
 
-For BIOMERO scripts. These can have extra dependencies above just BIOMERO python library.
+For BIOMERO.scripts. These can have extra dependencies above just BIOMERO.analyzer python library.
 
 .. code-block:: dockerfile
 
@@ -270,7 +270,7 @@ Development Guidelines
 BIOMERO Script Development
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Script Location**: BIOMERO scripts are installed on the **OMERO server container**, not the worker:
+**Script Location**: BIOMERO.scripts are installed on the **OMERO server container**, not the worker:
 
 * Scripts live in: ``/opt/omero/server/OMERO.server/lib/scripts/biomero/``
 * Worker executes scripts via OMERO.grid Processor-0 role
