@@ -202,7 +202,7 @@
 <li class="toctree-l4"><a class="reference internal" href="metabase.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="omeroadi.html">OMERO ADI Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="omeroadi.html">BIOMERO.importer Container</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="omeroadi.html#overview">Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="omeroadi.html#import-workflow">Import Workflow</a></li>
 <li class="toctree-l4"><a class="reference internal" href="omeroadi.html#import-order-creation-and-management">Import order creation and management</a></li>
@@ -293,7 +293,7 @@
 <span class="w">  </span><span class="no">biomeroworker-external:Processor-0</span>
 </pre></div>
 </div>
-<p>This ensures all OMERO script execution (<strong>including BIOMERO scripts</strong>) is routed to this container, which has the specialized environment needed for HPC cluster integration.</p>
+<p>This ensures all OMERO script execution (<strong>including BIOMERO.scripts</strong>) is routed to this container, which has the specialized environment needed for HPC cluster integration.</p>
 </section>
 <section id="key-features">
 <h2>Key Features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h2>
@@ -382,7 +382,7 @@
 </pre></div>
 </div>
 <p><strong>Supporting Libraries</strong>:</p>
-<p>For BIOMERO scripts. These can have extra dependencies above just BIOMERO python library.</p>
+<p>For BIOMERO.scripts. These can have extra dependencies above just BIOMERO.analyzer python library.</p>
 <div class="highlight-dockerfile notranslate"><div class="highlight"><pre><span></span><span class="k">RUN</span><span class="w"> </span><span class="nv">$VIRTUAL_ENV</span>/bin/python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="nv">ezomero</span><span class="o">==</span><span class="m">1</span>.1.1<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="nv">tifffile</span><span class="o">==</span><span class="m">2020</span>.9.3<span class="w"> </span><span class="se">\</span>
@@ -505,7 +505,7 @@
 <h2>Development Guidelines<a class="headerlink" href="#development-guidelines" title="Permalink to this heading"></a></h2>
 <section id="biomero-script-development">
 <h3>BIOMERO Script Development<a class="headerlink" href="#biomero-script-development" title="Permalink to this heading"></a></h3>
-<p><strong>Script Location</strong>: BIOMERO scripts are installed on the <strong>OMERO server container</strong>, not the worker:</p>
+<p><strong>Script Location</strong>: BIOMERO.scripts are installed on the <strong>OMERO server container</strong>, not the worker:</p>
 <ul class="simple">
 <li><p>Scripts live in: <code class="docutils literal notranslate"><span class="pre">/opt/omero/server/OMERO.server/lib/scripts/biomero/</span></code></p></li>
 <li><p>Worker executes scripts via OMERO.grid Processor-0 role</p></li>

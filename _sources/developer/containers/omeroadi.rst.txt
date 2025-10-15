@@ -1,7 +1,10 @@
-OMERO ADI Container
-===================
+BIOMERO.importer Container
+==========================
 
-The OMERO Automated Data Import (ADI) service handles automated data import workflows and order management.
+.. note::
+   **ADI** is the deprecated name for this service. The new canonical name is **BIOMERO.importer**.
+
+The BIOMERO.importer service handles automated data import workflows and order management.
 
 Overview
 --------

@@ -202,7 +202,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../developer/containers/metabase.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../developer/containers/omeroadi.html">OMERO ADI Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../developer/containers/omeroadi.html">BIOMERO.importer Container</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#overview">Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#import-workflow">Import Workflow</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#import-order-creation-and-management">Import order creation and management</a></li>
@@ -428,13 +428,13 @@ docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-b
 </pre></div>
 </div>
 </section>
-<section id="scenario-3-2-adi-only-external-omero">
-<h4>Scenario 3.2: ADI Only (External OMERO)<a class="headerlink" href="#scenario-3-2-adi-only-external-omero" title="Permalink to this heading"></a></h4>
-<p><strong>Purpose</strong>: Deploy only Automated Data Import with existing OMERO</p>
+<section id="scenario-3-2-biomero-importer-only-external-omero">
+<h4>Scenario 3.2: BIOMERO.importer Only (External OMERO)<a class="headerlink" href="#scenario-3-2-biomero-importer-only-external-omero" title="Permalink to this heading"></a></h4>
+<p><strong>Purpose</strong>: Deploy only BIOMERO.importer with existing OMERO</p>
 <p><strong>Docker Compose File</strong>: <code class="docutils literal notranslate"><span class="pre">docker-compose-adi-only.yml</span></code></p>
 <p><strong>Key Features</strong>:</p>
 <ul class="simple">
-<li><p>Deploys only ADI component</p></li>
+<li><p>Deploys only BIOMERO.importer component</p></li>
 <li><p>Configured to connect to external OMERO server</p></li>
 <li><p>Focused on automated data import functionality</p></li>
 </ul>
@@ -445,7 +445,7 @@ cp<span class="w"> </span>external-omero.env.example<span class="w"> </span>.env
 <span class="c1"># Edit .env to set external OMERO server details</span>
 nano<span class="w"> </span>.env
 
-<span class="c1"># Deploy ADI components</span>
+<span class="c1"># Deploy BIOMERO.importer components</span>
 docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-adi-only.yml<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
@@ -469,10 +469,10 @@ docker-compose<span class="w"> </span>up<span class="w"> </span>-d
 <section id="toggle-ui-modules-omero-biomero-plugin">
 <h4>Toggle UI Modules (OMERO.biomero plugin)<a class="headerlink" href="#toggle-ui-modules-omero-biomero-plugin" title="Permalink to this heading"></a></h4>
 <p>In the <code class="docutils literal notranslate"><span class="pre">.env</span></code> file you can hide specific UI modules without removing containers:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Automated Data Import (ADI) web UI</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># BIOMERO.importer web UI</span>
 <span class="nv">IMPORTER_ENABLED</span><span class="o">=</span>TRUE<span class="w">  </span><span class="c1"># set FALSE to hide importer UI</span>
 
-<span class="c1"># BIOMERO analysis workflows UI</span>
+<span class="c1"># BIOMERO.analyzer workflows UI</span>
 <span class="nv">ANALYZER_ENABLED</span><span class="o">=</span>TRUE<span class="w">  </span><span class="c1"># set FALSE to hide BIOMERO UI</span>
 </pre></div>
 </div>

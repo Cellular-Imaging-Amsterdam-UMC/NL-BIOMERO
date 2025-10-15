@@ -202,7 +202,7 @@
 <li class="toctree-l4"><a class="reference internal" href="containers/metabase.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="containers/omeroadi.html">OMERO ADI Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="containers/omeroadi.html">BIOMERO.importer Container</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="containers/omeroadi.html#overview">Overview</a></li>
 <li class="toctree-l4"><a class="reference internal" href="containers/omeroadi.html#import-workflow">Import Workflow</a></li>
 <li class="toctree-l4"><a class="reference internal" href="containers/omeroadi.html#import-order-creation-and-management">Import order creation and management</a></li>
@@ -286,13 +286,13 @@
 <h2>Container Architecture<a class="headerlink" href="#container-architecture" title="Permalink to this heading"></a></h2>
 <p>The platform uses Docker Compose to orchestrate multiple services:</p>
 <ul class="simple">
-<li><p><strong>omeroserver</strong> - Core OMERO server with BIOMERO scripts</p></li>
+<li><p><strong>omeroserver</strong> - Core OMERO server with BIOMERO.scripts</p></li>
 <li><p><strong>omeroweb</strong> - Web interface with custom plugins</p></li>
-<li><p><strong>biomeroworker</strong> - BIOMERO analysis processor</p></li>
-<li><p><strong>metabase</strong> - Analytics and visualization dashboard</p></li>
+<li><p><strong>biomeroworker</strong> - BIOMERO.analyzer processor</p></li>
+<li><p><strong>metabase</strong> - Analytics and visualization dashboard (BIOMERO.db)</p></li>
 <li><p><strong>database</strong> - PostgreSQL for OMERO data</p></li>
-<li><p><strong>database-biomero</strong> - PostgreSQL for BIOMERO workflows</p></li>
-<li><p><strong>omeroadi</strong> - Service for data import</p></li>
+<li><p><strong>database-biomero</strong> - PostgreSQL for BIOMERO workflows (BIOMERO.db)</p></li>
+<li><p><strong>omeroadi</strong> - BIOMERO.importer service</p></li>
 </ul>
 </section>
 <section id="network-architecture">

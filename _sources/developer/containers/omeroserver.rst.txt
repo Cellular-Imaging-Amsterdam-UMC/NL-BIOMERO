@@ -21,7 +21,7 @@ Script Installation
 
 The container automatically installs three sets of scripts during build:
 
-**1. BIOMERO Scripts**
+**1. BIOMERO.scripts**
    - Source: `NL-BioImaging/biomero-scripts <https://github.com/NL-BioImaging/biomero-scripts>`_
    - Location: ``/opt/omero/server/OMERO.server/lib/scripts/biomero/``
    - Purpose: Slurm-based image analysis workflows

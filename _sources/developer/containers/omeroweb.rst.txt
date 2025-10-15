@@ -79,7 +79,7 @@ Supporting Libraries
    - Scripts: ``44-create_forms_user.py`` and ``45-fix-forms-config.sh``
    - Benefit: No manual setup required for forms functionality
 
-**OMERO ADI (Automated Data Import)**
+**BIOMERO.importer (formerly OMERO ADI)**
    - Source: `OMERO-Automated-Data-Import <https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import>`_
    - Purpose: Automated import order creation
    - Integration: Used by OMERO.biomero for import workflows

@@ -31,7 +31,7 @@ Dashboards in use
 ~~~~~~~~~~~~~~~~~
 
 * ``#2`` BIOMERO analytics
-* ``#6`` OMERO Automated Data Importer
+* ``#6`` BIOMERO.importer (formerly OMERO Automated Data Importer)
 
 Both are published and embedded in OMERO.web (via OMERO.biomero) using iFrames.
 
@@ -115,7 +115,7 @@ Initial Security Setup
 
 4. **Update dashboard URL redirects**
    
-   - Open the sidebar (Ctrl + .), click on "OMERO Automated Data Importer" dashboard
+   - Open the sidebar (Ctrl + .), click on "BIOMERO.importer" dashboard
    - Click "Edit dashboard" (pen icon)
    - Hover over the "Upload Status" table and click "Click behavior"
    - Update all "GO TO CUSTOM DESTINATION" URLs to match your environment

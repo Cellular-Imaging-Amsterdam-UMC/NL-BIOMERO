@@ -18,7 +18,7 @@ The admin interfaces are available through the OMERO.web plugin after logging in
 Importer Admin Configuration
 ----------------------------
 
-The Importer Admin tab manages settings for the Automated Data Importer (ADI).
+The Importer Admin tab manages settings for BIOMERO.importer (formerly ADI).
 
 Group Folder Mappings
 ~~~~~~~~~~~~~~~~~~~~~
@@ -74,7 +74,7 @@ Configuration File Management
 Analyzer Admin Configuration
 ----------------------------
 
-The Analyzer Admin screen is split into two sections: BIOMERO settings (left) and OMERO scripts (right).
+The Analyzer Admin screen is split into two sections: BIOMERO.analyzer settings (left) and OMERO scripts (right).
 
 Overview
 ~~~~~~~~
