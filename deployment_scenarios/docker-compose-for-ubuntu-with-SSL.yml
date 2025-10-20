@@ -188,8 +188,8 @@ services:
     volumes:
       - "../metabase:/metabase-data"
 
-  omeroadi:
-    image: "cellularimagingcf/omeroadi:${OMEROADI_VERSION:-latest}"
+  biomero-importer:
+    image: "cellularimagingcf/biomero-importer:${BIOMERO_IMPORTER_VERSION:-latest}"
     privileged: true
     devices:
       - "/dev/fuse:/dev/fuse"
@@ -201,14 +201,15 @@ services:
       OMERO_PASSWORD: ${OMERO_ROOT_PASSWORD}
       OMERO_PORT: 4064
       INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
+      ADI_RUN_MIGRATIONS: "1"
       PODMAN_USERNS_MODE: keep-id
     networks:
       - omero
     volumes:
       - "omero:/OMERO"
       - "../web/L-Drive:/data" # TODO: Make sure to open permissions on the host e.g. chmod -R 777 ./web/L-Drive
-      - "../config/omeroadi/settings.yml:/auto-importer/config/settings.yml"
-      - "../config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
+      - "../config/biomero-importer/settings.yml:/auto-importer/config/settings.yml"
+      - "../config/biomero-importer/groups_list.json:/auto-importer/config/groups_list.json"
     user: "1000:1000"
 
 # Define the network(s) to communicate between containers

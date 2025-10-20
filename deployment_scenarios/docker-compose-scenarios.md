@@ -17,7 +17,7 @@ NL-BIOMERO supports multiple deployment scenarios from development to production
 >
 > **Example:**
 > ```bash
-> docker compose -f ./deployment_scenarios/docker-compose-adi-only.yml --env-file .env.shared up -d
+> docker compose -f ./deployment_scenarios/docker-compose-importer-only.yml --env-file .env.shared up -d
 > ```
 
 The examples below assume you're in the `deployment_scenarios` directory, but you can run them from the project root with the above pattern. Just double check the relative paths if you run them from somewhere else, especially if they have to build the containers instead of pull them from DockerHub.
@@ -147,7 +147,7 @@ docker-compose -f docker-compose-biomero-only.yml up -d
 ### Scenario 3.2: BIOMERO.importer Only (External OMERO)
 **Purpose**: Deploy only BIOMERO.importer with existing OMERO
 
-**Docker Compose File**: `docker-compose-adi-only.yml`
+**Docker Compose File**: `docker-compose-importer-only.yml`
 
 **Key Features**:
 - Deploys only BIOMERO.importer component
@@ -163,7 +163,7 @@ cp external-omero.env.example .env
 nano .env
 
 # Deploy BIOMERO.importer components
-docker-compose -f docker-compose-adi-only.yml up -d
+docker-compose -f docker-compose-importer-only.yml up -d
 ```
 
 ---
@@ -174,10 +174,10 @@ docker-compose -f docker-compose-adi-only.yml up -d
 Some docker-compose files support selective component deployment using profiles:
 
 ```bash
-# Deploy only with ADI enabled
-docker-compose --profile adi_enabled up -d
+# Deploy only with importer enabled
+docker-compose --profile importer_enabled up -d
 
-# Deploy without ADI
+# Deploy without importer
 docker-compose up -d
 ```
 

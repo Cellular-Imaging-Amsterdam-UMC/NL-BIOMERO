@@ -59,7 +59,7 @@ All files are placed in a timestamped subfolder under `./backup_and_restore/back
 
 ```bash
 # 1. Stop user-facing containers (optional for consistency)
-docker-compose stop omeroweb metabase omeroadi
+docker-compose stop omeroweb metabase biomero-importer
 
 # 2. Run master backup
 ./backup_and_restore/backup/backup_master.sh
