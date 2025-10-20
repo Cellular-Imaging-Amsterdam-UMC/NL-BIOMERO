@@ -210,10 +210,10 @@ services:
     volumes:
       - "./metabase:/metabase-data" # Mount existing H2 db
 
-  omeroadi:
+  biomero-importer:
     build:
-      context: ./omeroadi  # Adjust if needed
-      dockerfile: ./Dockerfile  # Path to the Dockerfile for your local build
+      context: ./biomero-importer
+      dockerfile: ./Dockerfile
     privileged: true
     devices:
       - "/dev/fuse:/dev/fuse"
@@ -231,10 +231,10 @@ services:
     volumes:
       - "omero:/OMERO"
       - "./web/L-Drive:/data"
-      - "./omeroadi/logs:/auto-importer/logs"
-      - "./omeroadi/config:/auto-importer/config"
-      - "./omeroadi/omero_adi:/auto-importer/omero_adi"
-      - "./logs/omeroadi:/auto-importer/logs"
+      - "./biomero-importer/logs:/auto-importer/logs"
+      - "./biomero-importer/config:/auto-importer/config"
+      - "./biomero-importer/biomero_importer:/auto-importer/biomero_importer"
+      - "./logs/biomero-importer:/auto-importer/logs"
     user: "1000:1000"
     logging:
       driver: "json-file"

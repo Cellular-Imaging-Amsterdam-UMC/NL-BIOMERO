@@ -1,4 +1,4 @@
-# ADI-only deployment that connects to an existing external OMERO server
+# BIOMERO Importer-only deployment that connects to an existing external OMERO server
 # Configure EXTERNAL_OMERO_HOST and related variables in .env file
 
 version: "3"
@@ -11,7 +11,7 @@ services:
       POSTGRES_DB: ${BIOMERO_POSTGRES_DB}
       POSTGRES_PASSWORD: ${BIOMERO_POSTGRES_PASSWORD}
     networks:
-      - adi-network
+      - importer-network
     volumes:
       - "database-biomero:/var/lib/postgresql/data"
 
@@ -30,7 +30,7 @@ services:
       IMPORTER_ENABLED: "TRUE"
       ANALYZER_ENABLED: "FALSE"
     networks:
-      - adi-network
+      - importer-network
     ports:
       - "4080:4080"
     volumes:
@@ -45,14 +45,14 @@ services:
       MB_USER: ${METABASE_USER}
       MB_PASSWORD: ${METABASE_PASSWORD}
     networks:
-      - adi-network
+      - importer-network
     ports:
       - "3000:3000"
     volumes:
       - "../metabase:/metabase-data"
 
-  omeroadi:
-    image: "cellularimagingcf/omeroadi:${OMEROADI_VERSION:-latest}"
+  biomero-importer:
+    image: "cellularimagingcf/biomero-importer:${BIOMERO_IMPORTER_VERSION:-latest}"
     privileged: true
     devices:
       - "/dev/fuse:/dev/fuse"
@@ -65,14 +65,14 @@ services:
       OMERO_PASSWORD: ${EXTERNAL_OMERO_PASSWORD}
       INGEST_TRACKING_DB_URL: postgresql+psycopg2://${BIOMERO_POSTGRES_USER}:${BIOMERO_POSTGRES_PASSWORD}@database-biomero:5432/${BIOMERO_POSTGRES_DB}
     networks:
-      - adi-network
+      - importer-network
     volumes:
       - "../web/L-Drive:/data"
-      - "../config/omeroadi/groups_list.json:/auto-importer/config/groups_list.json"
+      - "../config/biomero-importer/groups_list.json:/auto-importer/config/groups_list.json"
     user: "1000:1000"
 
 networks:
-  adi-network:
+  importer-network:
 
 volumes:
   database-biomero:
