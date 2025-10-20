@@ -209,11 +209,11 @@ The OMERO ADI component is managed as a Git submodule with independent versionin
    
    .. code-block:: bash
    
-      cd omeroadi
+      cd biomero-importer
       git fetch origin
       git checkout v1.x.x  # Latest ADI release
       cd ..
-      git add omeroadi
+      git add biomero-importer
       git commit -m "Update OMERO ADI to v1.x.x"
    
    3. **Release** new NL-BIOMERO version if ADI changes affect the platform
@@ -236,7 +236,7 @@ Container Registry
    - ``cellularimagingcf/omeroworker``
    - ``cellularimagingcf/omeroweb``
    - ``cellularimagingcf/biomero``
-   - ``cellularimagingcf/omeroadi`` (from separate repo)
+   - ``cellularimagingcf/biomero-importer`` (from separate repo)
 
 **Tagging Strategy**:
    - ``latest`` - Latest stable release, but preferably use specific version tags

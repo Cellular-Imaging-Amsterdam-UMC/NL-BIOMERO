@@ -202,18 +202,18 @@
 <li class="toctree-l4"><a class="reference internal" href="../developer/containers/metabase.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../developer/containers/omeroadi.html">BIOMERO.importer Container</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#import-workflow">Import Workflow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#import-order-creation-and-management">Import order creation and management</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#file-system-monitoring-and-processing">File system monitoring and processing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#configuration">Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#integration-with-omero-server">Integration with OMERO server</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#custom-import-pipeline-development">Custom import pipeline development</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#error-handling-and-retry-mechanisms">Error handling and retry mechanisms</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#testing">Testing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#security-and-runtime-requirements">Security and runtime requirements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../developer/containers/omeroadi.html#related-documentation">Related Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../developer/containers/biomero-importer.html">BIOMERO.importer Container</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#import-workflow">Import Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#import-order-creation-and-management">Import order creation and management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#file-system-monitoring-and-processing">File system monitoring and processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#integration-with-omero-server">Integration with OMERO server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#custom-import-pipeline-development">Custom import pipeline development</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#error-handling-and-retry-mechanisms">Error handling and retry mechanisms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#security-and-runtime-requirements">Security and runtime requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../developer/containers/biomero-importer.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../developer/containers/releases.html">Container Releases</a><ul>
@@ -301,7 +301,7 @@
 <li><p>Using the <code class="docutils literal notranslate"><span class="pre">up</span> <span class="pre">-d</span></code> flags to start containers in detached mode</p></li>
 </ol>
 <p><strong>Example:</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>./deployment_scenarios/docker-compose-adi-only.yml<span class="w"> </span>--env-file<span class="w"> </span>.env.shared<span class="w"> </span>up<span class="w"> </span>-d
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>-f<span class="w"> </span>./deployment_scenarios/docker-compose-importer-only.yml<span class="w"> </span>--env-file<span class="w"> </span>.env.shared<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
 </div></blockquote>
@@ -431,7 +431,7 @@ docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-b
 <section id="scenario-3-2-biomero-importer-only-external-omero">
 <h4>Scenario 3.2: BIOMERO.importer Only (External OMERO)<a class="headerlink" href="#scenario-3-2-biomero-importer-only-external-omero" title="Permalink to this heading"></a></h4>
 <p><strong>Purpose</strong>: Deploy only BIOMERO.importer with existing OMERO</p>
-<p><strong>Docker Compose File</strong>: <code class="docutils literal notranslate"><span class="pre">docker-compose-adi-only.yml</span></code></p>
+<p><strong>Docker Compose File</strong>: <code class="docutils literal notranslate"><span class="pre">docker-compose-importer-only.yml</span></code></p>
 <p><strong>Key Features</strong>:</p>
 <ul class="simple">
 <li><p>Deploys only BIOMERO.importer component</p></li>
@@ -446,7 +446,7 @@ cp<span class="w"> </span>external-omero.env.example<span class="w"> </span>.env
 nano<span class="w"> </span>.env
 
 <span class="c1"># Deploy BIOMERO.importer components</span>
-docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-adi-only.yml<span class="w"> </span>up<span class="w"> </span>-d
+docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-importer-only.yml<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>
 </section>
@@ -457,10 +457,10 @@ docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-a
 <section id="component-selection-with-profiles">
 <h4>Component Selection with Profiles<a class="headerlink" href="#component-selection-with-profiles" title="Permalink to this heading"></a></h4>
 <p>Some docker-compose files support selective component deployment using profiles:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Deploy only with ADI enabled</span>
-docker-compose<span class="w"> </span>--profile<span class="w"> </span>adi_enabled<span class="w"> </span>up<span class="w"> </span>-d
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Deploy only with importer enabled</span>
+docker-compose<span class="w"> </span>--profile<span class="w"> </span>importer_enabled<span class="w"> </span>up<span class="w"> </span>-d
 
-<span class="c1"># Deploy without ADI</span>
+<span class="c1"># Deploy without importer</span>
 docker-compose<span class="w"> </span>up<span class="w"> </span>-d
 </pre></div>
 </div>

@@ -272,7 +272,7 @@
           <li class="breadcrumb-item"><a href="index.html">Container Development</a></li>
       <li class="breadcrumb-item active">BIOMERO.importer Container</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/developer/containers/omeroadi.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/developer/containers/biomero-importer.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -289,32 +289,32 @@
 <p>The BIOMERO.importer service handles automated data import workflows and order management.</p>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
-<p>OMERO ADI provides:</p>
+<p>BIOMERO.importer provides:</p>
 <ul class="simple">
 <li><p><strong>Automated Import</strong>: Hands-free data import from configured directories</p></li>
 <li><p><strong>Order Management</strong>: Import job queuing and tracking</p></li>
 <li><p><strong>File Monitoring</strong>: Automated detection of new data files</p></li>
 <li><p><strong>Integration</strong>: Seamless connection with OMERO server and web interface</p></li>
 </ul>
-<p>See the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import#readme">OMERO ADI README</a> for detailed setup, configuration, and usage.</p>
+<p>See the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/BIOMERO.importer#readme">BIOMERO.importer README</a> for detailed setup, configuration, and usage.</p>
 </section>
 <section id="import-workflow">
 <h2>Import Workflow<a class="headerlink" href="#import-workflow" title="Permalink to this heading"></a></h2>
 <figure class="align-center" id="id4">
-<a class="reference internal image-reference" href="../../_images/flow_diagram_ADI_import.png"><img alt="OMERO ADI automated import workflow" src="../../_images/flow_diagram_ADI_import.png" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="../../_images/flow_diagram_ADI_import.png"><img alt="BIOMERO.importer automated import workflow" src="../../_images/flow_diagram_ADI_import.png" style="width: 100%;" /></a>
 <figcaption>
-<p><span class="caption-text">High-level flow of the OMERO ADI import process, from user request and database orchestration to worker thread execution.</span><a class="headerlink" href="#id4" title="Permalink to this image"></a></p>
+<p><span class="caption-text">High-level flow of the BIOMERO.importer import process, from user request and database orchestration to worker thread execution.</span><a class="headerlink" href="#id4" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="import-order-creation-and-management">
 <h2>Import order creation and management<a class="headerlink" href="#import-order-creation-and-management" title="Permalink to this heading"></a></h2>
-<p>Orders are managed in PostgreSQL. Tables are created by ADI via SQLAlchemy at startup, using the database configured by <code class="docutils literal notranslate"><span class="pre">INGEST_TRACKING_DB_URL</span></code> (env var preferred) or in <code class="docutils literal notranslate"><span class="pre">settings.yml</span></code> (see below).</p>
+<p>Orders are managed in PostgreSQL. Tables are created by BIOMERO.importer via SQLAlchemy at startup, using the database configured by <code class="docutils literal notranslate"><span class="pre">INGEST_TRACKING_DB_URL</span></code> (env var preferred) or in <code class="docutils literal notranslate"><span class="pre">settings.yml</span></code> (see below).</p>
 <p>Ways to create orders:</p>
 <ul class="simple">
-<li><p>OMERO.biomero web plugin: Uses the <code class="docutils literal notranslate"><span class="pre">omero_adi</span></code> Python library to insert into both the main imports table and the preprocessing table when needed.</p></li>
-<li><p>Direct SQL: Insert directly into the database (see the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import#readme">OMERO ADI README</a> for schema details).</p></li>
-<li><p>Programmatically: Use the <code class="docutils literal notranslate"><span class="pre">omero_adi</span></code> Python library from any client.</p></li>
+<li><p>OMERO.biomero web plugin: Uses the <code class="docutils literal notranslate"><span class="pre">biomero_importer</span></code> Python library to insert into both the main imports table and the preprocessing table when needed.</p></li>
+<li><p>Direct SQL: Insert directly into the database (see the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/BIOMERO.importer#readme">BIOMERO.importer README</a> for schema details).</p></li>
+<li><p>Programmatically: Use the <code class="docutils literal notranslate"><span class="pre">biomero_importer</span></code> Python library from any client.</p></li>
 </ul>
 <p>Database access:</p>
 <ul class="simple">
@@ -325,11 +325,11 @@
 <section id="file-system-monitoring-and-processing">
 <h2>File system monitoring and processing<a class="headerlink" href="#file-system-monitoring-and-processing" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p>The shared file system is mounted into omeroadi at <code class="docutils literal notranslate"><span class="pre">/data</span></code>. The ADI user must have read/write permissions.</p></li>
+<li><p>The shared file system is mounted into biomero-importer at <code class="docutils literal notranslate"><span class="pre">/data</span></code>. The importer user must have read/write permissions.</p></li>
 <li><p>Orders can reference any files/folders under this mount. The OMERO.biomero app can restrict selectable folders per group in its UI; the database itself does not enforce these restrictions.</p></li>
 <li><p>When preprocessing is enabled, converted files are written back alongside originals under a <code class="docutils literal notranslate"><span class="pre">.processed</span></code> subfolder within the same directory.</p></li>
 <li><p>All imports are in-place. OMERO.server must mount the same storage at the same path for symlink-based imports to work.</p></li>
-<li><p>For large/long imports, enable preprocessing: after preprocessing ADI imports from local temporary storage on OMERO.server, then redirects symlinks to the network location afterward. This reduces network risk during in-place import.</p></li>
+<li><p>For large/long imports, enable preprocessing: after preprocessing BIOMERO.importer imports from local temporary storage on OMERO.server, then redirects symlinks to the network location afterward. This reduces network risk during in-place import.</p></li>
 </ul>
 </section>
 <section id="configuration">
@@ -352,15 +352,15 @@
 <section id="integration-with-omero-server">
 <h2>Integration with OMERO server<a class="headerlink" href="#integration-with-omero-server" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p>The omeroadi container shares both <code class="docutils literal notranslate"><span class="pre">/OMERO</span></code> and <code class="docutils literal notranslate"><span class="pre">/data</span></code> with OMERO.server. This is required for preprocessing and in-place imports.</p></li>
-<li><p>ADI authenticates to OMERO as root initially, then switches context to the requesting user/group to perform the import as that user.</p></li>
+<li><p>The biomero-importer container shares both <code class="docutils literal notranslate"><span class="pre">/OMERO</span></code> and <code class="docutils literal notranslate"><span class="pre">/data</span></code> with OMERO.server. This is required for preprocessing and in-place imports.</p></li>
+<li><p>BIOMERO.importer authenticates to OMERO as root initially, then switches context to the requesting user/group to perform the import as that user.</p></li>
 </ul>
 </section>
 <section id="custom-import-pipeline-development">
 <h2>Custom import pipeline development<a class="headerlink" href="#custom-import-pipeline-development" title="Permalink to this heading"></a></h2>
 <ul class="simple">
-<li><p>See the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import#readme">OMERO ADI README</a> for container interfaces and examples.</p></li>
-<li><p>Provide a standalone Docker/Podman-compatible container that follows the IO conventions (inputs/outputs and optional JSON metadata). ADI will run it via podman-in-docker/podman-in-podman.</p></li>
+<li><p>See the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/BIOMERO.importer#readme">BIOMERO.importer README</a> for container interfaces and examples.</p></li>
+<li><p>Provide a standalone Docker/Podman-compatible container that follows the IO conventions (inputs/outputs and optional JSON metadata). BIOMERO.importer will run it via podman-in-docker/podman-in-podman.</p></li>
 <li><p>Windows note: preprocessing containers should run as root inside the container to avoid file permission issues on mounted volumes. On Linux, userns keep-id can help for non-root, but Windows Docker commonly needs root.</p></li>
 <li><p>Files without preprocessing are imported in-place using OMERO CLI/bioformats via ezomero/CLI integration.</p></li>
 </ul>
@@ -382,22 +382,22 @@
 <h2>Testing<a class="headerlink" href="#testing" title="Permalink to this heading"></a></h2>
 <p>Quick checks for a running deployment:</p>
 <p>Run a small end-to-end test order:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># ADI upload health check</span>
-podman<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>omeroadi<span class="w"> </span>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;python tests/t_main.py&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># BIOMERO.importer upload health check</span>
+podman<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>biomero-importer<span class="w"> </span>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;python tests/t_main.py&quot;</span>
 </pre></div>
 </div>
 <p>Test podman-in-podman:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Podman-in-podman test run</span>
-podman<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>omeroadi<span class="w"> </span>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;podman run docker.io/godlovedc/lolcow&quot;</span>
+podman<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>biomero-importer<span class="w"> </span>/bin/bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;podman run docker.io/godlovedc/lolcow&quot;</span>
 </pre></div>
 </div>
-<p>See the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import#readme">OMERO ADI README</a> for details on configuring <code class="docutils literal notranslate"><span class="pre">settings.yml</span></code> to point to your demo file and target destination.</p>
+<p>See the <a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/BIOMERO.importer#readme">BIOMERO.importer README</a> for details on configuring <code class="docutils literal notranslate"><span class="pre">settings.yml</span></code> to point to your demo file and target destination.</p>
 </section>
 <section id="security-and-runtime-requirements">
 <h2>Security and runtime requirements<a class="headerlink" href="#security-and-runtime-requirements" title="Permalink to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>ADI runs podman-in-podman (or podman-in-docker). The container currently requires <code class="docutils literal notranslate"><span class="pre">--privileged</span></code> and access to <code class="docutils literal notranslate"><span class="pre">/dev/fuse</span></code> for running preprocessing containers as the ADI user. Some reports suggest alternatives may be possible on specific platforms, but our attempts without privileged have not been reliable yet. A potential future improvement is to switch the podman engine that runs ADI to a different model so the inner podman can run without privileged.</p>
+<p>BIOMERO.importer runs podman-in-podman (or podman-in-docker). The container currently requires <code class="docutils literal notranslate"><span class="pre">--privileged</span></code> and access to <code class="docutils literal notranslate"><span class="pre">/dev/fuse</span></code> for running preprocessing containers as the importer user. Some reports suggest alternatives may be possible on specific platforms, but our attempts without privileged have not been reliable yet. A potential future improvement is to switch the podman engine that runs BIOMERO.importer to a different model so the inner podman can run without privileged.</p>
 </div>
 </section>
 <section id="related-documentation">
@@ -406,7 +406,7 @@ podman<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 <li><p><a class="reference internal" href="omeroserver.html"><span class="doc">OMERO Server Container</span></a> - Server integration</p></li>
 <li><p><a class="reference internal" href="omeroweb.html"><span class="doc">OMERO Web Container</span></a> - Web interface integration</p></li>
 <li><p><a class="reference internal" href="metabase.html"><span class="doc">Metabase Container</span></a> - Analytics and DB browsing</p></li>
-<li><p><a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/OMERO-Automated-Data-Import">OMERO ADI Repository</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Cellular-Imaging-Amsterdam-UMC/BIOMERO.importer">BIOMERO.importer Repository</a></p></li>
 </ul>
 </section>
 </section>

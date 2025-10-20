@@ -202,18 +202,18 @@
 <li class="toctree-l4"><a class="reference internal" href="metabase.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="omeroadi.html">BIOMERO.importer Container</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#import-workflow">Import Workflow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#import-order-creation-and-management">Import order creation and management</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#file-system-monitoring-and-processing">File system monitoring and processing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#configuration">Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#integration-with-omero-server">Integration with OMERO server</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#custom-import-pipeline-development">Custom import pipeline development</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#error-handling-and-retry-mechanisms">Error handling and retry mechanisms</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#testing">Testing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#security-and-runtime-requirements">Security and runtime requirements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#related-documentation">Related Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biomero-importer.html">BIOMERO.importer Container</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#import-workflow">Import Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#import-order-creation-and-management">Import order creation and management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#file-system-monitoring-and-processing">File system monitoring and processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#integration-with-omero-server">Integration with OMERO server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#custom-import-pipeline-development">Custom import pipeline development</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#error-handling-and-retry-mechanisms">Error handling and retry mechanisms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#security-and-runtime-requirements">Security and runtime requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="releases.html">Container Releases</a><ul>
@@ -305,7 +305,7 @@
 <h2>Schema customization<a class="headerlink" href="#schema-customization" title="Permalink to this heading"></a></h2>
 <ul class="simple">
 <li><p>OMERO: The OMERO schema is managed by the OME project. NL-BIOMERO does not alter it. Only OMERO.forms interacts with OMERO data using supported APIs.</p></li>
-<li><p>BIOMERO: Schemas are owned and created via SQLAlchemy by BIOMERO and ADI. Any schema changes or updates must go through SQLAlchemy migrations or model updates.</p></li>
+<li><p>BIOMERO: Schemas are owned and created via SQLAlchemy by BIOMERO and BIOMERO.importer. Any schema changes or updates must go through SQLAlchemy migrations or model updates.</p></li>
 </ul>
 </section>
 <section id="migration">
@@ -375,13 +375,13 @@ psql<span class="w"> </span>-U<span class="w"> </span><span class="s2">&quot;</s
 <span class="c1">-- OMERO DB: count jobs</span>
 <span class="k">SELECT</span><span class="w"> </span><span class="n">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">job</span><span class="p">;</span>
 
-<span class="go">-- BIOMERO DB: inspect recent imports (ADI orders)</span>
+<span class="go">-- BIOMERO DB: inspect recent imports (importer orders)</span>
 <span class="go">SELECT uuid, stage, group_name, user_name, timestamp</span>
 <span class="go">FROM imports</span>
 <span class="go">ORDER BY timestamp DESC</span>
 <span class="go">LIMIT 10;</span>
 
-<span class="go">-- Retry a failed ADI order by setting it back to pending</span>
+<span class="go">-- Retry a failed importer order by setting it back to pending</span>
 <span class="go">UPDATE imports</span>
 <span class="go">SET stage = &#39;Import Pending&#39;</span>
 <span class="go">WHERE uuid = &#39;00000000-0000-0000-0000-000000000000&#39;;</span>

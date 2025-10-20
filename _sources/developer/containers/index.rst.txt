@@ -11,5 +11,5 @@ Detailed development information for each NL-BIOMERO container.
    biomeroworker
    database
    metabase
-   omeroadi
+   biomero-importer
    releases

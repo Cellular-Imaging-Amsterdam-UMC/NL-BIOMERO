@@ -24,7 +24,7 @@ Schema customization
 --------------------
 
 * OMERO: The OMERO schema is managed by the OME project. NL-BIOMERO does not alter it. Only OMERO.forms interacts with OMERO data using supported APIs.
-* BIOMERO: Schemas are owned and created via SQLAlchemy by BIOMERO and ADI. Any schema changes or updates must go through SQLAlchemy migrations or model updates.
+* BIOMERO: Schemas are owned and created via SQLAlchemy by BIOMERO and BIOMERO.importer. Any schema changes or updates must go through SQLAlchemy migrations or model updates.
 
 Migration
 ---------
@@ -106,13 +106,13 @@ Common psql commands:
    -- OMERO DB: count jobs
    SELECT COUNT(*) FROM job;
 
-   -- BIOMERO DB: inspect recent imports (ADI orders)
+   -- BIOMERO DB: inspect recent imports (importer orders)
    SELECT uuid, stage, group_name, user_name, timestamp
    FROM imports
    ORDER BY timestamp DESC
    LIMIT 10;
 
-   -- Retry a failed ADI order by setting it back to pending
+   -- Retry a failed importer order by setting it back to pending
    UPDATE imports
    SET stage = 'Import Pending'
    WHERE uuid = '00000000-0000-0000-0000-000000000000';

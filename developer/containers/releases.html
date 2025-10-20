@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="User Guide" href="../../user/index.html" />
-    <link rel="prev" title="BIOMERO.importer Container" href="omeroadi.html" /> 
+    <link rel="prev" title="BIOMERO.importer Container" href="biomero-importer.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -202,18 +202,18 @@
 <li class="toctree-l4"><a class="reference internal" href="metabase.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="omeroadi.html">BIOMERO.importer Container</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#overview">Overview</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#import-workflow">Import Workflow</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#import-order-creation-and-management">Import order creation and management</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#file-system-monitoring-and-processing">File system monitoring and processing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#configuration">Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#integration-with-omero-server">Integration with OMERO server</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#custom-import-pipeline-development">Custom import pipeline development</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#error-handling-and-retry-mechanisms">Error handling and retry mechanisms</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#testing">Testing</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#security-and-runtime-requirements">Security and runtime requirements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="omeroadi.html#related-documentation">Related Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="biomero-importer.html">BIOMERO.importer Container</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#import-workflow">Import Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#import-order-creation-and-management">Import order creation and management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#file-system-monitoring-and-processing">File system monitoring and processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#configuration">Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#integration-with-omero-server">Integration with OMERO server</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#custom-import-pipeline-development">Custom import pipeline development</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#error-handling-and-retry-mechanisms">Error handling and retry mechanisms</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#testing">Testing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#security-and-runtime-requirements">Security and runtime requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="biomero-importer.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Container Releases</a><ul>
@@ -501,11 +501,11 @@ docker-compose<span class="w"> </span>-f<span class="w"> </span>docker-compose-d
 <li><p><strong>OMERO ADI releases</strong> new version independently</p></li>
 <li><p><strong>Update submodule</strong> reference in NL-BIOMERO:</p></li>
 </ol>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>omeroadi
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>biomero-importer
 git<span class="w"> </span>fetch<span class="w"> </span>origin
 git<span class="w"> </span>checkout<span class="w"> </span>v1.x.x<span class="w">  </span><span class="c1"># Latest ADI release</span>
 <span class="nb">cd</span><span class="w"> </span>..
-git<span class="w"> </span>add<span class="w"> </span>omeroadi
+git<span class="w"> </span>add<span class="w"> </span>biomero-importer
 git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Update OMERO ADI to v1.x.x&quot;</span>
 </pre></div>
 </div>
@@ -533,7 +533,7 @@ git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </sp
 <li><p><code class="docutils literal notranslate"><span class="pre">cellularimagingcf/omeroworker</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cellularimagingcf/omeroweb</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cellularimagingcf/biomero</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cellularimagingcf/omeroadi</span></code> (from separate repo)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cellularimagingcf/biomero-importer</span></code> (from separate repo)</p></li>
 </ul>
 </dd>
 <dt><strong>Tagging Strategy</strong>:</dt><dd><ul class="simple">
@@ -706,7 +706,7 @@ Tag with e.g.
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="omeroadi.html" class="btn btn-neutral float-left" title="BIOMERO.importer Container" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="biomero-importer.html" class="btn btn-neutral float-left" title="BIOMERO.importer Container" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../../user/index.html" class="btn btn-neutral float-right" title="User Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

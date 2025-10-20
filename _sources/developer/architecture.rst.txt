@@ -14,7 +14,7 @@ The platform uses Docker Compose to orchestrate multiple services:
 * **metabase** - Analytics and visualization dashboard (BIOMERO.db)
 * **database** - PostgreSQL for OMERO data
 * **database-biomero** - PostgreSQL for BIOMERO workflows (BIOMERO.db)
-* **omeroadi** - BIOMERO.importer service
+* **biomero-importer** - BIOMERO.importer service
 
 Network Architecture
 --------------------
