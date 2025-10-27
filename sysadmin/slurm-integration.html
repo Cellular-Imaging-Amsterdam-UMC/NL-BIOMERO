@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>System Administration Guide &mdash; NL-BIOMERO latest documentation</title>
+  <title>SLURM Integration &mdash; NL-BIOMERO latest documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -17,8 +17,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Deployment Guide" href="deployment.html" />
-    <link rel="prev" title="Welcome to NL-BIOMERO’s documentation!" href="../index.html" /> 
+    <link rel="next" title="Docker Compose Scenarios" href="docker-compose-scenarios.html" />
+    <link rel="prev" title="OMERO.biomero Plugin Administration" href="omero-biomero-admin.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,7 +42,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">System Administration</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">System Administration Guide</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">System Administration Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="deployment.html">Deployment Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="deployment.html#nl-biomero-deployment-upgrade-guide">NL-BIOMERO Deployment &amp; Upgrade Guide</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="deployment.html#scenario-0-development-demo">Scenario 0: Development &amp; Demo</a></li>
@@ -83,35 +83,35 @@
 <li class="toctree-l3"><a class="reference internal" href="omero-biomero-admin.html#related-documentation">Related Documentation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html">SLURM Integration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#overview">Overview</a></li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#architecture">Architecture</a></li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#configuration">Configuration</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#basic-configuration">Basic Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#container-environment-configuration">Container Environment Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#workflow-definitions">Workflow Definitions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#analytics-and-monitoring">Analytics and Monitoring</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SLURM Integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#basic-configuration">Basic Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#container-environment-configuration">Container Environment Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#workflow-definitions">Workflow Definitions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#analytics-and-monitoring">Analytics and Monitoring</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#deployment-considerations">Deployment Considerations</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#ssh-configuration">SSH Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#directory-structure">Directory Structure</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#permissions-and-access">Permissions and Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deployment-considerations">Deployment Considerations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ssh-configuration">SSH Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#permissions-and-access">Permissions and Access</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#troubleshooting">Troubleshooting</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#common-issues">Common Issues</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#debug-commands">Debug Commands</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#common-issues">Common Issues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#debug-commands">Debug Commands</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#performance-tuning">Performance Tuning</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#resource-allocation">Resource Allocation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#queue-management">Queue Management</a></li>
-<li class="toctree-l4"><a class="reference internal" href="slurm-integration.html#monitoring-and-analytics">Monitoring and Analytics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance-tuning">Performance Tuning</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#resource-allocation">Resource Allocation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#queue-management">Queue Management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#monitoring-and-analytics">Monitoring and Analytics</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#security-considerations">Security Considerations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="slurm-integration.html#further-reading">Further Reading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security-considerations">Security Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#further-reading">Further Reading</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="docker-compose-scenarios.html">Docker Compose Scenarios</a><ul>
@@ -299,9 +299,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">System Administration Guide</li>
+          <li class="breadcrumb-item"><a href="index.html">System Administration Guide</a></li>
+      <li class="breadcrumb-item active">SLURM Integration</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/sysadmin/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/sysadmin/slurm-integration.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -309,63 +310,265 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="system-administration-guide">
-<h1>System Administration Guide<a class="headerlink" href="#system-administration-guide" title="Permalink to this heading"></a></h1>
-<p>Complete guide for deploying and managing NL-BIOMERO infrastructure.</p>
-<p>This section covers all aspects of NL-BIOMERO deployment, from initial setup to ongoing maintenance.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="deployment.html#nl-biomero-deployment-upgrade-guide">NL-BIOMERO Deployment &amp; Upgrade Guide</a></li>
+  <section id="slurm-integration">
+<h1>SLURM Integration<a class="headerlink" href="#slurm-integration" title="Permalink to this heading"></a></h1>
+<p>NL-BIOMERO integrates with High-Performance Computing (HPC) clusters using SLURM for scalable bioimage analysis workflows.</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h2>
+<p>The SLURM integration allows you to:</p>
+<ul class="simple">
+<li><p>Execute computationally intensive workflows on HPC clusters</p></li>
+<li><p>Scale analysis across multiple compute nodes</p></li>
+<li><p>Leverage specialized hardware (GPUs, high-memory nodes)</p></li>
+<li><p>Manage workflow queuing and resource allocation</p></li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="omero-biomero-admin.html">OMERO.biomero Plugin Administration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#accessing-admin-interfaces">Accessing Admin Interfaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#importer-admin-configuration">Importer Admin Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#analyzer-admin-configuration">Analyzer Admin Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#settings-categories">Settings Categories</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#security-considerations">Security Considerations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="omero-biomero-admin.html#related-documentation">Related Documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="slurm-integration.html">SLURM Integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#architecture">Architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#configuration">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#deployment-considerations">Deployment Considerations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#troubleshooting">Troubleshooting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#performance-tuning">Performance Tuning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#security-considerations">Security Considerations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="slurm-integration.html#further-reading">Further Reading</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="docker-compose-scenarios.html">Docker Compose Scenarios</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="docker-compose-scenarios.html#nl-biomero-deployment-scenarios-and-docker-compose-files">NL-BIOMERO Deployment Scenarios and Docker Compose Files</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="linux-deployment.html">Linux/Ubuntu Deployment</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="linux-deployment.html#nlbiomero-ubuntu-linux">NL‑BIOMERO (Ubuntu/Linux) 🚀</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="development-setup.html">Development &amp; Demo Setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="development-setup.html#biomero-101-installation-guide">BIOMERO 101 Installation Guide</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="backup-restore.html">Backup and Restore</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="backup-restore.html#nl-biomero-backup-restore-scripts">NL-BIOMERO Backup &amp; Restore Scripts</a></li>
-</ul>
-</li>
-</ul>
+</section>
+<section id="architecture">
+<h2>Architecture<a class="headerlink" href="#architecture" title="Permalink to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   OMERO Web     │    │  BIOMERO Worker │    │  SLURM Cluster  │
+│                 │    │                 │    │                 │
+│ ┌─────────────┐ │    │ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │ User submits│ │───▶│ │ Workflow    │ │───▶│ │ Job Queue   │ │
+│ │ workflow    │ │    │ │ Manager     │ │    │ │             │ │
+│ └─────────────┘ │    │ └─────────────┘ │    │ └─────────────┘ │
+│                 │    │        │        │    │        │        │
+│ ┌─────────────┐ │    │        ▼        │    │        ▼        │
+│ │ Results     │ │◀───│ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │ Display     │ │    │ │ Progress    │ │◀───│ │ Compute     │ │
+│ └─────────────┘ │    │ │ Tracking    │ │    │ │ Nodes       │ │
+└─────────────────┘    │ └─────────────┘ │    │ └─────────────┘ │
+                       └─────────────────┘    └─────────────────┘
+</pre></div>
 </div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<p>SLURM integration is configured through <code class="docutils literal notranslate"><span class="pre">slurm-config.ini</span></code> files located in:</p>
+<ul class="simple">
+<li><p><strong>Web interface</strong>: <code class="docutils literal notranslate"><span class="pre">/NL-BIOMERO/web/slurm-config.ini</span></code></p></li>
+<li><p><strong>Worker service</strong>: <code class="docutils literal notranslate"><span class="pre">/NL-BIOMERO/biomeroworker/slurm-config.ini</span></code></p></li>
+</ul>
+<section id="basic-configuration">
+<h3>Basic Configuration<a class="headerlink" href="#basic-configuration" title="Permalink to this heading"></a></h3>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[SSH]</span>
+<span class="c1"># SLURM cluster connection</span>
+<span class="na">host</span><span class="o">=</span><span class="s">localslurm</span>
+
+<span class="k">[SLURM]</span>
+<span class="c1"># Storage paths on SLURM cluster</span>
+<span class="na">slurm_data_path</span><span class="o">=</span><span class="s">/data/my-scratch/data</span>
+<span class="na">slurm_images_path</span><span class="o">=</span><span class="s">/data/my-scratch/singularity_images/workflows</span>
+<span class="na">slurm_converters_path</span><span class="o">=</span><span class="s">/data/my-scratch/singularity_images/converters</span>
+<span class="na">slurm_script_path</span><span class="o">=</span><span class="s">/data/my-scratch/slurm-scripts</span>
+</pre></div>
+</div>
+</section>
+<section id="container-environment-configuration">
+<h3>Container Environment Configuration<a class="headerlink" href="#container-environment-configuration" title="Permalink to this heading"></a></h3>
+<p>For environments requiring explicit container path binding:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[SLURM]</span>
+<span class="c1"># Required when containers need explicit path binding</span>
+<span class="c1"># Sets APPTAINER_BINDPATH environment variable</span>
+<span class="na">slurm_data_bind_path</span><span class="o">=</span><span class="s">/data/my-scratch/data</span>
+
+<span class="c1"># Optional: specify partition for conversion jobs</span>
+<span class="na">slurm_conversion_partition</span><span class="o">=</span><span class="s">cpu-short</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Configure <code class="docutils literal notranslate"><span class="pre">slurm_data_bind_path</span></code> only when your HPC administrator requires setting the <code class="docutils literal notranslate"><span class="pre">APPTAINER_BINDPATH</span></code> environment variable.</p>
+</div>
+</section>
+<section id="workflow-definitions">
+<h3>Workflow Definitions<a class="headerlink" href="#workflow-definitions" title="Permalink to this heading"></a></h3>
+<p>Available workflows are defined in the <code class="docutils literal notranslate"><span class="pre">[MODELS]</span></code> section:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[MODELS]</span>
+<span class="c1"># Cellpose segmentation workflow</span>
+<span class="na">cellpose</span><span class="o">=</span><span class="s">cellpose</span>
+<span class="na">cellpose_repo</span><span class="o">=</span><span class="s">https://github.com/TorecLuik/W_NucleiSegmentation-Cellpose/tree/v1.4.0</span>
+<span class="na">cellpose_job</span><span class="o">=</span><span class="s">jobs/cellpose.sh</span>
+<span class="na">cellpose_job_mem</span><span class="o">=</span><span class="s">4GB</span>
+
+<span class="c1"># StarDist segmentation workflow</span>
+<span class="na">stardist</span><span class="o">=</span><span class="s">stardist</span>
+<span class="na">stardist_repo</span><span class="o">=</span><span class="s">https://github.com/Neubias-WG5/W_NucleiSegmentation-Stardist/tree/v1.3.2</span>
+<span class="na">stardist_job</span><span class="o">=</span><span class="s">jobs/stardist.sh</span>
+</pre></div>
+</div>
+</section>
+<section id="analytics-and-monitoring">
+<h3>Analytics and Monitoring<a class="headerlink" href="#analytics-and-monitoring" title="Permalink to this heading"></a></h3>
+<p>Enable workflow tracking and analytics:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ANALYTICS]</span>
+<span class="c1"># Enable workflow tracking</span>
+<span class="na">track_workflows</span><span class="o">=</span><span class="s">True</span>
+
+<span class="c1"># Enable specific monitoring features</span>
+<span class="na">enable_job_accounting</span><span class="o">=</span><span class="s">True</span>
+<span class="na">enable_job_progress</span><span class="o">=</span><span class="s">True</span>
+<span class="na">enable_workflow_analytics</span><span class="o">=</span><span class="s">True</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="deployment-considerations">
+<h2>Deployment Considerations<a class="headerlink" href="#deployment-considerations" title="Permalink to this heading"></a></h2>
+<section id="ssh-configuration">
+<h3>SSH Configuration<a class="headerlink" href="#ssh-configuration" title="Permalink to this heading"></a></h3>
+<p>Configure SSH access to your SLURM cluster:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># In ~/.ssh/config</span>
+Host<span class="w"> </span>localslurm
+<span class="w">    </span>HostName<span class="w"> </span>your-slurm-cluster.example.com
+<span class="w">    </span>User<span class="w"> </span>your-username
+<span class="w">    </span>IdentityFile<span class="w"> </span>~/.ssh/id_rsa_slurm
+<span class="w">    </span>Port<span class="w"> </span><span class="m">22</span>
+</pre></div>
+</div>
+</section>
+<section id="directory-structure">
+<h3>Directory Structure<a class="headerlink" href="#directory-structure" title="Permalink to this heading"></a></h3>
+<p>Ensure required directories exist on the SLURM cluster:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create directory structure</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>/data/my-scratch/<span class="o">{</span>data,singularity_images/<span class="o">{</span>workflows,converters<span class="o">}</span>,slurm-scripts<span class="o">}</span>
+</pre></div>
+</div>
+</section>
+<section id="permissions-and-access">
+<h3>Permissions and Access<a class="headerlink" href="#permissions-and-access" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Verify the BIOMERO worker can SSH to the SLURM cluster</p></li>
+<li><p>Ensure read/write access to configured directories</p></li>
+<li><p>Check SLURM account permissions and quotas</p></li>
+</ul>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permalink to this heading"></a></h2>
+<section id="common-issues">
+<h3>Common Issues<a class="headerlink" href="#common-issues" title="Permalink to this heading"></a></h3>
+<p><strong>Container Access Errors</strong></p>
+<p>If workflows fail with file access errors:</p>
+<ol class="arabic">
+<li><p>Configure explicit path binding:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[SLURM]</span>
+<span class="na">slurm_data_bind_path</span><span class="o">=</span><span class="s">/data/my-scratch/data</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify directory permissions on the SLURM cluster</p></li>
+<li><p>Check if Singularity/Apptainer can access the data directory</p></li>
+</ol>
+<p><strong>SSH Connection Failures</strong></p>
+<p>If the worker cannot connect to SLURM:</p>
+<ol class="arabic simple">
+<li><p>Test SSH connection manually from the worker container</p></li>
+<li><p>Verify SSH key authentication</p></li>
+<li><p>Check network connectivity and firewall rules</p></li>
+</ol>
+<p><strong>Job Submission Issues</strong></p>
+<p>If jobs fail to submit:</p>
+<ol class="arabic simple">
+<li><p>Verify SLURM account and partition access</p></li>
+<li><p>Check resource request limits (memory, GPU, etc.)</p></li>
+<li><p>Review SLURM queue policies and restrictions</p></li>
+</ol>
+<p><strong>Workflow Execution Failures</strong></p>
+<p>If submitted jobs fail during execution:</p>
+<ol class="arabic simple">
+<li><p>Check SLURM job logs for errors</p></li>
+<li><p>Verify container images are accessible</p></li>
+<li><p>Ensure input data is properly transferred</p></li>
+</ol>
+</section>
+<section id="debug-commands">
+<h3>Debug Commands<a class="headerlink" href="#debug-commands" title="Permalink to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Test SSH connection</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>biomeroworker<span class="w"> </span>ssh<span class="w"> </span>localslurm
+
+<span class="c1"># Check SLURM status</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>biomeroworker<span class="w"> </span>ssh<span class="w"> </span>localslurm<span class="w"> </span><span class="s2">&quot;squeue -u </span><span class="nv">$USER</span><span class="s2">&quot;</span>
+
+<span class="c1"># View job details</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>biomeroworker<span class="w"> </span>ssh<span class="w"> </span>localslurm<span class="w"> </span><span class="s2">&quot;scontrol show job JOBID&quot;</span>
+
+<span class="c1"># Check directory permissions</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>biomeroworker<span class="w"> </span>ssh<span class="w"> </span>localslurm<span class="w"> </span><span class="s2">&quot;ls -la /data/my-scratch/&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="performance-tuning">
+<h2>Performance Tuning<a class="headerlink" href="#performance-tuning" title="Permalink to this heading"></a></h2>
+<section id="resource-allocation">
+<h3>Resource Allocation<a class="headerlink" href="#resource-allocation" title="Permalink to this heading"></a></h3>
+<p>Optimize resource requests for different workflow types:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[MODELS]</span>
+<span class="c1"># CPU-intensive workflow</span>
+<span class="na">cellprofiler_job_mem</span><span class="o">=</span><span class="s">32GB</span>
+<span class="na">cellprofiler_job_time</span><span class="o">=</span><span class="s">02:00:00</span>
+
+<span class="c1"># GPU workflow</span>
+<span class="na">cellpose_job_gres</span><span class="o">=</span><span class="s">gpu:1g.10gb:1</span>
+<span class="na">cellpose_job_partition</span><span class="o">=</span><span class="s">gpu-partition</span>
+
+<span class="c1"># Memory-intensive workflow</span>
+<span class="na">stardist_job_mem</span><span class="o">=</span><span class="s">64GB</span>
+<span class="na">stardist_job_partition</span><span class="o">=</span><span class="s">himem</span>
+</pre></div>
+</div>
+</section>
+<section id="queue-management">
+<h3>Queue Management<a class="headerlink" href="#queue-management" title="Permalink to this heading"></a></h3>
+<ul class="simple">
+<li><p>Use appropriate partitions for different workflow types</p></li>
+<li><p>Configure job time limits based on expected runtime</p></li>
+<li><p>Consider using job arrays for batch processing</p></li>
+</ul>
+</section>
+<section id="monitoring-and-analytics">
+<h3>Monitoring and Analytics<a class="headerlink" href="#monitoring-and-analytics" title="Permalink to this heading"></a></h3>
+<p>Enable comprehensive monitoring:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[ANALYTICS]</span>
+<span class="na">track_workflows</span><span class="o">=</span><span class="s">True</span>
+<span class="na">enable_job_accounting</span><span class="o">=</span><span class="s">True</span>
+<span class="na">enable_job_progress</span><span class="o">=</span><span class="s">True</span>
+<span class="na">enable_workflow_analytics</span><span class="o">=</span><span class="s">True</span>
+
+<span class="c1"># Optional: specify analytics database</span>
+<span class="na">sqlalchemy_url</span><span class="o">=</span><span class="s">postgresql://user:pass@db:5432/analytics</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="security-considerations">
+<h2>Security Considerations<a class="headerlink" href="#security-considerations" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Use SSH key authentication instead of passwords</p></li>
+<li><p>Restrict SSH access to specific users and commands</p></li>
+<li><p>Configure firewall rules to limit network access</p></li>
+<li><p>Regularly rotate SSH keys and credentials</p></li>
+<li><p>Monitor access logs for suspicious activity</p></li>
+</ul>
+</section>
+<section id="further-reading">
+<h2>Further Reading<a class="headerlink" href="#further-reading" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../developer/containers/biomeroworker.html"><span class="doc">BIOMERO Worker Container</span></a> - Worker container details</p></li>
+<li><p><a class="reference internal" href="omero-biomero-admin.html"><span class="doc">OMERO.biomero Plugin Administration</span></a> - Administrative procedures</p></li>
+<li><p><a class="reference external" href="https://slurm.schedmd.com/documentation.html">SLURM Documentation</a></p></li>
+<li><p><a class="reference external" href="https://docs.sylabs.io/guides/latest/user-guide/">Singularity User Guide</a></p></li>
+</ul>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to NL-BIOMERO’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="deployment.html" class="btn btn-neutral float-right" title="Deployment Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="omero-biomero-admin.html" class="btn btn-neutral float-left" title="OMERO.biomero Plugin Administration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="docker-compose-scenarios.html" class="btn btn-neutral float-right" title="Docker Compose Scenarios" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
